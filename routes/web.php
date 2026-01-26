@@ -4,11 +4,21 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Client\TicketController as ClientTicketController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController; // ✅ Novo import
+use App\Http\Controllers\Public\FaqController;
+use App\Http\Controllers\Public\LegalController;
 
 Route::view('/', 'public.home')->name('home');
 Route::view('/servicos', 'public.services')->name('services');
 Route::view('/portfolio', 'public.portfolio')->name('portfolio');
 Route::view('/contato', 'public.contact')->name('contact');
+Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+
+// Páginas Legais
+Route::get('/termos-de-uso', [LegalController::class, 'terms'])->name('terms');
+Route::get('/privacidade', [LegalController::class, 'privacy'])->name('privacy');
+Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
+
+
 
 /**
  * CLIENTE
