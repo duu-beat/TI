@@ -6,41 +6,52 @@
    📊 Dashboard
 </a>
 
-
     <a href="{{ route('admin.tickets.index') }}"
        class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10">
         🎫 Chamados
     </a>
 @endsection
 
-@section('title', 'Dashboard administrativo ')
-
+@section('title', 'Dashboard administrativo')
 
 @section('content')
 @php
     $tickets = \App\Models\Ticket::query();
 
-    $countNew = (clone $tickets)->where('status','new')->count();
-    $countInProgress = (clone $tickets)->where('status','in_progress')->count();
-    $countWaiting = (clone $tickets)->where('status','waiting_client')->count();
-    $countResolved = (clone $tickets)->whereIn('status',['resolved','closed'])->count();
+    // 1. Contagens Individuais para os Cards (CORREÇÃO AQUI)
+    // Precisamos destas variáveis separadas para os cards HTML funcionarem
+    $countNew = (clone $tickets)->where('status', \App\Enums\TicketStatus::NEW)->count();
+    $countInProgress = (clone $tickets)->where('status', \App\Enums\TicketStatus::IN_PROGRESS)->count();
+    $countWaiting = (clone $tickets)->where('status', \App\Enums\TicketStatus::WAITING_CLIENT)->count();
+    $countResolved = (clone $tickets)->whereIn('status', [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED])->count();
 
-    $queue = (clone $tickets)->with('user')->latest()->take(8)->get();
+    // 2. Dados para o Gráfico de Volume (Últimos 7 dias)
+    $dailyTickets = \App\Models\Ticket::selectRaw('DATE(created_at) as date, count(*) as total')
+        ->where('created_at', '>=', now()->subDays(7))
+        ->groupBy('date')
+        ->orderBy('date')
+        ->get();
 
+    $chartLabels = [];
+    $chartValues = [];
+    
+    // Loop para preencher os últimos 7 dias (mesmo os vazios)
+    for ($i = 6; $i >= 0; $i--) {
+        $date = now()->subDays($i)->format('Y-m-d');
+        $prettyDate = now()->subDays($i)->format('d/m');
+        $chartLabels[] = $prettyDate;
+        $chartValues[] = $dailyTickets->where('date', $date)->first()->total ?? 0;
+    }
+
+    // Fila de chamados recentes
+    $queue = (clone $tickets)->with('user')->latest()->take(6)->get();
+    
     $statusColors = [
-        'new' => 'bg-indigo-500/20 text-indigo-300',
-        'in_progress' => 'bg-cyan-500/20 text-cyan-300',
-        'waiting_client' => 'bg-yellow-500/20 text-yellow-300',
-        'resolved' => 'bg-emerald-500/20 text-emerald-300',
-        'closed' => 'bg-slate-500/20 text-slate-300',
-    ];
-
-    $statusLabels = [
-        'new' => 'Novo',
-        'in_progress' => 'Em andamento',
-        'waiting_client' => 'Aguardando cliente',
-        'resolved' => 'Resolvido',
-        'closed' => 'Fechado',
+        'new' => 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
+        'in_progress' => 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30',
+        'waiting_client' => 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+        'resolved' => 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+        'closed' => 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
     ];
 @endphp
 
@@ -63,6 +74,7 @@
     </div>
 </div>
 
+{{-- CARDS DE STATUS --}}
 <div class="grid lg:grid-cols-4 gap-6 mb-6">
     <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
         <div class="text-sm text-slate-400">Novos</div>
@@ -89,6 +101,26 @@
     </div>
 </div>
 
+{{-- GRÁFICOS (Chart.js) --}}
+<div class="grid lg:grid-cols-3 gap-6 mb-6">
+    {{-- Gráfico 1: Status (Rosca) --}}
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h3 class="text-sm font-semibold text-slate-300 mb-4">Distribuição de Status</h3>
+        <div class="relative h-64">
+            <canvas id="statusChart"></canvas>
+        </div>
+    </div>
+
+    {{-- Gráfico 2: Volume Semanal (Barras) --}}
+    <div class="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-6">
+        <h3 class="text-sm font-semibold text-slate-300 mb-4">Chamados nos últimos 7 dias</h3>
+        <div class="relative h-64">
+            <canvas id="weeklyChart"></canvas>
+        </div>
+    </div>
+</div>
+
+{{-- LISTA E ATALHOS --}}
 <div class="grid lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 rounded-2xl bg-white/5 border border-white/10 p-6">
         <div class="flex items-center justify-between gap-4 flex-wrap">
@@ -101,17 +133,17 @@
         <div class="mt-4 space-y-3">
             @forelse($queue as $ticket)
                 <a href="{{ route('admin.tickets.show', $ticket) }}"
-                   class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition">
+                   class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition group">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <div class="font-semibold text-white">{{ $ticket->subject }}</div>
+                            <div class="font-semibold text-white group-hover:text-cyan-400 transition">{{ $ticket->subject }}</div>
                             <div class="mt-1 text-xs text-slate-400">
                                 {{ $ticket->user->name }} • {{ $ticket->created_at->format('d/m/Y H:i') }}
                             </div>
                         </div>
 
-                        <span class="text-xs rounded-full px-3 py-1 font-medium {{ $statusColors[$ticket->status] ?? 'bg-white/10 text-slate-200' }}">
-                            {{ $statusLabels[$ticket->status] ?? ucfirst(str_replace('_',' ', $ticket->status)) }}
+                        <span class="text-xs rounded-full px-3 py-1 font-medium {{ $statusColors[$ticket->status->value] ?? 'bg-white/10 text-slate-200' }}">
+                            {{ $ticket->status->label() }}
                         </span>
                     </div>
                 </a>
@@ -139,14 +171,57 @@
                     Responde e deixa em “Aguardando cliente” pra manter a fila organizada.
                 </div>
             </div>
-
-            <div class="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                <div class="font-semibold text-white">Padrão de resposta</div>
-                <div class="mt-1 text-sm text-slate-400">
-                    Pergunte: quando começou, se houve atualização, e se aparece mensagem de erro.
-                </div>
-            </div>
         </div>
     </div>
 </div>
+
+{{-- SCRIPT DOS GRÁFICOS --}}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    Chart.defaults.color = '#94a3b8';
+    Chart.defaults.borderColor = '#334155';
+
+    // Gráfico de Status
+    new Chart(document.getElementById('statusChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Novos', 'Em Andamento', 'Resolvidos'],
+            datasets: [{
+                // Aqui somamos "In Progress" + "Waiting" para simplificar o gráfico visualmente
+                data: [{{ $countNew }}, {{ $countInProgress + $countWaiting }}, {{ $countResolved }}],
+                backgroundColor: ['#818cf8', '#22d3ee', '#34d399'], 
+                borderWidth: 0,
+                hoverOffset: 4
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: { legend: { position: 'bottom' } }
+        }
+    });
+
+    // Gráfico Semanal
+    new Chart(document.getElementById('weeklyChart'), {
+        type: 'bar',
+        data: {
+            labels: @json($chartLabels),
+            datasets: [{
+                label: 'Chamados',
+                data: @json($chartValues),
+                backgroundColor: '#38bdf8',
+                borderRadius: 4,
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: { beginAtZero: true, grid: { color: '#1e293b' } },
+                x: { grid: { display: false } }
+            },
+            plugins: { legend: { display: false } }
+        }
+    });
+</script>
 @endsection

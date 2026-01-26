@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Client\TicketController as ClientTicketController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
+use App\Http\Controllers\Admin\AuthController as AdminAuthController; // ✅ Novo import
 
 Route::view('/', 'public.home')->name('home');
 Route::view('/servicos', 'public.services')->name('services');
@@ -24,31 +24,33 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('client.')->group(f
 });
 
 /**
- * ADMIN (login próprio em /admin)
- * - se não estiver logado: mostra auth.admin-login
- * - se estiver logado e for admin: manda pro dashboard
- * - se estiver logado e NÃO for admin: 403
+ * ADMIN - Autenticação e Painel
  */
-Route::get('/admin', function () {
-    if (!Auth::check()) {
-        return view('auth.admin-login');
-    }
+Route::prefix('admin')->name('admin.')->group(function () {
+    
+    // 1. Rota Raiz: Ao acessar "/admin", redireciona para o login
+    Route::get('/', function () {
+        return redirect()->route('admin.login');
+    });
 
-    if (Auth::user()->role !== 'admin') {
-        abort(403);
-    }
+    // 2. Rotas de Autenticação (Ficam em /admin/login)
+    Route::middleware('guest')->group(function () {
+        Route::get('/login', [AdminAuthController::class, 'create'])->name('login');
+        Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store');
+    });
 
-    return redirect()->route('admin.dashboard');
-})->name('admin.login');
+    // 3. Logout
+    Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
 
-/**
- * ADMIN (área protegida)
- */
-Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
-    Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
-
-    Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');
-    Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
-    Route::post('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.status');
-    Route::post('/chamados/{ticket}/responder', [AdminTicketController::class, 'reply'])->name('tickets.reply');
+    // 4. Área Protegida
+    Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+        Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+        
+        // Rotas de Chamados
+        Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');
+        Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
+        Route::post('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.status');
+        Route::post('/chamados/{ticket}/responder', [AdminTicketController::class, 'reply'])->name('tickets.reply');
+        Route::get('/relatorio', [AdminTicketController::class, 'report'])->name('tickets.report');
+    });
 });

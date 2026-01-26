@@ -2,7 +2,7 @@
 
 @section('menu')
     <a href="{{ route('client.dashboard') }}"
-       class="block rounded-xl px-4 py-2 bg-white/10 text-white">
+       class="block rounded-xl px-4 py-2 bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 text-white border border-white/10">
         🏠 Início
     </a>
 
@@ -14,33 +14,36 @@
 
 @section('title', 'Minha conta')
 
-
 @section('content')
 @php
     $user = auth()->user();
-
+    
+    // Importante: usar os Enums para garantir consistência
     $ticketsQuery = \App\Models\Ticket::query()->where('user_id', $user->id);
 
-    $countOpen = (clone $ticketsQuery)->whereIn('status', ['new','in_progress','waiting_client'])->count();
-    $countInProgress = (clone $ticketsQuery)->where('status', 'in_progress')->count();
-    $countResolved = (clone $ticketsQuery)->whereIn('status', ['resolved','closed'])->count();
+    // Contagens
+    $countOpen = (clone $ticketsQuery)->whereIn('status', [
+        \App\Enums\TicketStatus::NEW, 
+        \App\Enums\TicketStatus::IN_PROGRESS, 
+        \App\Enums\TicketStatus::WAITING_CLIENT
+    ])->count();
+    
+    $countInProgress = (clone $ticketsQuery)->where('status', \App\Enums\TicketStatus::IN_PROGRESS)->count();
+    
+    $countResolved = (clone $ticketsQuery)->whereIn('status', [
+        \App\Enums\TicketStatus::RESOLVED, 
+        \App\Enums\TicketStatus::CLOSED
+    ])->count();
 
     $recentTickets = (clone $ticketsQuery)->latest()->take(5)->get();
 
+    // Definição de cores usando os valores do Enum (strings)
     $statusColors = [
-        'new' => 'bg-indigo-500/20 text-indigo-300',
-        'in_progress' => 'bg-cyan-500/20 text-cyan-300',
-        'waiting_client' => 'bg-yellow-500/20 text-yellow-300',
-        'resolved' => 'bg-emerald-500/20 text-emerald-300',
-        'closed' => 'bg-slate-500/20 text-slate-300',
-    ];
-
-    $statusLabels = [
-        'new' => 'Novo',
-        'in_progress' => 'Em andamento',
-        'waiting_client' => 'Aguardando você',
-        'resolved' => 'Resolvido',
-        'closed' => 'Fechado',
+        'new' => 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
+        'in_progress' => 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30',
+        'waiting_client' => 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
+        'resolved' => 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
+        'closed' => 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
     ];
 @endphp
 
@@ -71,7 +74,7 @@
     <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
         <div class="text-sm text-slate-400">Chamados em aberto</div>
         <div class="mt-2 text-3xl font-bold text-white">{{ $countOpen }}</div>
-        <div class="mt-2 text-xs text-slate-400">Inclui novos, em andamento e aguardando você.</div>
+        <div class="mt-2 text-xs text-slate-400">Inclui novos, em andamento e aguardando.</div>
     </div>
 
     <div class="rounded-2xl bg-white/5 border border-white/10 p-5">
@@ -99,22 +102,23 @@
         <div class="mt-4 space-y-3">
             @forelse($recentTickets as $ticket)
                 <a href="{{ route('client.tickets.show', $ticket) }}"
-                   class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition">
+                   class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition group">
                     <div class="flex items-start justify-between gap-4">
                         <div>
-                            <div class="font-semibold text-white">{{ $ticket->subject }}</div>
+                            <div class="font-semibold text-white group-hover:text-cyan-400 transition">{{ $ticket->subject }}</div>
                             <div class="mt-1 text-xs text-slate-400">
                                 {{ $ticket->created_at->format('d/m/Y H:i') }}
                             </div>
                         </div>
 
-                        <span class="text-xs rounded-full px-3 py-1 font-medium {{ $statusColors[$ticket->status] ?? 'bg-white/10 text-slate-200' }}">
-                            {{ $statusLabels[$ticket->status] ?? ucfirst(str_replace('_',' ', $ticket->status)) }}
+                        {{-- Correção aqui: Acessar ->value para o array e ->label() para o texto --}}
+                        <span class="text-xs rounded-full px-3 py-1 font-medium {{ $statusColors[$ticket->status->value] ?? 'bg-white/10 text-slate-200' }}">
+                            {{ $ticket->status->label() }}
                         </span>
                     </div>
                 </a>
             @empty
-                <div class="text-sm text-slate-300">
+                <div class="text-sm text-slate-300 py-4">
                     Você ainda não tem chamados. Bora abrir o primeiro 😉
                 </div>
             @endforelse

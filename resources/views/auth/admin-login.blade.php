@@ -7,10 +7,11 @@
 >
     <x-validation-errors class="mb-4 text-red-200" />
 
-    <form method="POST" action="{{ route('login') }}" class="space-y-4">
+    {{-- ✅ Rota atualizada para admin.login.store --}}
+    <form method="POST" action="{{ route('admin.login.store') }}" class="space-y-4">
         @csrf
 
-        <input type="hidden" name="admin_login" value="1">
+        {{-- O input hidden 'admin_login' já não é necessário, podes apagar --}}
 
         <div>
             <label class="text-sm text-slate-300">Email</label>
