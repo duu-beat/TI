@@ -3,6 +3,11 @@
 @section('menu')
     <a href="{{ route('admin.dashboard') }}" class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">📊 Dashboard</a>
     <a href="{{ route('admin.tickets.index') }}" class="block rounded-xl px-4 py-2 bg-white/10 text-white font-medium shadow-lg shadow-black/20">🎫 Chamados</a>
+    {{-- Link Novo: Perfil --}}
+    <a href="{{ route('profile.show') }}"
+       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
+        👤 Meu Perfil
+    </a>
 @endsection
 
 @section('title', 'Quadro de Chamados')

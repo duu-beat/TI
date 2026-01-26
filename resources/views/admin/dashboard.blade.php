@@ -10,6 +10,12 @@
        class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10">
         🎫 Chamados
     </a>
+
+    {{-- Link Novo: Perfil --}}
+    <a href="{{ route('profile.show') }}"
+       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
+        👤 Meu Perfil
+    </a>
 @endsection
 
 @section('title', 'Dashboard administrativo')
@@ -18,11 +24,13 @@
 @php
     $tickets = \App\Models\Ticket::query();
 
+    // Contagens
     $countNew = (clone $tickets)->where('status', \App\Enums\TicketStatus::NEW)->count();
     $countInProgress = (clone $tickets)->where('status', \App\Enums\TicketStatus::IN_PROGRESS)->count();
     $countWaiting = (clone $tickets)->where('status', \App\Enums\TicketStatus::WAITING_CLIENT)->count();
     $countResolved = (clone $tickets)->whereIn('status', [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED])->count();
 
+    // Dados do Gráfico
     $dailyTickets = \App\Models\Ticket::selectRaw('DATE(created_at) as date, count(*) as total')
         ->where('created_at', '>=', now()->subDays(7))
         ->groupBy('date')
@@ -57,34 +65,18 @@
          1. ESTADO DE LOADING (Skeleton)
          ======================== --}}
     <div x-show="!loaded" class="space-y-6 animate-pulse">
-        {{-- Banner --}}
         <x-skeleton class="h-32 rounded-3xl" />
-
-        {{-- Stats Grid (4 cards) --}}
         <div class="grid lg:grid-cols-4 gap-6">
-            <x-skeleton class="h-32 rounded-2xl" />
-            <x-skeleton class="h-32 rounded-2xl" />
-            <x-skeleton class="h-32 rounded-2xl" />
-            <x-skeleton class="h-32 rounded-2xl" />
+            <x-skeleton class="h-32 rounded-2xl" /><x-skeleton class="h-32 rounded-2xl" /><x-skeleton class="h-32 rounded-2xl" /><x-skeleton class="h-32 rounded-2xl" />
         </div>
-
-        {{-- Charts --}}
         <div class="grid lg:grid-cols-3 gap-6">
-            <x-skeleton class="h-64 rounded-2xl" />
-            <x-skeleton class="lg:col-span-2 h-64 rounded-2xl" />
+            <x-skeleton class="h-64 rounded-2xl" /><x-skeleton class="lg:col-span-2 h-64 rounded-2xl" />
         </div>
-
-        {{-- List --}}
         <div class="grid lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 space-y-4">
-                 <x-skeleton class="h-8 w-40 mb-2" />
-                 <x-skeleton type="card" />
-                 <x-skeleton type="card" />
-                 <x-skeleton type="card" />
+                 <x-skeleton class="h-8 w-40 mb-2" /><x-skeleton type="card" /><x-skeleton type="card" /><x-skeleton type="card" />
             </div>
-            <div>
-                 <x-skeleton class="h-48 rounded-2xl" />
-            </div>
+            <div><x-skeleton class="h-48 rounded-2xl" /></div>
         </div>
     </div>
 
@@ -96,6 +88,15 @@
          x-transition:enter="transition ease-out duration-500"
          x-transition:enter-start="opacity-0 translate-y-4"
          x-transition:enter-end="opacity-100 translate-y-0">
+
+        {{-- Top Bar Navigation (NOVO) --}}
+        <div class="flex items-center justify-between mb-6">
+            <div class="text-sm text-slate-400">Painel Administrativo</div>
+            <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+                Ir para o Site
+            </a>
+        </div>
 
         {{-- Banner Summary --}}
         <div class="rounded-3xl border border-white/10 bg-white/5 p-6 mb-6">
@@ -109,8 +110,13 @@
                 </div>
 
                 <div class="flex gap-3 flex-wrap">
+                    {{-- Botão Configurações (Perfil) --}}
+                    <a href="{{ route('profile.show') }}" class="rounded-2xl bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition flex items-center gap-2">
+                        ⚙️ Configurações
+                    </a>
+                    
                     <a href="{{ route('admin.tickets.index') }}"
-                       class="rounded-2xl bg-white/10 px-5 py-3 text-sm font-semibold text-white hover:bg-white/15 transition">
+                       class="rounded-2xl bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/15 transition">
                         Gerenciar chamados
                     </a>
                 </div>
@@ -198,22 +204,27 @@
                 </div>
             </div>
 
-            <div class="rounded-2xl bg-white/5 border border-white/10 p-6">
-                <h2 class="text-lg font-semibold text-white">Atalhos</h2>
-
-                <div class="mt-4 space-y-3">
-                    <a href="{{ route('admin.tickets.index') }}"
-                       class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition hover:border-white/20">
-                        <div class="font-semibold text-white">Abrir fila de chamados</div>
-                        <div class="mt-1 text-sm text-slate-400">Filtrar, responder e atualizar status.</div>
-                    </a>
-
-                    <div class="rounded-2xl border border-white/10 bg-slate-950/30 p-4">
-                        <div class="font-semibold text-white">Sugestão</div>
-                        <div class="mt-1 text-sm text-slate-400">
-                            Responde e deixa em “Aguardando cliente” pra manter a fila organizada.
-                        </div>
+            {{-- Atalhos e Sistema --}}
+            <div class="rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-white mb-4">Atalhos</h2>
+                    <div class="space-y-3">
+                        <a href="{{ route('admin.tickets.index') }}"
+                           class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition hover:border-white/20">
+                            <div class="font-semibold text-white">Abrir fila de chamados</div>
+                            <div class="mt-1 text-sm text-slate-400">Filtrar, responder e atualizar status.</div>
+                        </a>
                     </div>
+                </div>
+
+                {{-- Logout Button --}}
+                <div class="mt-6 pt-6 border-t border-white/5">
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button type="submit" class="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition group">
+                            <span>🚪</span> Sair do Painel
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

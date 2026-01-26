@@ -1,47 +1,32 @@
 <x-action-section>
-    <x-slot name="title">
-        {{ __('Browser Sessions') }}
-    </x-slot>
-
-    <x-slot name="description">
-        {{ __('Manage and log out your active sessions on other browsers and devices.') }}
-    </x-slot>
+    <x-slot name="title">{{ __('Sessões Ativas') }}</x-slot>
+    <x-slot name="description">{{ __('Gerencie onde sua conta está conectada.') }}</x-slot>
 
     <x-slot name="content">
-        <div class="max-w-xl text-sm text-gray-600">
-            {{ __('If necessary, you may log out of all of your other browser sessions across all of your devices. Some of your recent sessions are listed below; however, this list may not be exhaustive. If you feel your account has been compromised, you should also update your password.') }}
+        <div class="max-w-xl text-sm text-slate-400 mb-6">
+            {{ __('Lista de dispositivos conectados recentemente.') }}
         </div>
 
         @if (count($this->sessions) > 0)
-            <div class="mt-5 space-y-6">
-                <!-- Other Browser Sessions -->
+            <div class="space-y-3">
                 @foreach ($this->sessions as $session)
-                    <div class="flex items-center">
-                        <div>
-                            @if ($session->agent->isDesktop())
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-gray-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 01-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0115 18.257V17.25m6-12V15a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 15V5.25m18 0A2.25 2.25 0 0018.75 3H5.25A2.25 2.25 0 003 5.25m18 0V12a2.25 2.25 0 01-2.25 2.25H5.25A2.25 2.25 0 013 12V5.25" />
-                                </svg>
-                            @else
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-8 text-gray-500">
-                                    <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 1.5H8.25A2.25 2.25 0 006 3.75v16.5a2.25 2.25 0 002.25 2.25h7.5A2.25 2.25 0 0018 20.25V3.75a2.25 2.25 0 00-2.25-2.25H13.5m-3 0V3h3V1.5m-3 0h3m-3 18.75h3" />
-                                </svg>
-                            @endif
-                        </div>
-
-                        <div class="ms-3">
-                            <div class="text-sm text-gray-600">
-                                {{ $session->agent->platform() ? $session->agent->platform() : __('Unknown') }} - {{ $session->agent->browser() ? $session->agent->browser() : __('Unknown') }}
+                    <div class="flex items-center justify-between p-4 rounded-2xl bg-slate-950/30 border {{ $session->is_current_device ? 'border-cyan-500/30 bg-cyan-500/5' : 'border-white/5' }} transition hover:border-white/10">
+                        <div class="flex items-center gap-4">
+                            <div class="h-10 w-10 rounded-xl flex items-center justify-center text-xl {{ $session->is_current_device ? 'bg-cyan-500/20 text-cyan-400' : 'bg-white/5 text-slate-500' }}">
+                                @if ($session->agent->isDesktop()) 💻 @else 📱 @endif
                             </div>
-
                             <div>
-                                <div class="text-xs text-gray-500">
-                                    {{ $session->ip_address }},
-
+                                <div class="text-sm font-bold text-white flex items-center gap-2">
+                                    {{ $session->agent->platform() ?: 'Desconhecido' }} 
+                                    <span class="w-1 h-1 rounded-full bg-slate-600"></span> 
+                                    {{ $session->agent->browser() ?: 'Desconhecido' }}
+                                </div>
+                                <div class="text-xs text-slate-500 mt-1 flex items-center gap-2">
+                                    <span>{{ $session->ip_address }}</span>
                                     @if ($session->is_current_device)
-                                        <span class="text-green-500 font-semibold">{{ __('This device') }}</span>
+                                        <span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-cyan-500/20 text-cyan-400 uppercase tracking-wide">Atual</span>
                                     @else
-                                        {{ __('Last active') }} {{ $session->last_active }}
+                                        <span>• {{ $session->last_active }}</span>
                                     @endif
                                 </div>
                             </div>
@@ -51,47 +36,26 @@
             </div>
         @endif
 
-        <div class="flex items-center mt-5">
-            <x-button wire:click="confirmLogout" wire:loading.attr="disabled">
-                {{ __('Log Out Other Browser Sessions') }}
-            </x-button>
-
-            <x-action-message class="ms-3" on="loggedOut">
-                {{ __('Done.') }}
-            </x-action-message>
+        <div class="flex items-center mt-8 pt-6 border-t border-white/5">
+            <button type="button" wire:click="confirmLogout" wire:loading.attr="disabled" class="flex items-center gap-2 px-5 py-2.5 bg-slate-800 border border-slate-700 rounded-xl text-sm font-bold text-white hover:bg-slate-700 transition hover:border-red-500/50 hover:text-red-400 group">
+                <span class="group-hover:grayscale-0 grayscale transition text-lg">🚪</span>
+                {{ __('Desconectar Outros') }}
+            </button>
+            <x-action-message class="ms-3 text-emerald-400 font-bold" on="loggedOut">{{ __('Feito.') }}</x-action-message>
         </div>
 
-        <!-- Log Out Other Devices Confirmation Modal -->
         <x-dialog-modal wire:model.live="confirmingLogout">
-            <x-slot name="title">
-                {{ __('Log Out Other Browser Sessions') }}
-            </x-slot>
-
+            <x-slot name="title">{{ __('Confirmar Saída') }}</x-slot>
             <x-slot name="content">
-                {{ __('Please enter your password to confirm you would like to log out of your other browser sessions across all of your devices.') }}
-
+                <span class="text-slate-300">{{ __('Digite sua senha para confirmar.') }}</span>
                 <div class="mt-4" x-data="{}" x-on:confirming-logout-other-browser-sessions.window="setTimeout(() => $refs.password.focus(), 250)">
-                    <x-input type="password" class="mt-1 block w-3/4"
-                                autocomplete="current-password"
-                                placeholder="{{ __('Password') }}"
-                                x-ref="password"
-                                wire:model="password"
-                                wire:keydown.enter="logoutOtherBrowserSessions" />
-
-                    <x-input-error for="password" class="mt-2" />
+                    <input type="password" class="mt-2 w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 focus:border-cyan-400/50 transition outline-none" placeholder="{{ __('Senha') }}" x-ref="password" wire:model="password" wire:keydown.enter="logoutOtherBrowserSessions" />
+                    <x-input-error for="password" class="mt-2 text-red-400" />
                 </div>
             </x-slot>
-
             <x-slot name="footer">
-                <x-secondary-button wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">
-                    {{ __('Cancel') }}
-                </x-secondary-button>
-
-                <x-button class="ms-3"
-                            wire:click="logoutOtherBrowserSessions"
-                            wire:loading.attr="disabled">
-                    {{ __('Log Out Other Browser Sessions') }}
-                </x-button>
+                <x-secondary-button wire:click="$toggle('confirmingLogout')" wire:loading.attr="disabled">{{ __('Cancelar') }}</x-secondary-button>
+                <button type="button" class="ms-3 px-4 py-2 bg-gradient-to-r from-red-500 to-orange-500 rounded-xl text-sm font-bold text-white hover:shadow-lg transition hover:scale-105" wire:click="logoutOtherBrowserSessions" wire:loading.attr="disabled">{{ __('Desconectar Tudo') }}</button>
             </x-slot>
         </x-dialog-modal>
     </x-slot>

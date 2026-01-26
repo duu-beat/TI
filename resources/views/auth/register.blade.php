@@ -1,134 +1,173 @@
 <x-guest-layout>
     <div class="w-full max-w-5xl">
-        <div class="grid lg:grid-cols-2 rounded-3xl overflow-hidden border border-white/10 bg-white/5 shadow-sm">
+        <div class="grid lg:grid-cols-2 rounded-3xl overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-xl shadow-2xl relative">
+            
+            {{-- Background Glows --}}
+            <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
+                <div class="absolute top-[-10%] right-[-10%] w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
+                <div class="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
+            </div>
 
-            {{-- Brand panel --}}
-            <div class="relative p-8 lg:p-10 bg-slate-950">
-                <div class="absolute inset-0">
-                    <div class="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-indigo-500/30 blur-3xl"></div>
-                    <div class="absolute -bottom-24 -right-24 h-72 w-72 rounded-full bg-cyan-400/20 blur-3xl"></div>
-                    <div class="absolute inset-0 bg-gradient-to-b from-white/0 to-white/5"></div>
-                </div>
+            {{-- Brand Panel (Esquerda) --}}
+            <div class="relative p-8 lg:p-12 flex flex-col justify-between z-10 border-r border-white/5 bg-slate-950/30">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-400 opacity-50"></div>
 
-                <div class="relative">
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3">
-                        <img
-                            src="{{ asset('images/logosuporteTI.png') }}"
-                            alt="Suporte TI"
-                            class="h-11 w-auto object-contain"
-                        >
+                <div>
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 mb-8 group">
+                        <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" class="h-10 w-auto object-contain group-hover:scale-105 transition duration-300">
                         <div class="leading-tight">
-                            <div class="text-white font-extrabold tracking-tight text-lg leading-none">Suporte TI</div>
-                            <div class="text-xs text-slate-300 leading-snug">Criar conta</div>
+                            <div class="text-white font-bold tracking-tight text-xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
+                            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">Criar Conta</div>
                         </div>
                     </a>
 
-                    <h1 class="mt-10 text-3xl font-extrabold tracking-tight text-white">
-                        Comece seu atendimento em minutos.
+                    <h1 class="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
+                        Comece em segundos.
                     </h1>
-                    <p class="mt-3 text-slate-300">
-                        Crie sua conta para abrir chamados e acompanhar tudo pelo portal.
+                    <p class="mt-4 text-lg text-slate-400 leading-relaxed">
+                        Tenha acesso total ao histórico de chamados, suporte prioritário e atendimento personalizado.
                     </p>
 
-                    <div class="mt-8 space-y-3 text-sm text-slate-200">
-                        <div class="flex items-start gap-3">
-                            <div class="mt-1.5 h-2 w-2 rounded-full bg-cyan-400"></div>
-                            <p><span class="font-semibold text-white">Chamados organizados</span> por status.</p>
+                    <div class="mt-8 space-y-3">
+                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400">
+                                ✓
+                            </div>
+                            <span>Histórico completo de soluções.</span>
                         </div>
-                        <div class="flex items-start gap-3">
-                            <div class="mt-1.5 h-2 w-2 rounded-full bg-indigo-400"></div>
-                            <p><span class="font-semibold text-white">Mensagens no histórico</span> do chamado.</p>
-                        </div>
-                        <div class="flex items-start gap-3">
-                            <div class="mt-1.5 h-2 w-2 rounded-full bg-emerald-400"></div>
-                            <p><span class="font-semibold text-white">Transparência</span> no acompanhamento.</p>
+                        <div class="flex items-center gap-3 text-sm text-slate-300">
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400">
+                                ✓
+                            </div>
+                            <span>Notificações em tempo real.</span>
                         </div>
                     </div>
+                </div>
 
-                    <div class="mt-10 text-xs text-slate-400">
-                        Você pode usar o mesmo email do WhatsApp/contato que você costuma usar.
-                    </div>
+                <div class="mt-12 text-xs font-medium text-slate-500 border-t border-white/5 pt-6">
+                    Você pode usar o mesmo email do seu WhatsApp para facilitar.
                 </div>
             </div>
 
-            {{-- Form panel --}}
-            <div class="p-8 lg:p-10 bg-slate-950/40">
-                <div class="flex items-center justify-between gap-3">
+            {{-- Form Panel (Direita) --}}
+            <div class="relative p-8 lg:p-12 flex flex-col justify-center bg-slate-900/40 z-10">
+                <div class="flex items-center justify-between mb-8">
                     <div>
-                        <div class="text-white font-bold text-xl">Cadastro</div>
-                        <div class="text-sm text-slate-400">Crie sua conta para abrir chamados.</div>
+                        <h2 class="text-2xl font-bold text-white">Cadastro</h2>
+                        <p class="text-sm text-slate-400 mt-1">Preencha seus dados.</p>
                     </div>
-                    <a href="{{ route('home') }}" class="text-sm text-slate-300 hover:text-white underline">
-                        Voltar ao site
-                    </a>
+                    <a href="{{ route('home') }}" class="text-sm text-slate-400 hover:text-white transition underline">Voltar</a>
                 </div>
 
-                <x-validation-errors class="mt-6 mb-4 text-red-200" />
+                <x-validation-errors class="mb-4 text-red-200 bg-red-500/10 p-3 rounded-xl border border-red-500/20 text-sm" />
 
-                <form method="POST" action="{{ route('register') }}" class="mt-6 space-y-4">
+                {{-- Login Social (Placeholders) --}}
+                <div class="grid grid-cols-2 gap-4 mb-6">
+                    <button type="button" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
+                        <svg class="h-5 w-5 opacity-70 group-hover:opacity-100 transition" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
+                        </svg>
+                        Google
+                    </button>
+                    <button type="button" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
+                        <svg class="h-5 w-5 opacity-70 group-hover:opacity-100 transition" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.42-1.305.763-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
+                        </svg>
+                        GitHub
+                    </button>
+                </div>
+
+                <div class="relative flex py-2 items-center mb-6">
+                    <div class="flex-grow border-t border-white/10"></div>
+                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">Ou com email</span>
+                    <div class="flex-grow border-t border-white/10"></div>
+                </div>
+
+                <form method="POST" action="{{ route('register') }}" class="space-y-4" x-data="{ showPassword: false }">
                     @csrf
 
                     <div>
-                        <label for="name" class="text-sm text-slate-300">Nome</label>
-                        <input id="name" name="name" type="text" value="{{ old('name') }}" required autofocus autocomplete="name"
-                               class="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-500
-                                      focus:border-cyan-400/60 focus:ring-cyan-400/20">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Nome Completo</label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                </svg>
+                            </div>
+                            <input id="name" type="text" name="name" :value="old('name')" required autofocus autocomplete="name"
+                                class="w-full rounded-xl border border-white/10 bg-slate-950/50 pl-11 pr-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
+                                placeholder="Seu nome">
+                        </div>
                     </div>
 
                     <div>
-                        <label for="email" class="text-sm text-slate-300">Email</label>
-                        <input id="email" name="email" type="email" value="{{ old('email') }}" required autocomplete="username"
-                               class="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-500
-                                      focus:border-cyan-400/60 focus:ring-cyan-400/20">
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Email</label>
+                        <div class="relative mt-1">
+                            <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" />
+                                </svg>
+                            </div>
+                            <input id="email" type="email" name="email" :value="old('email')" required autocomplete="username"
+                                class="w-full rounded-xl border border-white/10 bg-slate-950/50 pl-11 pr-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
+                                placeholder="seu@email.com">
+                        </div>
                     </div>
 
-                    <div>
-                        <label for="password" class="text-sm text-slate-300">Senha</label>
-                        <input id="password" name="password" type="password" required autocomplete="new-password"
-                               class="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-500
-                                      focus:border-cyan-400/60 focus:ring-cyan-400/20">
-                    </div>
-
-                    <div>
-                        <label for="password_confirmation" class="text-sm text-slate-300">Confirmar senha</label>
-                        <input id="password_confirmation" name="password_confirmation" type="password" required autocomplete="new-password"
-                               class="mt-2 w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-500
-                                      focus:border-cyan-400/60 focus:ring-cyan-400/20">
+                    <div class="grid grid-cols-2 gap-4">
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Senha</label>
+                            <div class="relative mt-1">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                    </svg>
+                                </div>
+                                <input id="password" :type="showPassword ? 'text' : 'password'" name="password" required autocomplete="new-password"
+                                    class="w-full rounded-xl border border-white/10 bg-slate-950/50 pl-11 pr-10 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
+                                    placeholder="••••••••">
+                                <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white focus:outline-none">
+                                    <svg x-show="!showPassword" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                    <svg x-show="showPassword" style="display: none;" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.059 10.059 0 011.591-2.714M9.828 9.828a3 3 0 114.242 4.242M3 3l18 18" /></svg>
+                                </button>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Confirmar</label>
+                            <div class="relative mt-1">
+                                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                                    <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                    </svg>
+                                </div>
+                                <input id="password_confirmation" :type="showPassword ? 'text' : 'password'" name="password_confirmation" required autocomplete="new-password"
+                                    class="w-full rounded-xl border border-white/10 bg-slate-950/50 pl-11 pr-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
+                                    placeholder="••••••••">
+                            </div>
+                        </div>
                     </div>
 
                     @if (Laravel\Jetstream\Jetstream::hasTermsAndPrivacyPolicyFeature())
-                        <div class="rounded-2xl border border-white/10 bg-white/5 p-4 text-sm text-slate-300">
-                            <label for="terms" class="inline-flex items-start gap-2">
-                                <input id="terms" name="terms" type="checkbox" required
-                                       class="mt-1 rounded border-white/20 bg-slate-950/60 text-cyan-400 focus:ring-cyan-400/30">
-                                <span>
-                                    Eu concordo com os
-                                    <a target="_blank" href="{{ route('terms.show') }}" class="underline text-white hover:opacity-90">Termos</a>
-                                    e a
-                                    <a target="_blank" href="{{ route('policy.show') }}" class="underline text-white hover:opacity-90">Política</a>.
+                        <div class="mt-2">
+                            <label for="terms" class="flex items-start cursor-pointer group">
+                                <input id="terms" name="terms" type="checkbox" required class="mt-1 rounded border-white/20 bg-slate-900 text-cyan-500 shadow-sm focus:ring-cyan-500/50 focus:ring-offset-0 cursor-pointer">
+                                <span class="ms-2 text-sm text-slate-400 group-hover:text-slate-300 transition">
+                                    Concordo com os <a target="_blank" href="{{ route('terms.show') }}" class="underline text-white hover:text-cyan-400">Termos</a> e <a target="_blank" href="{{ route('policy.show') }}" class="underline text-white hover:text-cyan-400">Política</a>.
                                 </span>
                             </label>
                         </div>
                     @endif
 
-                    <button type="submit"
-                            class="w-full rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-3 font-semibold text-slate-950 hover:opacity-95 transition">
-                        Criar conta
+                    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
+                        Criar Conta
                     </button>
-
-                    <div class="mt-2 text-sm text-slate-400">
-                        Já tem conta?
-                        <a href="{{ route('login') }}" class="text-white underline hover:opacity-90">
-                            Entrar
-                        </a>
-                    </div>
                 </form>
 
-                <div class="mt-8 rounded-2xl border border-white/10 bg-white/5 p-4 text-xs text-slate-300">
-                    Segurança: sua senha é criptografada e não é visível nem pra gente.
+                <div class="mt-8 text-center text-sm text-slate-400">
+                    Já tem conta? 
+                    <a href="{{ route('login') }}" class="text-white font-semibold hover:text-cyan-400 transition">Entrar</a>
                 </div>
             </div>
-
         </div>
     </div>
 </x-guest-layout>

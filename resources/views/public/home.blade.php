@@ -200,30 +200,6 @@
                         Já tenho conta
                     </a>
                 </div>
-
-                {{-- Preview Section (Mockup) --}}
-                <div class="mt-20 relative mx-auto max-w-5xl group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-2xl blur opacity-20 group-hover:opacity-40 transition duration-1000"></div>
-                    <div class="relative rounded-2xl border border-white/10 bg-slate-900/80 backdrop-blur-xl p-2 shadow-2xl">
-                        <div class="h-6 flex items-center gap-2 px-4 border-b border-white/5 mb-2">
-                            <div class="w-3 h-3 rounded-full bg-red-500/50"></div>
-                            <div class="w-3 h-3 rounded-full bg-yellow-500/50"></div>
-                            <div class="w-3 h-3 rounded-full bg-green-500/50"></div>
-                        </div>
-                        <div class="aspect-video rounded bg-slate-950 flex items-center justify-center text-slate-600 relative overflow-hidden">
-                            {{-- Podes substituir este SVG por um print real do teu dashboard --}}
-                            <div class="text-center z-10">
-                                <div class="text-6xl mb-4 opacity-50">🖥️</div>
-                                <p class="text-sm font-mono opacity-50">Dashboard Preview</p>
-                            </div>
-                            
-                            {{-- Elementos decorativos do mockup --}}
-                            <div class="absolute top-10 left-10 right-10 h-8 bg-slate-800/50 rounded-lg animate-pulse"></div>
-                            <div class="absolute top-24 left-10 w-1/3 h-32 bg-slate-800/30 rounded-lg"></div>
-                            <div class="absolute top-24 left-[40%] right-10 h-32 bg-slate-800/30 rounded-lg"></div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </section>
         
