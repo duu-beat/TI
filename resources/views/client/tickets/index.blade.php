@@ -11,7 +11,6 @@
         🎫 Meus chamados
     </a>
 
-    {{-- Link Novo: Perfil --}}
     <a href="{{ route('profile.show') }}"
        class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
         👤 Minha conta
@@ -59,17 +58,6 @@
         @if($tickets->count() > 0)
             <div class="grid gap-4">
                 @foreach($tickets as $ticket)
-                    @php
-                        $colorClass = match($ticket->status->value) {
-                            'new' => 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20',
-                            'in_progress' => 'bg-cyan-500/10 text-cyan-300 border-cyan-500/20',
-                            'waiting_client' => 'bg-yellow-500/10 text-yellow-300 border-yellow-500/20',
-                            'resolved' => 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20',
-                            'closed' => 'bg-slate-500/10 text-slate-300 border-slate-500/20',
-                            default => 'bg-white/5 text-slate-200 border-white/10',
-                        };
-                    @endphp
-
                     <a href="{{ route('client.tickets.show', $ticket) }}"
                        class="relative block rounded-2xl border border-white/10 bg-white/5 p-5 group
                               transition-all duration-300 
@@ -87,16 +75,18 @@
                             </div>
 
                             <div class="shrink-0">
-                                <span class="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold border {{ $colorClass }}">
+                                {{-- 🎨 USO DO ENUM COLOR() --}}
+                                <span class="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold border {{ $ticket->status->color() }}">
                                     {{ $ticket->status->label() }}
                                 </span>
                             </div>
                         </div>
 
                         <div class="mt-4 flex items-center gap-4 text-xs text-slate-500 border-t border-white/5 pt-3">
-                            <div class="flex items-center gap-1.5">
+                            {{-- 📅 DATA HUMANIZADA --}}
+                            <div class="flex items-center gap-1.5" title="{{ $ticket->created_at->format('d/m/Y H:i') }}">
                                 <span class="text-slate-600">📅</span> 
-                                {{ $ticket->created_at->format('d/m/Y') }}
+                                {{ ucfirst($ticket->created_at->diffForHumans()) }}
                             </div>
                             
                             @if($ticket->priority)

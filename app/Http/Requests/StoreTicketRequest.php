@@ -2,25 +2,27 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\TicketPriority;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Enums\TicketPriority;
 
 class StoreTicketRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return true; // A rota já tem middleware 'auth', então permitimos
+        return true;
     }
 
     public function rules(): array
-{
-    return [
-        'subject' => ['required', 'string', 'max:255'],
-        'description' => ['required', 'string'],
-        'priority' => ['nullable', \Illuminate\Validation\Rule::enum(\App\Enums\TicketPriority::class)],
-        // Aceita imagem ou PDF, máx 2MB
-        'attachment' => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'], 
-    ];
-}
+    {
+        return [
+            'subject' => ['required', 'string', 'max:255'],
+            'description' => ['required', 'string'],
+            'priority' => ['nullable', Rule::enum(TicketPriority::class)],
+            
+            // ✨ ATUALIZADO PARA MÚLTIPLOS ARQUIVOS
+            'attachments' => ['nullable', 'array', 'max:5'], // Máx 5 arquivos (opcional)
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'], // 5MB cada
+        ];
+    }
 }
