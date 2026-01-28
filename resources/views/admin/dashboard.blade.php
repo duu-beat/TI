@@ -1,23 +1,5 @@
 @extends('layouts.portal')
 
-@section('menu')
-    <a href="{{ route('admin.dashboard') }}"
-       class="block rounded-xl px-4 py-2 {{ request()->routeIs('admin.dashboard') ? 'bg-white/10 text-white font-medium shadow-lg' : 'text-slate-300 hover:bg-white/10' }}">
-       📊 Dashboard
-    </a>
-
-    <a href="{{ route('admin.tickets.index') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10">
-        🎫 Chamados
-    </a>
-
-    {{-- Link Novo: Perfil --}}
-    <a href="{{ route('profile.show') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
-        👤 Meu Perfil
-    </a>
-@endsection
-
 @section('title', 'Dashboard administrativo')
 
 @section('content')
@@ -30,7 +12,7 @@
     $countWaiting = (clone $tickets)->where('status', \App\Enums\TicketStatus::WAITING_CLIENT)->count();
     $countResolved = (clone $tickets)->whereIn('status', [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED])->count();
 
-    // Dados do Gráfico
+    // Dados do Gráfico (Últimos 7 dias)
     $dailyTickets = \App\Models\Ticket::selectRaw('DATE(created_at) as date, count(*) as total')
         ->where('created_at', '>=', now()->subDays(7))
         ->groupBy('date')
@@ -58,12 +40,9 @@
     ];
 @endphp
 
-{{-- 💀 WRAPPER ALPINE PARA O LOADING --}}
 <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)">
 
-    {{-- ========================
-         1. ESTADO DE LOADING (Skeleton)
-         ======================== --}}
+    {{-- SKELETON LOADING --}}
     <div x-show="!loaded" class="space-y-6 animate-pulse">
         <x-skeleton class="h-32 rounded-3xl" />
         <div class="grid lg:grid-cols-4 gap-6">
@@ -72,24 +51,15 @@
         <div class="grid lg:grid-cols-3 gap-6">
             <x-skeleton class="h-64 rounded-2xl" /><x-skeleton class="lg:col-span-2 h-64 rounded-2xl" />
         </div>
-        <div class="grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 space-y-4">
-                 <x-skeleton class="h-8 w-40 mb-2" /><x-skeleton type="card" /><x-skeleton type="card" /><x-skeleton type="card" />
-            </div>
-            <div><x-skeleton class="h-48 rounded-2xl" /></div>
-        </div>
     </div>
 
-
-    {{-- ========================
-         2. CONTEÚDO REAL
-         ======================== --}}
+    {{-- CONTEÚDO REAL --}}
     <div x-show="loaded" style="display: none;"
          x-transition:enter="transition ease-out duration-500"
          x-transition:enter-start="opacity-0 translate-y-4"
          x-transition:enter-end="opacity-100 translate-y-0">
 
-        {{-- Top Bar Navigation (NOVO) --}}
+        {{-- Top Bar --}}
         <div class="flex items-center justify-between mb-6">
             <div class="text-sm text-slate-400">Painel Administrativo</div>
             <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">
@@ -110,7 +80,6 @@
                 </div>
 
                 <div class="flex gap-3 flex-wrap">
-                    {{-- Botão Configurações (Perfil) --}}
                     <a href="{{ route('profile.show') }}" class="rounded-2xl bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition flex items-center gap-2">
                         ⚙️ Configurações
                     </a>
@@ -169,7 +138,7 @@
             </div>
         </div>
 
-        {{-- LISTA E ATALHOS --}}
+        {{-- LISTA RECENTE --}}
         <div class="grid lg:grid-cols-3 gap-6">
             <div class="lg:col-span-2 rounded-2xl bg-white/5 border border-white/10 p-6">
                 <div class="flex items-center justify-between gap-4 flex-wrap">
@@ -198,13 +167,13 @@
                         </a>
                     @empty
                         <div class="text-sm text-slate-300">
-                            Nenhum chamado por enquanto. Milagre? 😄
+                            Nenhum chamado por enquanto.
                         </div>
                     @endforelse
                 </div>
             </div>
 
-            {{-- Atalhos e Sistema --}}
+            {{-- Atalhos --}}
             <div class="rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-white mb-4">Atalhos</h2>
@@ -231,7 +200,6 @@
     </div>
 </div>
 
-{{-- SCRIPT DOS GRÁFICOS --}}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     Chart.defaults.color = '#94a3b8';
@@ -243,7 +211,6 @@
         data: {
             labels: ['Novos', 'Em Andamento', 'Resolvidos'],
             datasets: [{
-                // Aqui somamos "In Progress" + "Waiting" para simplificar o gráfico visualmente
                 data: [{{ $countNew }}, {{ $countInProgress + $countWaiting }}, {{ $countResolved }}],
                 backgroundColor: ['#818cf8', '#22d3ee', '#34d399'], 
                 borderWidth: 0,

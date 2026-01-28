@@ -11,8 +11,9 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Ticket extends Model
 {
     protected $fillable = [
-        'user_id', 'subject', 'description', 'status', 'priority',
-    ];
+    'user_id', 'subject', 'description', 'status', 'priority', 
+    'rating', 'rating_comment' // <--- Adicionado
+];
 
     // ✅ O segredo está aqui: Casts automáticos
     protected $casts = [

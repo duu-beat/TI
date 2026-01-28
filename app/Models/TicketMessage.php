@@ -9,8 +9,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TicketMessage extends Model
 {
     protected $fillable = [
-        'ticket_id', 'user_id', 'message',
-    ];
+    'ticket_id', 'user_id', 'message', 'is_internal' // <--- Adicionado
+];
 
     public function ticket(): BelongsTo
     {

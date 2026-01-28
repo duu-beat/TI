@@ -1,22 +1,5 @@
 @extends('layouts.portal')
 
-@section('menu')
-    <a href="{{ route('client.dashboard') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
-        🏠 Início
-    </a>
-
-    <a href="{{ route('client.tickets.index') }}"
-       class="block rounded-xl px-4 py-2 bg-white/10 text-white font-medium shadow-lg shadow-black/20">
-        🎫 Meus chamados
-    </a>
-
-    <a href="{{ route('profile.show') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
-        👤 Minha conta
-    </a>
-@endsection
-
 @section('title', 'Meus Chamados')
 
 @section('actions')
@@ -28,28 +11,63 @@
 @endsection
 
 @section('content')
+{{-- BARRA DE PESQUISA E FILTROS --}}
+<div class="mb-8 mt-4">
+    <form method="GET" action="{{ route('client.tickets.index') }}" class="p-4 rounded-2xl bg-slate-900/50 border border-white/10 flex flex-col md:flex-row gap-4 items-center shadow-lg">
+        
+        {{-- Campo de Busca --}}
+        <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+            </div>
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Buscar por assunto ou ID..." 
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-slate-200 placeholder-slate-600 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 outline-none transition">
+        </div>
+
+        {{-- Filtro de Status --}}
+        <div class="relative w-full md:w-64">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
+                </svg>
+            </div>
+            <select name="status" class="w-full pl-10 pr-10 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-slate-200 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 outline-none appearance-none cursor-pointer">
+                <option value="">Todos os status</option>
+                @foreach(\App\Enums\TicketStatus::cases() as $status)
+                    <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
+                        {{ $status->label() }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        {{-- Botão Filtrar --}}
+        <button type="submit" class="w-full md:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95">
+            Filtrar
+        </button>
+
+        {{-- Botão Limpar --}}
+        @if(request()->hasAny(['search', 'status']))
+            <a href="{{ route('client.tickets.index') }}" class="text-sm text-slate-400 hover:text-white underline decoration-slate-600 hover:decoration-white whitespace-nowrap">
+                Limpar filtros
+            </a>
+        @endif
+    </form>
+</div>
+
 <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)">
 
-    {{-- 💀 SKELETON (Lista Vertical) --}}
+    {{-- SKELETON --}}
     <div x-show="!loaded" class="space-y-4 animate-pulse">
         @foreach(range(1, 4) as $i)
-            <div class="rounded-2xl border border-white/5 bg-white/5 p-5 h-32">
-                <div class="flex justify-between">
-                    <div class="space-y-3 w-1/2">
-                        <div class="h-6 bg-slate-700/50 rounded w-3/4"></div>
-                        <div class="h-4 bg-slate-700/50 rounded w-full"></div>
-                    </div>
-                    <div class="h-6 w-20 bg-slate-700/50 rounded-full"></div>
-                </div>
-                <div class="mt-6 flex gap-4">
-                    <div class="h-4 w-24 bg-slate-700/50 rounded"></div>
-                    <div class="h-4 w-24 bg-slate-700/50 rounded"></div>
-                </div>
-            </div>
+            <div class="rounded-2xl border border-white/5 bg-white/5 p-5 h-32"></div>
         @endforeach
     </div>
 
-    {{-- ✅ CONTEÚDO REAL --}}
+    {{-- CONTEÚDO REAL --}}
     <div x-show="loaded" style="display: none;"
          x-transition:enter="transition ease-out duration-500"
          x-transition:enter-start="opacity-0 translate-y-4"
@@ -75,7 +93,6 @@
                             </div>
 
                             <div class="shrink-0">
-                                {{-- 🎨 USO DO ENUM COLOR() --}}
                                 <span class="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold border {{ $ticket->status->color() }}">
                                     {{ $ticket->status->label() }}
                                 </span>
@@ -83,7 +100,6 @@
                         </div>
 
                         <div class="mt-4 flex items-center gap-4 text-xs text-slate-500 border-t border-white/5 pt-3">
-                            {{-- 📅 DATA HUMANIZADA --}}
                             <div class="flex items-center gap-1.5" title="{{ $ticket->created_at->format('d/m/Y H:i') }}">
                                 <span class="text-slate-600">📅</span> 
                                 {{ ucfirst($ticket->created_at->diffForHumans()) }}

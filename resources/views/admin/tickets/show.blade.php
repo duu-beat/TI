@@ -1,207 +1,130 @@
 @extends('layouts.portal')
 
-@section('menu')
-    <a href="{{ route('admin.dashboard') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10">
-        📊 Dashboard
-    </a>
-
-    <a href="{{ route('admin.tickets.index') }}"
-       class="block rounded-xl px-4 py-2 bg-white/10 text-white">
-        🎫 Chamados
-    </a>
-
-    <a href="{{ route('profile.show') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
-        👤 Meu Perfil
-    </a>
-@endsection
-
-@section('title')
-    Gerenciar Chamado #{{ $ticket->id }}
-@endsection
+@section('title', 'Gerenciar Chamado')
 
 @section('actions')
-    <a href="{{ route('admin.tickets.index') }}"
-       class="rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/15 transition">
-        Voltar
-    </a>
+    <a href="{{ route('admin.tickets.index') }}" class="rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/15 transition">Voltar</a>
 @endsection
 
 @section('content')
-@php
-    $statusColors = [
-        'new' => 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
-        'in_progress' => 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30',
-        'waiting_client' => 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
-        'resolved' => 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
-        'closed' => 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
-    ];
-@endphp
+<div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)" class="space-y-6">
 
-<div class="space-y-4">
-
-    {{-- INFO DO TICKET --}}
-    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <div class="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-                <div class="text-sm text-slate-400">Assunto</div>
-                <div class="mt-1 text-white font-semibold text-xl">{{ $ticket->subject }}</div>
-
-                <div class="mt-3 text-sm text-slate-400">
-                    Aberto por <span class="text-slate-200 font-semibold">{{ $ticket->user->name }}</span>
-                    <span class="text-slate-500">•</span>
-                    {{ $ticket->created_at->format('d/m/Y H:i') }}
-                </div>
-
-                <div class="mt-4 flex items-center gap-2 flex-wrap">
-                    <span class="text-xs text-slate-400">Status:</span>
-                    <span class="text-xs rounded-full px-3 py-1 font-medium
-                        {{ $statusColors[$ticket->status->value] ?? 'bg-white/10 text-slate-200' }}">
-                        {{ $ticket->status->label() }}
-                    </span>
-
-                    <span class="text-xs text-slate-500">•</span>
-                    <span class="text-xs text-slate-400">{{ $ticket->user->email }}</span>
-                </div>
+    {{-- ⭐ AVALIAÇÃO DO CLIENTE (VISÍVEL APENAS SE AVALIADO) --}}
+    @if($ticket->rating)
+        <div class="rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 p-4 flex items-center gap-4 animate-fade-in">
+            <div class="text-4xl text-yellow-400 tracking-widest">
+                {{ str_repeat('★', $ticket->rating) }}<span class="text-slate-600 opacity-30">{{ str_repeat('★', 5 - $ticket->rating) }}</span>
             </div>
+            <div>
+                <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Avaliação do Cliente</div>
+                <div class="text-slate-300 text-sm italic">"{{ $ticket->rating_comment ?? 'Sem comentário adicional.' }}"</div>
+            </div>
+        </div>
+    @endif
 
-            {{-- Form de Alterar Status --}}
-            <form action="{{ route('admin.tickets.status', $ticket) }}"
-                  method="POST"
-                  class="flex gap-3 flex-wrap items-end">
-                @csrf
-
-                <div>
-                    <label class="text-sm text-slate-300">Atualizar status</label>
-                    <select name="status"
-                            onchange="this.form.submit()"
-                            class="mt-2 rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100
-                                   focus:border-cyan-400/60 focus:ring-cyan-400/20">
-                        @foreach(\App\Enums\TicketStatus::cases() as $status)
-                            <option value="{{ $status->value }}" @selected($ticket->status === $status)>
-                                {{ $status->label() }}
-                            </option>
-                        @endforeach
-                    </select>
+    {{-- HEADER INFO --}}
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md relative overflow-hidden">
+        <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex justify-between items-start gap-4">
+            <div>
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-slate-700 text-slate-300">#{{ $ticket->id }}</span>
+                    <span class="text-sm text-slate-400">{{ $ticket->user->email }}</span>
                 </div>
-
-                <noscript>
-                    <button type="submit"
-                            class="rounded-2xl bg-white/10 px-6 py-3 font-semibold text-white hover:bg-white/15 transition">
-                        Salvar
-                    </button>
-                </noscript>
+                <h2 class="text-2xl font-bold text-white">{{ $ticket->subject }}</h2>
+            </div>
+            
+            {{-- MUDAR STATUS RAPIDAMENTE --}}
+            <form action="{{ route('admin.tickets.status', $ticket) }}" method="POST">
+                @csrf
+                <select name="status" onchange="this.form.submit()" class="bg-slate-900 border border-white/20 text-white text-xs rounded-lg px-3 py-2 focus:ring-indigo-500 cursor-pointer hover:bg-slate-800 transition">
+                    @foreach(\App\Enums\TicketStatus::cases() as $status)
+                        <option value="{{ $status->value }}" {{ $ticket->status === $status ? 'selected' : '' }}>
+                            {{ $status->label() }}
+                        </option>
+                    @endforeach
+                </select>
             </form>
         </div>
 
-        {{-- Descrição do Cliente --}}
-        <div class="mt-6 border-t border-white/10 pt-4">
-            <div class="text-sm text-slate-300">Descrição do cliente</div>
-            <p class="mt-2 text-slate-200 whitespace-pre-line">{{ $ticket->description }}</p>
-
-            {{-- Anexo Original (se houver) --}}
-            @if($ticket->messages->first() && $ticket->messages->first()->attachments->count() > 0)
-                <div class="mt-4 pt-3 border-t border-white/10">
-                    <p class="text-xs font-bold text-slate-500 mb-2">Anexos:</p>
-                    <div class="flex flex-wrap gap-2">
-                        @foreach($ticket->messages->first()->attachments as $att)
-                            <a href="{{ Storage::url($att->file_path) }}"
-                               target="_blank"
-                               class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 text-sm transition">
-                                📎 {{ $att->file_name }}
-                            </a>
-                        @endforeach
-                    </div>
-                </div>
-            @endif
+        <div class="mt-6 p-4 rounded-xl bg-slate-950/30 border border-white/5">
+            <p class="text-slate-300 leading-relaxed whitespace-pre-line">{{ $ticket->description }}</p>
         </div>
     </div>
 
-    {{-- ÁREA DE CHAT (Admin) --}}
-    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <div class="text-sm text-slate-300 mb-3">Mensagens</div>
+    {{-- CHAT --}}
+    <div class="rounded-2xl border border-white/10 bg-slate-950/20 p-6 flex flex-col space-y-6">
+        @foreach($ticket->messages as $message)
+            @php
+                $isMe = $message->user_id === auth()->id();
+                $isInternal = $message->is_internal;
+                
+                // Cores dinâmicas para distinguir notas internas
+                $bubbleClass = $isInternal 
+                    ? 'bg-yellow-500/10 border border-yellow-500/30 text-yellow-100' // Estilo Nota Interna
+                    : ($isMe ? 'bg-indigo-600 text-white border border-indigo-500/50' : 'bg-slate-800 text-slate-200 border border-white/5'); // Normal
+            @endphp
 
-        <div class="space-y-3 max-h-[520px] overflow-y-auto pr-1"
-             x-data="{ init() { this.$el.scrollTop = this.$el.scrollHeight } }">
-
-            @forelse($ticket->messages as $message)
-                @php
-                    $isAdmin = optional($message->user)->role === 'admin';
-                    // se preferir pelo usuário logado:
-                    // $isAdmin = $message->user_id === auth()->id();
-                @endphp
-
-                <div class="rounded-2xl border border-white/10 p-4 {{ $isAdmin ? 'bg-indigo-500/10 border-indigo-500/20' : 'bg-slate-950/40' }}">
-                    <div class="flex items-center justify-between gap-4">
-                        <div class="text-sm font-semibold {{ $isAdmin ? 'text-indigo-200' : 'text-white' }}">
-                            {{ $isAdmin ? 'Admin' : $message->user->name }}
-                        </div>
-                        <div class="text-xs text-slate-400">{{ $message->created_at->format('d/m/Y H:i') }}</div>
+            <div class="flex w-full {{ $isMe ? 'justify-end' : 'justify-start' }}">
+                <div class="flex max-w-[85%] gap-3 {{ $isMe ? 'flex-row-reverse' : 'flex-row' }}">
+                    {{-- Avatar --}}
+                    <div class="shrink-0 h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold overflow-hidden border border-white/10
+                        {{ $isInternal ? 'bg-yellow-500/20 text-yellow-500' : 'bg-slate-700 text-slate-300' }}">
+                        {{ substr($message->user->name, 0, 2) }}
                     </div>
 
-                    <p class="mt-2 text-slate-200 whitespace-pre-line">{{ $message->message }}</p>
+                    {{-- Balão --}}
+                    <div class="relative p-4 rounded-2xl text-sm shadow-md {{ $bubbleClass }} {{ $isMe ? 'rounded-tr-none' : 'rounded-tl-none' }}">
+                        
+                        {{-- Badge de Nota Interna --}}
+                        @if($isInternal)
+                            <div class="absolute -top-3 left-0 bg-yellow-500 text-slate-900 text-[9px] font-black px-2 py-0.5 rounded shadow-sm flex items-center gap-1">
+                                🔒 NOTA INTERNA
+                            </div>
+                        @endif
 
-                    @if($message->attachments->count() > 0)
-                        <div class="mt-4 pt-3 border-t border-white/10">
-                            <p class="text-xs font-bold text-slate-500 mb-2">Anexos:</p>
-                            <div class="flex flex-wrap gap-2">
+                        <div class="flex items-center gap-2 mb-1 opacity-60 text-[10px] uppercase font-bold tracking-wider {{ $isMe ? 'justify-end' : 'justify-start' }}">
+                            <span>{{ $message->user->name }}</span> • <span>{{ $message->created_at->format('H:i') }}</span>
+                        </div>
+
+                        <p class="whitespace-pre-line leading-relaxed">{{ $message->message }}</p>
+
+                        @if($message->attachments->count() > 0)
+                            <div class="mt-3 pt-2 border-t border-white/10">
                                 @foreach($message->attachments as $attachment)
-                                    <a href="{{ Storage::url($attachment->file_path) }}"
-                                       target="_blank"
-                                       class="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-cyan-400 text-sm transition">
-                                        📎 {{ $attachment->file_name }}
+                                    <a href="{{ $attachment->url }}" target="_blank" class="flex items-center gap-2 p-1.5 rounded hover:bg-black/20 transition">
+                                        📎 <span class="underline text-xs">{{ $attachment->file_name }}</span>
                                     </a>
                                 @endforeach
                             </div>
-                        </div>
-                    @endif
-                </div>
-            @empty
-                <div class="text-sm text-slate-400">
-                    Ainda não há mensagens neste chamado.
-                </div>
-            @endforelse
-        </div>
-    </div>
-
-    {{-- FORM DE RESPOSTA (Admin) --}}
-    <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
-        <form action="{{ route('admin.tickets.reply', $ticket) }}"
-              method="POST"
-              enctype="multipart/form-data"
-              class="space-y-3">
-            @csrf
-
-            <label class="text-sm text-slate-300">Responder ao cliente</label>
-
-            <textarea id="replyMessage"
-                      name="message"
-                      rows="4"
-                      class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-500
-                             focus:border-cyan-400/60 focus:ring-cyan-400/20"
-                      placeholder="Escreva a resposta..." required>{{ old('message') }}</textarea>
-
-            @error('message') <p class="text-sm text-red-300">{{ $message }}</p> @enderror
-
-            <div class="flex items-center justify-between gap-3 flex-wrap">
-                <div x-data="{ files: [] }" class="flex flex-col gap-2">
-                    <label class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white/10 hover:bg-white/15 border border-white/10 text-slate-200 text-sm transition">
-                        📎 Anexar Arquivos
-                        <input type="file" name="attachments[]" multiple class="hidden"
-                               @change="files = Array.from($el.files)">
-                    </label>
-
-                    <div class="text-xs text-slate-400 space-y-1">
-                        <template x-for="file in files" :key="file.name">
-                            <div x-text="'📄 ' + file.name"></div>
-                        </template>
+                        @endif
                     </div>
                 </div>
+            </div>
+        @endforeach
+    </div>
 
-                <button type="submit"
-                        class="rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-3 font-semibold text-slate-950 hover:opacity-95 transition">
-                    Enviar resposta
+    {{-- FORMULÁRIO DE RESPOSTA (ADMIN) --}}
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md">
+        <form method="POST" action="{{ route('admin.tickets.reply', $ticket) }}" enctype="multipart/form-data">
+            @csrf
+            
+            {{-- CHECKBOX NOTA INTERNA --}}
+            <div class="mb-4">
+                <label class="inline-flex items-center gap-2 p-2 pr-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 cursor-pointer hover:bg-yellow-500/20 transition select-none">
+                    <input type="checkbox" name="is_internal" value="1" class="rounded border-yellow-500/50 bg-slate-900 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0">
+                    <span class="text-xs font-bold text-yellow-500 uppercase tracking-wide">🔒 Nota Interna (Cliente não vê)</span>
+                </label>
+            </div>
+
+            <textarea name="message" rows="3" class="w-full rounded-2xl border border-white/10 bg-slate-950/60 px-4 py-3 text-slate-100 placeholder:text-slate-500 focus:border-indigo-500 focus:ring-indigo-500/20 transition-all" placeholder="Escreva a resposta..." required></textarea>
+
+            <div class="mt-4 flex justify-between items-center">
+                <input type="file" name="attachments[]" multiple class="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20">
+                
+                <button type="submit" class="rounded-xl bg-indigo-600 px-6 py-2.5 font-bold text-white hover:bg-indigo-500 hover:shadow-lg transition-all">
+                    Enviar Resposta
                 </button>
             </div>
         </form>

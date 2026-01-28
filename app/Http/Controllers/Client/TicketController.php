@@ -7,24 +7,57 @@ use App\Http\Requests\StoreTicketRequest;
 use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
-use App\Models\TicketAttachment; // Importado
+use App\Models\TicketAttachment;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\User;
 use App\Notifications\TicketUpdated;
-use Illuminate\Support\Facades\DB; // Importado para Transactions
-use Illuminate\Support\Facades\Notification; // Importado para envio em massa
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class TicketController extends Controller
 {
     use AuthorizesRequests;
 
+    public function dashboard(Request $request)
+    {
+        $user = $request->user();
+        $ticketsQuery = Ticket::where('user_id', $user->id);
+
+        $stats = [
+            'open' => (clone $ticketsQuery)->whereIn('status', [TicketStatus::NEW, TicketStatus::IN_PROGRESS, TicketStatus::WAITING_CLIENT])->count(),
+            'in_progress' => (clone $ticketsQuery)->where('status', TicketStatus::IN_PROGRESS)->count(),
+            'resolved' => (clone $ticketsQuery)->whereIn('status', [TicketStatus::RESOLVED, TicketStatus::CLOSED])->count(),
+        ];
+
+        $recentTickets = (clone $ticketsQuery)->latest()->take(5)->get();
+
+        return view('client.dashboard', compact('stats', 'recentTickets'));
+    }
+
+    // ✅ MÉTODO INDEX ATUALIZADO COM FILTROS
     public function index(Request $request)
     {
-        $tickets = Ticket::query()
-            ->where('user_id', $request->user()->id)
-            ->latest()
-            ->paginate(10);
+        $query = Ticket::where('user_id', $request->user()->id);
+
+        // 1. Filtro de Busca (Assunto ou ID)
+        if ($request->filled('search')) {
+            $term = $request->search;
+            $query->where(function($q) use ($term) {
+                $q->where('subject', 'like', "%{$term}%")
+                  ->orWhere('id', $term);
+            });
+        }
+
+        // 2. Filtro de Status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $tickets = $query->latest()
+            ->paginate(10)
+            ->withQueryString(); // Mantém os filtros na paginação
+
         return view('client.tickets.index', compact('tickets'));
     }
 
@@ -38,8 +71,6 @@ class TicketController extends Controller
         $data = $request->validated();
 
         $ticket = DB::transaction(function () use ($request, $data) {
-            
-            // 1. Cria o Ticket
             $ticket = Ticket::create([
                 'user_id' => $request->user()->id,
                 'subject' => $data['subject'],
@@ -48,18 +79,15 @@ class TicketController extends Controller
                 'status' => TicketStatus::NEW,
             ]);
 
-            // 2. Cria a Mensagem Inicial
             $message = TicketMessage::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => $request->user()->id,
                 'message' => $data['description'],
             ]);
 
-            // 3. ✨ UPLOAD MÚLTIPLO (Loop)
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
                     $path = $file->store('attachments', 'public');
-
                     TicketAttachment::create([
                         'ticket_message_id' => $message->id,
                         'file_path' => $path,
@@ -67,11 +95,9 @@ class TicketController extends Controller
                     ]);
                 }
             }
-
             return $ticket;
         });
 
-        // Notificar Admins
         $admins = User::where('role', 'admin')->get();
         Notification::send($admins, new TicketUpdated($ticket, 'created'));
 
@@ -82,13 +108,9 @@ class TicketController extends Controller
     public function show(Ticket $ticket)
     {
         $this->authorize('view', $ticket);
-        $ticket->load(['messages.user', 'messages.attachments']); // Carregar anexos também, se necessário na view
+        $ticket->load(['messages.user', 'messages.attachments']);
         return view('client.tickets.show', compact('ticket'));
     }
-
-    // ... imports existentes ...
-    // Certifica-te de ter: use App\Models\TicketAttachment;
-    // Certifica-te de ter: use Illuminate\Support\Facades\DB;
 
     public function reply(Request $request, Ticket $ticket)
     {
@@ -96,23 +118,20 @@ class TicketController extends Controller
         
         $data = $request->validate([
             'message' => ['required', 'string'],
-            'attachments' => ['nullable', 'array'],           // Aceita array
-            'attachments.*' => ['file', 'max:5120'],          // Cada arquivo máx 5MB
+            'attachments' => ['nullable', 'array'],
+            'attachments.*' => ['file', 'max:5120'],
         ]);
 
         DB::transaction(function () use ($request, $ticket, $data) {
-            // 1. Cria a mensagem
             $message = TicketMessage::create([
                 'ticket_id' => $ticket->id,
                 'user_id' => $request->user()->id,
                 'message' => $data['message'],
             ]);
 
-            // 2. Upload Múltiplo
             if ($request->hasFile('attachments')) {
                 foreach ($request->file('attachments') as $file) {
                     $path = $file->store('attachments', 'public');
-                    
                     TicketAttachment::create([
                         'ticket_message_id' => $message->id,
                         'file_path' => $path,
@@ -121,16 +140,32 @@ class TicketController extends Controller
                 }
             }
 
-            // 3. Atualiza Status
             if (in_array($ticket->status, [TicketStatus::WAITING_CLIENT, TicketStatus::RESOLVED])) {
                 $ticket->update(['status' => TicketStatus::IN_PROGRESS]);
             }
         });
 
-        // Notificar Admins
         $admins = User::where('role', 'admin')->get();
         Notification::send($admins, new TicketUpdated($ticket, 'replied'));
 
         return back()->with('success', 'Mensagem enviada!');
+    }
+
+    public function rate(Request $request, Ticket $ticket)
+    {
+        $this->authorize('view', $ticket);
+
+        $data = $request->validate([
+            'rating' => ['required', 'integer', 'min:1', 'max:5'],
+            'rating_comment' => ['nullable', 'string', 'max:500'],
+        ]);
+
+        $ticket->update([
+            'rating' => $data['rating'],
+            'rating_comment' => $data['rating_comment'],
+            'status' => TicketStatus::CLOSED,
+        ]);
+
+        return back()->with('success', 'Obrigado pela sua avaliação!');
     }
 }

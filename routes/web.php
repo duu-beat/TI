@@ -3,7 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Client\TicketController as ClientTicketController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
-use App\Http\Controllers\Admin\AuthController as AdminAuthController; // ✅ Novo import
+use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\LegalController;
 
@@ -18,19 +18,22 @@ Route::get('/termos-de-uso', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacidade', [LegalController::class, 'privacy'])->name('privacy');
 Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
 
-
-
 /**
  * CLIENTE
  */
 Route::middleware(['auth', 'verified'])->prefix('app')->name('client.')->group(function () {
-    Route::view('/', 'client.dashboard')->name('dashboard');
+    
+    // ✅ CORREÇÃO 1: Dashboard agora aponta para o Controller (para carregar stats)
+    Route::get('/', [ClientTicketController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/chamados', [ClientTicketController::class, 'index'])->name('tickets.index');
     Route::get('/chamados/criar', [ClientTicketController::class, 'create'])->name('tickets.create');
     Route::post('/chamados', [ClientTicketController::class, 'store'])->name('tickets.store');
     Route::get('/chamados/{ticket}', [ClientTicketController::class, 'show'])->name('tickets.show');
     Route::post('/chamados/{ticket}/responder', [ClientTicketController::class, 'reply'])->name('tickets.reply');
+    
+    // ✅ CORREÇÃO 2: Rota de Avaliação adicionada
+    Route::post('/chamados/{ticket}/avaliar', [ClientTicketController::class, 'rate'])->name('tickets.rate');
 });
 
 /**
@@ -38,12 +41,12 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('client.')->group(f
  */
 Route::prefix('admin')->name('admin.')->group(function () {
     
-    // 1. Rota Raiz: Ao acessar "/admin", redireciona para o login
+    // 1. Rota Raiz
     Route::get('/', function () {
         return redirect()->route('admin.login');
     });
 
-    // 2. Rotas de Autenticação (Ficam em /admin/login)
+    // 2. Rotas de Autenticação
     Route::middleware('guest')->group(function () {
         Route::get('/login', [AdminAuthController::class, 'create'])->name('login');
         Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store');

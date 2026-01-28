@@ -1,116 +1,106 @@
 @extends('layouts.portal')
 
-@section('menu')
-    <a href="{{ route('admin.dashboard') }}" class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">📊 Dashboard</a>
-    <a href="{{ route('admin.tickets.index') }}" class="block rounded-xl px-4 py-2 bg-white/10 text-white font-medium shadow-lg shadow-black/20">🎫 Chamados</a>
-    {{-- Link Novo: Perfil --}}
-    <a href="{{ route('profile.show') }}"
-       class="block rounded-xl px-4 py-2 text-slate-300 hover:bg-white/10 transition">
-        👤 Meu Perfil
+@section('title', 'Gerenciar Chamados')
+
+@section('actions')
+    {{-- Botão para gerar relatório (Exemplo) --}}
+    <a href="{{ route('admin.tickets.report') }}" target="_blank"
+       class="rounded-xl bg-white/10 px-4 py-2 text-sm font-semibold text-white hover:bg-white/15 transition flex items-center gap-2">
+        📄 Gerar Relatório
     </a>
 @endsection
 
-@section('title', 'Quadro de Chamados')
-
-@section('actions')
-    <div class="flex gap-2">
-        <a href="{{ route('admin.tickets.report') }}" target="_blank"
-           class="flex items-center gap-2 rounded-xl bg-slate-800/80 px-4 py-2 text-sm font-semibold text-white border border-white/5 hover:bg-slate-700 hover:-translate-y-0.5 transition-all duration-300">
-            📄 Baixar PDF
-        </a>
-        <a href="{{ route('admin.dashboard') }}"
-           class="rounded-xl bg-white/5 px-4 py-2 text-sm text-slate-300 border border-white/5 hover:bg-white/10 hover:text-white transition-all">
-            Voltar
-        </a>
-    </div>
-@endsection
-
 @section('content')
-<div class="h-full overflow-x-auto pb-4" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)">
-    
-    {{-- 💀 SKELETON KANBAN (3 Colunas) --}}
-    <div x-show="!loaded" class="flex gap-6 min-w-[1000px] animate-pulse">
-        @foreach(range(1, 3) as $col)
-            <div class="w-1/3 space-y-4">
-                {{-- Header da Coluna --}}
-                <div class="h-10 bg-slate-800/50 rounded-xl w-full"></div>
-                {{-- Cards --}}
-                <div class="h-32 bg-slate-800/30 rounded-xl border border-white/5"></div>
-                <div class="h-32 bg-slate-800/30 rounded-xl border border-white/5"></div>
-                <div class="h-32 bg-slate-800/30 rounded-xl border border-white/5"></div>
-            </div>
-        @endforeach
-    </div>
+@php
+    // Definição de cores para status
+    $statusColors = [
+        'new' => 'bg-indigo-500/20 text-indigo-300 border-indigo-500/30',
+        'in_progress' => 'bg-cyan-500/20 text-cyan-300 border-cyan-500/30',
+        'waiting_client' => 'bg-yellow-500/20 text-yellow-300 border-yellow-500/30',
+        'resolved' => 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30',
+        'closed' => 'bg-slate-500/20 text-slate-300 border-slate-500/30',
+    ];
+@endphp
 
-    {{-- ✅ CONTEÚDO REAL --}}
-    <div x-show="loaded" style="display: none;"
-         class="flex gap-6 min-w-[1000px]"
-         x-transition:enter="transition ease-out duration-500"
-         x-transition:enter-start="opacity-0 translate-y-4"
-         x-transition:enter-end="opacity-100 translate-y-0">
-
-        {{-- Coluna 1: NOVOS (Indigo) --}}
-        <div class="w-1/3 flex flex-col gap-4">
-            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/10 backdrop-blur-sm">
-                <h3 class="font-bold text-indigo-200 flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-indigo-400 shadow-[0_0_10px_rgba(129,140,248,0.8)]"></span>
-                    Novos
-                </h3>
-                <span class="bg-indigo-500/20 text-indigo-300 text-xs font-bold px-2 py-0.5 rounded-lg border border-indigo-500/20">
-                    {{ $tickets->where('status', \App\Enums\TicketStatus::NEW)->count() }}
-                </span>
+{{-- BARRA DE FILTROS --}}
+<div class="mb-8 mt-4">
+    <form method="GET" action="{{ route('admin.tickets.index') }}" class="p-4 rounded-2xl bg-slate-900/50 border border-white/10 flex flex-col md:flex-row gap-4 items-center shadow-lg">
+        
+        {{-- Busca --}}
+        <div class="relative w-full">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
             </div>
+            <input type="text" name="search" value="{{ request('search') }}" 
+                   placeholder="Buscar por assunto, ID ou nome do cliente..." 
+                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-slate-200 placeholder-slate-600 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 outline-none transition">
+        </div>
+
+        {{-- Filtro Status --}}
+        <div class="relative w-full md:w-64">
+            <select name="status" class="w-full px-4 py-2.5 rounded-xl bg-slate-950 border border-white/10 text-slate-200 focus:border-cyan-500/50 focus:ring-2 focus:ring-cyan-500/20 outline-none cursor-pointer">
+                <option value="">Todos os status</option>
+                @foreach(\App\Enums\TicketStatus::cases() as $status)
+                    <option value="{{ $status->value }}" {{ request('status') === $status->value ? 'selected' : '' }}>
+                        {{ $status->label() }}
+                    </option>
+                @endforeach
+            </select>
+        </div>
+
+        <button type="submit" class="w-full md:w-auto px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition shadow-lg">
+            Filtrar
+        </button>
+
+        @if(request()->hasAny(['search', 'status']))
+            <a href="{{ route('admin.tickets.index') }}" class="text-sm text-slate-400 hover:text-white underline whitespace-nowrap">
+                Limpar
+            </a>
+        @endif
+    </form>
+</div>
+
+{{-- LISTA DE TICKETS --}}
+<div class="space-y-4">
+    @forelse($tickets as $ticket)
+        <a href="{{ route('admin.tickets.show', $ticket) }}"
+           class="relative block rounded-2xl border border-white/10 bg-white/5 p-5 group
+                  transition-all duration-300 
+                  hover:-translate-y-1 hover:bg-slate-800/80 hover:border-cyan-500/30">
             
-            <div class="space-y-3 p-1">
-                @foreach($tickets->where('status', \App\Enums\TicketStatus::NEW) as $ticket)
-                    <x-kanban-card :ticket="$ticket" color="border-indigo-500" glow="shadow-indigo-500/20" />
-                @endforeach
-                @if($tickets->where('status', \App\Enums\TicketStatus::NEW)->count() === 0)
-                   <div class="text-center py-8 opacity-40 border-2 border-dashed border-indigo-500/20 rounded-xl">
-                       <div class="text-2xl mb-1">📭</div>
-                       <div class="text-xs text-indigo-200">Sem novos chamados</div>
-                   </div>
-                @endif
+            <div class="flex items-start justify-between gap-4">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs font-bold text-slate-500">#{{ $ticket->id }}</span>
+                        <div class="font-semibold text-white text-lg group-hover:text-cyan-400 transition">
+                            {{ $ticket->subject }}
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 text-sm text-slate-400">
+                        <span class="text-slate-300">👤 {{ $ticket->user->name }}</span>
+                        <span>•</span>
+                        <span>{{ $ticket->user->email }}</span>
+                    </div>
+                </div>
+
+                <div class="shrink-0 flex flex-col items-end gap-2">
+                    <span class="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold border {{ $statusColors[$ticket->status->value] ?? '' }}">
+                        {{ $ticket->status->label() }}
+                    </span>
+                    <span class="text-xs text-slate-500">{{ $ticket->created_at->diffForHumans() }}</span>
+                </div>
             </div>
+        </a>
+    @empty
+        <div class="text-center py-16 rounded-2xl border border-dashed border-white/10 bg-white/5">
+            <p class="text-slate-400">Nenhum chamado encontrado com estes filtros.</p>
         </div>
+    @endforelse
+</div>
 
-        {{-- Coluna 2: EM ANDAMENTO (Cyan) --}}
-        <div class="w-1/3 flex flex-col gap-4">
-            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-cyan-500/10 border border-cyan-500/10 backdrop-blur-sm">
-                <h3 class="font-bold text-cyan-200 flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.8)] animate-pulse"></span>
-                    Em Progresso
-                </h3>
-                <span class="bg-cyan-500/20 text-cyan-300 text-xs font-bold px-2 py-0.5 rounded-lg border border-cyan-500/20">
-                    {{ $tickets->whereIn('status', [\App\Enums\TicketStatus::IN_PROGRESS, \App\Enums\TicketStatus::WAITING_CLIENT])->count() }}
-                </span>
-            </div>
-
-            <div class="space-y-3 p-1">
-                @foreach($tickets->whereIn('status', [\App\Enums\TicketStatus::IN_PROGRESS, \App\Enums\TicketStatus::WAITING_CLIENT]) as $ticket)
-                    <x-kanban-card :ticket="$ticket" color="border-cyan-500" glow="shadow-cyan-500/20" />
-                @endforeach
-            </div>
-        </div>
-
-        {{-- Coluna 3: FINALIZADOS (Emerald) --}}
-        <div class="w-1/3 flex flex-col gap-4">
-            <div class="flex items-center justify-between px-3 py-2 rounded-xl bg-emerald-500/10 border border-emerald-500/10 backdrop-blur-sm">
-                <h3 class="font-bold text-emerald-200 flex items-center gap-2">
-                    <span class="h-2 w-2 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></span>
-                    Resolvidos
-                </h3>
-                <span class="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2 py-0.5 rounded-lg border border-emerald-500/20">
-                    {{ $tickets->whereIn('status', [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED])->count() }}
-                </span>
-            </div>
-
-            <div class="space-y-3 p-1 opacity-70 hover:opacity-100 transition duration-500">
-                @foreach($tickets->whereIn('status', [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED]) as $ticket)
-                    <x-kanban-card :ticket="$ticket" color="border-emerald-500" glow="shadow-emerald-500/10" />
-                @endforeach
-            </div>
-        </div>
-    </div>
+<div class="mt-6">
+    {{ $tickets->links() }}
 </div>
 @endsection
