@@ -39,22 +39,25 @@
                 <div class="flex items-center justify-between gap-6">
                     
                     {{-- LOGO --}}
-                    <a href="{{ route('home') }}" class="flex items-center gap-3 group relative z-50">
-                        <div class="relative">
-                            <div class="absolute inset-0 bg-cyan-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition duration-500"></div>
-                            <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI"
-                                 class="h-10 md:h-11 w-auto object-contain relative z-10" />
-                        </div>
+                    <a href="{{ route('home') }}" class="flex items-center gap-1 group relative z-50">
+    
+    {{-- Bloco da Imagem --}}
+    <div class="relative">
+        <div class="absolute inset-0 bg-cyan-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition duration-500"></div>
+        <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI"
+             class="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition" />
+    </div>
 
-                        <div class="leading-tight">
-                            <div class="font-bold tracking-tight text-white leading-none text-lg group-hover:text-cyan-400 transition">
-                                Suporte TI
-                            </div>
-                            <div class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">
-                                Soluções Rápidas
-                            </div>
-                        </div>
-                    </a>
+    {{-- Bloco do Texto --}}
+    <div class="leading-tight text-left">
+        <div class="font-bold tracking-tight text-white leading-none text-lg group-hover:text-cyan-400 transition">
+            Suporte TI
+        </div>
+        <div class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">
+            Soluções Rápidas
+        </div>
+    </div>
+</a>
 
                     {{-- DESKTOP NAV --}}
                     <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
@@ -143,12 +146,14 @@
                     <div class="space-y-6">
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
-                                <img src="{{ asset('images/logosuporteTI.png') }}" class="h-8 w-auto opacity-90" alt="Logo">
-                                <span class="font-bold text-white text-xl">Suporte TI</span>
-                            </div>
-                            <p class="text-slate-400 text-sm leading-relaxed">
-                                Soluções de tecnologia ágeis e transparentes. O parceiro ideal para o seu dia a dia digital.
-                            </p>
+    <img src="{{ asset('images/logosuporteTI.png') }}" 
+         class="h-16 md:h-20 w-auto opacity-90 object-contain" alt="Logo">
+
+    {{-- Fonte aumentada para text-3xl --}}
+    <div class="font-bold text-white text-2xl md:text-3xl leading-none">
+        Suporte TI
+    </div>
+</div>
                         </div>
                         
                         {{-- Status do Sistema --}}

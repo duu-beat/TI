@@ -15,13 +15,16 @@
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-400 opacity-50"></div>
 
                 <div>
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-3 mb-8 group">
-                        <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" class="h-10 w-auto object-contain group-hover:scale-105 transition duration-300">
-                        <div class="leading-tight">
+                    {{-- LOGO PADRONIZADA --}}
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-1 mb-8 group">
+                        <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" 
+                             class="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition duration-300">
+                        <div class="leading-tight text-left">
                             <div class="text-white font-bold tracking-tight text-xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
-                            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-0.5">Portal do Cliente</div>
+                            <div class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1">Portal do Cliente</div>
                         </div>
                     </a>
+                    {{-- FIM LOGO PADRONIZADA --}}
 
                     <h1 class="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
                         Bem-vindo de volta!
