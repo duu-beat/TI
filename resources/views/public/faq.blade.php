@@ -1,89 +1,86 @@
 @extends('layouts.site')
 
 @section('content')
-<div class="relative py-20 overflow-hidden">
-    {{-- Luzes de fundo decorativas --}}
-    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
-        <div class="absolute top-[10%] left-[20%] w-96 h-96 bg-indigo-500/10 rounded-full blur-[120px]"></div>
-        <div class="absolute bottom-[20%] right-[20%] w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]"></div>
+<div class="relative py-24 min-h-screen">
+    
+    {{-- Background Glow (Referência Base: Azul/Ciano para Informação) --}}
+    <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none overflow-hidden">
+        <div class="absolute top-[10%] right-[20%] w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px]"></div>
+        <div class="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
     </div>
 
     <div class="relative z-10 max-w-4xl mx-auto px-6">
-        {{-- Header --}}
+        
+        {{-- HERO SECTION PADRONIZADA --}}
         <div class="text-center mb-16">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-semibold text-cyan-400 uppercase tracking-wider mb-4">
-                💡 Base de Conhecimento
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6 hover:bg-cyan-500/20 transition cursor-default">
+                ❓ Tira-Dúvidas
             </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4">
-                Perguntas Frequentes
+            <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">
+                Perguntas <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Frequentes.</span>
             </h1>
             <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-                Tire as suas dúvidas rapidamente. Se não encontrar o que procura, a nossa equipa está pronta para ajudar.
+                As respostas para as dúvidas mais comuns sobre os nossos serviços e processos.
             </p>
         </div>
 
-        {{-- Lista de FAQs (Acordeão) --}}
-        <div class="space-y-4">
-            @forelse($faqs as $faq)
-                <div x-data="{ open: false }" 
-                     class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-md overflow-hidden transition-all duration-300 hover:border-white/20 hover:bg-white/[0.07]">
-                    
-                    {{-- Pergunta (Botão Clicável) --}}
-                    <button @click="open = !open" class="w-full flex items-center justify-between p-6 text-left group">
-                        <span class="font-semibold text-slate-200 text-lg group-hover:text-white transition">
+        {{-- LISTA DE FAQS (COM ALPINE JS PARA ACORDEÃO) --}}
+        <div class="space-y-4" x-data="{ active: null }">
+            @forelse($faqs as $index => $faq)
+                <div class="rounded-2xl border border-white/10 bg-slate-900/50 hover:bg-slate-900/80 transition overflow-hidden">
+                    {{-- Pergunta (Botão) --}}
+                    <button @click="active = (active === {{ $index }} ? null : {{ $index }})" 
+                            class="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
+                        <span class="text-lg font-bold text-white group-hover:text-cyan-400 transition pr-8">
                             {{ $faq->question }}
                         </span>
-                        
-                        {{-- Ícone + / - Animado --}}
-                        <span class="ml-6 flex h-10 w-10 items-center justify-center rounded-full bg-white/5 border border-white/5 transition-all duration-300 group-hover:border-cyan-500/30"
-                              :class="open ? 'rotate-180 bg-cyan-500/20 text-cyan-400 border-cyan-500/50' : 'text-slate-400'">
-                            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <span class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center text-slate-400 transition-transform duration-300"
+                              :class="active === {{ $index }} ? 'rotate-180 bg-cyan-500/20 text-cyan-400' : ''">
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                             </svg>
                         </span>
                     </button>
 
-                    {{-- Resposta (Expansível) --}}
-                    <div x-show="open" 
+                    {{-- Resposta (Conteúdo) --}}
+                    <div x-show="active === {{ $index }}" 
                          x-collapse 
-                         class="border-t border-white/5 bg-slate-950/30 px-6 pb-8 pt-4">
-                        <div class="prose prose-invert prose-p:text-slate-400 max-w-none">
+                         x-cloak
+                         class="border-t border-white/5 bg-white/[0.02]">
+                        <div class="p-6 pt-2 text-slate-400 leading-relaxed">
                             {{ $faq->answer }}
-                        </div>
-                        
-                        <div class="mt-4 flex items-center gap-2 text-xs text-slate-500">
-                            <span>Isso foi útil?</span>
-                            <button class="hover:text-cyan-400 transition">👍 Sim</button>
-                            <button class="hover:text-red-400 transition">👎 Não</button>
                         </div>
                     </div>
                 </div>
             @empty
-                {{-- Empty State --}}
-                <div class="text-center py-12">
-                    <div class="text-2xl mb-2">🤔</div>
-                    <h3 class="text-white font-medium">Ainda não há perguntas</h3>
-                    <p class="text-slate-500 text-sm">Volte mais tarde ou entre em contato.</p>
+                <div class="text-center py-16 rounded-3xl border border-dashed border-white/10 bg-white/5">
+                    <div class="text-4xl mb-4 grayscale opacity-50">🔍</div>
+                    <h3 class="text-white font-bold mb-2">Ainda não há perguntas</h3>
+                    <p class="text-slate-500 text-sm">Estamos a atualizar a nossa base de conhecimento.</p>
                 </div>
             @endforelse
         </div>
 
-        {{-- Footer CTA --}}
-        <div class="mt-20 text-center p-8 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent">
-            <h3 class="text-xl font-bold text-white mb-2">Ainda precisa de ajuda?</h3>
-            <p class="text-slate-400 mb-6">Não encontrou a sua resposta? Abra um chamado e responderemos o mais rápido possível.</p>
+        {{-- CTA FINAL PADRÃO --}}
+        <div class="mt-20 text-center p-10 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-md">
+            <h3 class="text-2xl font-bold text-white mb-3">Não encontrou o que procura?</h3>
+            <p class="text-slate-400 mb-8 max-w-lg mx-auto">
+                A nossa equipa está pronta para ajudar com dúvidas específicas ou problemas complexos.
+            </p>
             
             <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                 <a href="{{ route('client.tickets.create') }}" 
-                   class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-8 py-3 font-bold text-slate-950 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:brightness-110 transition-all">
+                   class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition">
                     Abrir Chamado
                 </a>
                 <a href="{{ route('contact') }}" 
-                   class="w-full sm:w-auto inline-flex items-center justify-center rounded-2xl bg-white/5 border border-white/10 px-8 py-3 font-semibold text-white hover:bg-white/10 transition">
-                    Entrar em Contato
+                   class="w-full sm:w-auto px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition">
+                    Fale Conosco
                 </a>
             </div>
         </div>
+
     </div>
 </div>
 @endsection

@@ -1,10 +1,11 @@
 <x-form-section submit="updateProfileInformation">
-    <x-slot name="title">{{ __('Dados Cadastrais') }}</x-slot>
-    <x-slot name="description">{{ __('Informações básicas de identificação.') }}</x-slot>
+    <x-slot name="title">{{ __('Informações do Perfil') }}</x-slot>
+    <x-slot name="description">{{ __('Atualize as informações de perfil e endereço de e-mail da sua conta.') }}</x-slot>
 
     <x-slot name="form">
+        {{-- Foto de Perfil --}}
         @if (Laravel\Jetstream\Jetstream::managesProfilePhotos())
-            <div x-data="{photoName: null, photoPreview: null}" class="col-span-6">
+            <div x-data="{photoName: null, photoPreview: null}" class="col-span-6 sm:col-span-4">
                 <input type="file" id="photo" class="hidden" wire:model.live="photo" x-ref="photo"
                         x-on:change="photoName = $refs.photo.files[0].name; const reader = new FileReader(); reader.onload = (e) => { photoPreview = e.target.result; }; reader.readAsDataURL($refs.photo.files[0]);" />
                 
@@ -32,6 +33,7 @@
             </div>
         @endif
 
+        {{-- Nome --}}
         <div class="col-span-6 sm:col-span-4">
             <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">{{ __('Nome Completo') }}</label>
             <div class="relative group">
@@ -43,8 +45,9 @@
             <x-input-error for="name" class="mt-2 text-red-400" />
         </div>
 
+        {{-- Email --}}
         <div class="col-span-6 sm:col-span-4">
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">{{ __('Email') }}</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">{{ __('E-mail') }}</label>
             <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-500 group-focus-within:text-cyan-400 transition duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
@@ -56,7 +59,7 @@
     </x-slot>
 
     <x-slot name="actions">
-        <x-action-message class="me-3 text-emerald-400 font-bold text-sm" on="saved">{{ __('Salvo.') }}</x-action-message>
+        <x-action-message class="me-3 text-emerald-400 font-bold text-sm" on="saved">{{ __('Salvo com sucesso.') }}</x-action-message>
         <button type="submit" wire:loading.attr="disabled" class="rounded-xl bg-white/10 border border-white/10 px-6 py-2 text-sm font-bold text-white hover:bg-white/20 hover:scale-105 transition-all shadow-lg cursor-pointer">
             {{ __('Salvar') }}
         </button>

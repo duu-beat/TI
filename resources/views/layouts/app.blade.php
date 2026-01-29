@@ -33,76 +33,18 @@
         <div class="absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] rounded-full bg-purple-600/10 blur-[100px]"></div>
     </div>
 
-    @php
-        $user = auth()->user();
-        $isAdmin = $user && ($user->role === 'admin');
-        $badge = $isAdmin ? 'Admin' : 'Cliente';
-        $badgeClass = $isAdmin 
-            ? 'bg-red-500/10 text-red-200 border-red-500/20' 
-            : 'bg-cyan-500/10 text-cyan-200 border-cyan-500/20';
-    @endphp
-
     {{-- Layout Wrapper com Controle de Estado (Sidebar + Modal) --}}
     <div class="min-h-screen flex relative z-10" x-data="{ sidebarOpen: false, logoutModalOpen: false }">
 
-        {{-- Sidebar --}}
-        <aside class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-950/80 backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto"
-               :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
-            
-            {{-- Logo --}}
-            <div class="p-6 border-b border-white/10 flex items-center justify-between">
-                <a href="{{ route('home') }}" class="flex items-center gap-4 group">
-                    <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" 
-                         class="h-12 w-12 rounded-xl object-contain shrink-0 group-hover:scale-105 transition" />
-                    <div class="flex-1">
-                        <div class="font-bold text-white leading-tight tracking-tight">Suporte TI</div>
-                        <div class="mt-1 inline-flex items-center">
-                            <span class="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded border {{ $badgeClass }}">
-                                {{ $badge }}
-                            </span>
-                        </div>
-                    </div>
-                </a>
-                <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-                </button>
-            </div>
-
-            {{-- Menu Dinâmico --}}
-            <nav class="flex-1 p-4 space-y-1 text-sm overflow-y-auto">
-                @if($isAdmin)
-                    @include('layouts.partials.admin-menu')
-                @else
-                    @include('layouts.partials.client-menu')
-                @endif
-            </nav>
-
-            {{-- Footer Sidebar (User + Logout) --}}
-            <div class="p-4 border-t border-white/10 bg-white/5">
-                <div class="flex items-center justify-between gap-3">
-                    <div class="overflow-hidden">
-                        <div class="text-sm text-slate-200 font-semibold truncate">{{ $user->name }}</div>
-                        <div class="text-xs text-slate-500 truncate">{{ $user->email }}</div>
-                    </div>
-                    
-                    {{-- BOTÃO DE SAIR (Abre o Modal) --}}
-                    <button type="button" 
-                            @click="logoutModalOpen = true"
-                            class="rounded-xl bg-white/10 p-2 text-slate-200 hover:bg-white/20 hover:text-red-400 transition" 
-                            title="Sair">
-                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </aside>
+        {{-- ✨ NOVA SIDEBAR (Componente) --}}
+        <x-sidebar />
 
         {{-- Conteúdo Principal --}}
         <main class="flex-1 flex flex-col min-h-screen overflow-hidden bg-transparent">
             {{-- Topbar Sticky --}}
             <header class="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-md border-b border-white/10 h-16 flex items-center justify-between px-6">
                 <div class="flex items-center gap-4">
+                    {{-- Trigger Mobile Sidebar --}}
                     <button @click="sidebarOpen = true" class="lg:hidden text-slate-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
@@ -114,7 +56,7 @@
                 </div>
             </header>
 
-            {{-- Slot do Jetstream --}}
+            {{-- Slot do Conteúdo --}}
             <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
                 {{ $slot }}
             </div>
@@ -123,41 +65,23 @@
         {{-- Backdrop Mobile --}}
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"></div>
 
-        {{-- 🛑 MODAL DE LOGOUT PERSONALIZADO --}}
+        {{-- Modal de Logout --}}
         <div x-show="logoutModalOpen" style="display: none;" class="fixed inset-0 z-[999] flex items-center justify-center p-6" x-cloak>
-            
-            {{-- Backdrop Escuro --}}
             <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" 
-                 x-show="logoutModalOpen"
-                 x-transition:enter="ease-out duration-300"
-                 x-transition:enter-start="opacity-0"
-                 x-transition:enter-end="opacity-100"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100"
-                 x-transition:leave-end="opacity-0"
-                 @click="logoutModalOpen = false"></div>
+                 x-show="logoutModalOpen" x-transition.opacity @click="logoutModalOpen = false"></div>
 
-            {{-- O Cartão do Modal --}}
             <div class="relative w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 shadow-2xl p-1"
                  x-show="logoutModalOpen"
                  x-transition:enter="ease-out duration-300"
                  x-transition:enter-start="opacity-0 scale-95 translate-y-4"
-                 x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                 x-transition:leave="ease-in duration-200"
-                 x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                 x-transition:leave-end="opacity-0 scale-95 translate-y-4">
+                 x-transition:enter-end="opacity-100 scale-100 translate-y-0">
                 
                 <div class="bg-white/5 rounded-[20px] p-6 border border-white/5">
                     <div class="flex items-center gap-4 mb-6">
-                        {{-- Ícone 👋 --}}
-                        <div class="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">
-                            👋
-                        </div>
+                        <div class="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">👋</div>
                         <div>
                             <div class="text-lg font-bold text-white">Confirmar saída</div>
-                            <div class="text-sm text-slate-400">
-                                {{ $isAdmin ? 'Deseja sair do painel administrativo?' : 'Deseja sair do seu portal?' }}
-                            </div>
+                            <div class="text-sm text-slate-400">Deseja encerrar a sessão?</div>
                         </div>
                     </div>
 

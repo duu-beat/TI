@@ -1,89 +1,109 @@
 @extends('layouts.site')
 
 @section('content')
-<div class="relative py-20 min-h-[80vh] flex items-center">
+<div class="relative py-20 min-h-screen flex items-center">
     
-    {{-- Background Glow --}}
-    <div class="absolute top-1/2 left-3/4 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/20 rounded-full blur-[120px] pointer-events-none"></div>
+    {{-- Background --}}
+    <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/5 to-transparent pointer-events-none hidden lg:block"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 w-full">
-        <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <div class="grid lg:grid-cols-2 gap-16 items-start">
             
-            {{-- Lado Esquerdo: Texto e Infos --}}
-            <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 text-xs font-bold uppercase tracking-widest mb-6">
-                    💬 Vamos conversar
+            {{-- Lado Esquerdo: Infos --}}
+            <div class="space-y-8">
+                <div>
+                    <h1 class="text-4xl md:text-5xl font-black text-white tracking-tight mb-6">
+                        Vamos resolver <br>
+                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">o seu problema?</span>
+                    </h1>
+                    <p class="text-lg text-slate-400 leading-relaxed">
+                        Preencha o formulário ou utilize um de nossos canais diretos. Nossa equipa está pronta para agir.
+                    </p>
                 </div>
-                <h1 class="text-4xl md:text-5xl font-extrabold text-white tracking-tight mb-6">
-                    Tem um problema? <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Nós temos a solução.</span>
-                </h1>
-                <p class="text-lg text-slate-400 mb-10 leading-relaxed">
-                    Sem "tecniquês" complicado, sem sustos no orçamento. Descreva o que está acontecendo e responderemos com o melhor caminho.
-                </p>
 
-                <div class="space-y-6">
-                    {{-- Info Card 1 --}}
-                    <div class="flex items-start gap-4 p-5 rounded-2xl border border-white/5 bg-white/[0.02]">
-                        <div class="w-10 h-10 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xl shrink-0">
-                            📍
-                        </div>
+                <div class="space-y-4">
+                    {{-- Card Email --}}
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition">
+                        <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xl">📧</div>
                         <div>
-                            <div class="text-white font-bold text-lg">Atendimento Híbrido</div>
-                            <p class="text-slate-400 text-sm mt-1">Suporte remoto para todo o Brasil ou presencial (dependendo da sua região).</p>
+                            <div class="text-xs font-bold text-slate-500 uppercase">E-mail</div>
+                            <div class="text-white font-medium">contato@suporteti.com</div>
                         </div>
                     </div>
 
-                    {{-- Info Card 2 --}}
-                    <div class="flex items-start gap-4 p-5 rounded-2xl border border-white/5 bg-white/[0.02]">
-                        <div class="w-10 h-10 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl shrink-0">
-                            ⏰
-                        </div>
+                    {{-- Card WhatsApp --}}
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition">
+                        <div class="w-12 h-12 rounded-xl bg-green-500/20 flex items-center justify-center text-green-400 text-xl">📱</div>
                         <div>
-                            <div class="text-white font-bold text-lg">Horários Flexíveis</div>
-                            <p class="text-slate-400 text-sm mt-1">Atendemos de Seg a Sáb. Mande sua mensagem e combinamos o melhor horário.</p>
+                            <div class="text-xs font-bold text-slate-500 uppercase">WhatsApp / Telefone</div>
+                            <div class="text-white font-medium">(21) 99999-9999</div>
+                        </div>
+                    </div>
+
+                    {{-- Card Endereço --}}
+                    <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition">
+                        <div class="w-12 h-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-xl">📍</div>
+                        <div>
+                            <div class="text-xs font-bold text-slate-500 uppercase">Localização</div>
+                            <div class="text-white font-medium">Seropédica, RJ</div>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {{-- Lado Direito: Formulário Glass --}}
-            <div class="relative">
-                <div class="absolute -inset-1 bg-gradient-to-r from-indigo-500 to-cyan-500 rounded-3xl blur opacity-20"></div>
-                
-                <div class="relative rounded-3xl border border-white/10 bg-slate-900/80 backdrop-blur-xl p-8 shadow-2xl">
-                    <h3 class="text-xl font-bold text-white mb-6">Mande uma mensagem</h3>
-                    
-                    <form class="space-y-5" method="POST" action="#">
-                        @csrf
+            {{-- Lado Direito: Formulário --}}
+            <div class="bg-slate-900/80 border border-white/10 rounded-[2.5rem] p-8 shadow-2xl backdrop-blur-xl relative">
+                {{-- Decorative border glow --}}
+                <div class="absolute inset-0 rounded-[2.5rem] border border-white/10 pointer-events-none"></div>
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Seu Nome</label>
-                            <input name="name" type="text"
-                                class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
-                                placeholder="Como prefere ser chamado?" required />
-                        </div>
+                {{-- Feedback de Sucesso --}}
+@if(session('success'))
+    <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-emerald-400 animate-fade-in">
+        <svg class="w-6 h-6 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+        <span class="font-bold">{{ session('success') }}</span>
+    </div>
+@endif
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Seu Email</label>
-                            <input name="email" type="email"
-                                class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
-                                placeholder="exemplo@email.com" required />
-                        </div>
+{{-- O Formulário Ativo --}}
+<form action="{{ route('contact.submit') }}" method="POST" class="space-y-5 relative z-10">
+    @csrf {{-- ⚠️ OBRIGATÓRIO PARA FUNCIONAR --}}
+    
+    <div class="grid md:grid-cols-2 gap-5">
+        <div class="space-y-1">
+            <label class="text-xs font-bold text-slate-400 uppercase ml-1">Nome</label>
+            <input type="text" name="name" value="{{ old('name') }}" 
+                   class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition" 
+                   placeholder="Seu nome" required>
+            @error('name') <span class="text-xs text-red-400 ml-1">{{ $message }}</span> @enderror
+        </div>
+        <div class="space-y-1">
+            <label class="text-xs font-bold text-slate-400 uppercase ml-1">Telefone</label>
+            <input type="text" name="phone" value="{{ old('phone') }}" 
+                   class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition" 
+                   placeholder="(00) 00000-0000">
+        </div>
+    </div>
 
-                        <div class="space-y-1">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">O Problema</label>
-                            <textarea name="message" rows="4"
-                                class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none resize-none"
-                                placeholder="Descreva brevemente o que está acontecendo..." required></textarea>
-                        </div>
+    <div class="space-y-1">
+        <label class="text-xs font-bold text-slate-400 uppercase ml-1">E-mail</label>
+        <input type="email" name="email" value="{{ old('email') }}" 
+               class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition" 
+               placeholder="seu@email.com" required>
+        @error('email') <span class="text-xs text-red-400 ml-1">{{ $message }}</span> @enderror
+    </div>
 
-                        <button type="submit"
-                            class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                            Enviar Mensagem 🚀
-                        </button>
-                    </form>
-                </div>
+    <div class="space-y-1">
+        <label class="text-xs font-bold text-slate-400 uppercase ml-1">Mensagem</label>
+        <textarea name="message" rows="4" 
+                  class="w-full rounded-xl border border-white/10 bg-slate-950/50 px-4 py-3 text-slate-100 focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 outline-none transition resize-none" 
+                  placeholder="Como podemos ajudar?" required>{{ old('message') }}</textarea>
+        @error('message') <span class="text-xs text-red-400 ml-1">{{ $message }}</span> @enderror
+    </div>
+
+    <button type="submit" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-cyan-500/20 hover:scale-[1.02] transition">
+        Enviar Mensagem 
+    </button>
+</form>
             </div>
 
         </div>

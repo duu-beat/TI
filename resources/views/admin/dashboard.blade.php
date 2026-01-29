@@ -1,250 +1,139 @@
-@extends('layouts.portal')
+<x-app-layout>
+    <x-slot name="header">
+        Dashboard Administrativo
+    </x-slot>
 
-@section('title', 'Dashboard administrativo')
-
-@section('content')
-@php
-    $tickets = \App\Models\Ticket::query();
-
-    // Contagens
-    $countNew = (clone $tickets)->where('status', \App\Enums\TicketStatus::NEW)->count();
-    $countInProgress = (clone $tickets)->where('status', \App\Enums\TicketStatus::IN_PROGRESS)->count();
-    $countWaiting = (clone $tickets)->where('status', \App\Enums\TicketStatus::WAITING_CLIENT)->count();
-    $countResolved = (clone $tickets)->whereIn('status', [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED])->count();
-
-    // Dados do Gráfico (Últimos 7 dias)
-    $dailyTickets = \App\Models\Ticket::selectRaw('DATE(created_at) as date, count(*) as total')
-        ->where('created_at', '>=', now()->subDays(7))
-        ->groupBy('date')
-        ->orderBy('date')
-        ->get();
-
-    $chartLabels = [];
-    $chartValues = [];
-    
-    for ($i = 6; $i >= 0; $i--) {
-        $date = now()->subDays($i)->format('Y-m-d');
-        $prettyDate = now()->subDays($i)->format('d/m');
-        $chartLabels[] = $prettyDate;
-        $chartValues[] = $dailyTickets->where('date', $date)->first()->total ?? 0;
-    }
-
-    $queue = (clone $tickets)->with('user')->latest()->take(6)->get();
-    
-    $statusColors = [
-        'new' => 'bg-indigo-500/20 text-indigo-300 border border-indigo-500/30',
-        'in_progress' => 'bg-cyan-500/20 text-cyan-300 border border-cyan-500/30',
-        'waiting_client' => 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30',
-        'resolved' => 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/30',
-        'closed' => 'bg-slate-500/20 text-slate-300 border border-slate-500/30',
-    ];
-@endphp
-
-<div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)">
-
-    {{-- SKELETON LOADING --}}
-    <div x-show="!loaded" class="space-y-6 animate-pulse">
-        <x-skeleton class="h-32 rounded-3xl" />
-        <div class="grid lg:grid-cols-4 gap-6">
-            <x-skeleton class="h-32 rounded-2xl" /><x-skeleton class="h-32 rounded-2xl" /><x-skeleton class="h-32 rounded-2xl" /><x-skeleton class="h-32 rounded-2xl" />
-        </div>
-        <div class="grid lg:grid-cols-3 gap-6">
-            <x-skeleton class="h-64 rounded-2xl" /><x-skeleton class="lg:col-span-2 h-64 rounded-2xl" />
-        </div>
-    </div>
-
-    {{-- CONTEÚDO REAL --}}
-    <div x-show="loaded" style="display: none;"
-         x-transition:enter="transition ease-out duration-500"
-         x-transition:enter-start="opacity-0 translate-y-4"
-         x-transition:enter-end="opacity-100 translate-y-0">
-
-        {{-- Top Bar --}}
-        <div class="flex items-center justify-between mb-6">
-            <div class="text-sm text-slate-400">Painel Administrativo</div>
-            <a href="{{ route('home') }}" class="flex items-center gap-2 text-sm font-medium text-cyan-400 hover:text-cyan-300 transition">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
-                Ir para o Site
-            </a>
-        </div>
-
-        {{-- Banner Summary --}}
-        <div class="rounded-3xl border border-white/10 bg-white/5 p-6 mb-6">
-            <div class="flex items-start justify-between gap-4 flex-wrap">
+    <div class="space-y-8">
+        
+        {{-- 🚨 ALERTA DE PRIORIDADE (Se houver chamados urgentes abertos) --}}
+        @if($priorityStats['high'] > 0)
+            <div class="rounded-2xl bg-red-500/10 border border-red-500/20 p-4 flex items-center gap-4 animate-pulse">
+                <div class="bg-red-500 text-white h-10 w-10 rounded-full flex items-center justify-center font-bold">!</div>
                 <div>
-                    <div class="text-sm text-slate-400">Resumo</div>
-                    <div class="text-2xl font-extrabold text-white">Fila de atendimento</div>
-                    <div class="mt-1 text-sm text-slate-300">
-                        Priorize os novos e acompanhe respostas pendentes.
-                    </div>
+                    <h3 class="text-red-400 font-bold">Atenção Necessária</h3>
+                    <p class="text-red-200/70 text-sm">Existem <strong>{{ $priorityStats['high'] }}</strong> chamados de Alta Prioridade em aberto.</p>
                 </div>
+                <a href="{{ route('admin.tickets.index', ['status' => 'new']) }}" class="ml-auto text-xs bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg transition">Ver Fila</a>
+            </div>
+        @endif
 
-                <div class="flex gap-3 flex-wrap">
-                    <a href="{{ route('profile.show') }}" class="rounded-2xl bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 border border-white/10 hover:bg-white/10 hover:text-white transition flex items-center gap-2">
-                        ⚙️ Configurações
-                    </a>
-                    
-                    <a href="{{ route('admin.tickets.index') }}"
-                       class="rounded-2xl bg-white/10 px-5 py-2 text-sm font-semibold text-white hover:bg-white/15 transition">
-                        Gerenciar chamados
-                    </a>
+        {{-- KPIS PRINCIPAIS --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="rounded-2xl border border-indigo-500/20 bg-gradient-to-br from-indigo-500/10 to-transparent p-6">
+                <div class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-2">Novos Tickets</div>
+                <div class="flex items-center justify-between">
+                    <div class="text-3xl font-bold text-white">{{ $stats['new'] }}</div>
+                    <div class="h-10 w-10 rounded-lg bg-indigo-500/20 flex items-center justify-center text-xl">🔥</div>
                 </div>
             </div>
-        </div>
 
-        {{-- CARDS DE STATUS --}}
-        <div class="grid lg:grid-cols-4 gap-6 mb-6">
-            <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:border-indigo-500/30 transition duration-300 hover:-translate-y-1">
-                <div class="text-sm text-slate-400">Novos</div>
-                <div class="mt-2 text-3xl font-bold text-indigo-300">{{ $countNew }}</div>
-                <div class="mt-2 text-xs text-slate-400">Chegaram e ainda não foram assumidos.</div>
+            <div class="rounded-2xl border border-cyan-500/20 bg-gradient-to-br from-cyan-500/10 to-transparent p-6">
+                <div class="text-cyan-300 text-xs font-bold uppercase tracking-wider mb-2">Em Atendimento</div>
+                <div class="flex items-center justify-between">
+                    <div class="text-3xl font-bold text-white">{{ $stats['in_progress'] }}</div>
+                    <div class="h-10 w-10 rounded-lg bg-cyan-500/20 flex items-center justify-center text-xl">⚙️</div>
+                </div>
             </div>
 
-            <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:border-cyan-500/30 transition duration-300 hover:-translate-y-1">
-                <div class="text-sm text-slate-400">Em andamento</div>
-                <div class="mt-2 text-3xl font-bold text-cyan-300">{{ $countInProgress }}</div>
-                <div class="mt-2 text-xs text-slate-400">Você está trabalhando nisso.</div>
+            <div class="rounded-2xl border border-emerald-500/20 bg-gradient-to-br from-emerald-500/10 to-transparent p-6">
+                <div class="text-emerald-300 text-xs font-bold uppercase tracking-wider mb-2">Resolvidos</div>
+                <div class="flex items-center justify-between">
+                    <div class="text-3xl font-bold text-white">{{ $stats['resolved'] }}</div>
+                    <div class="h-10 w-10 rounded-lg bg-emerald-500/20 flex items-center justify-center text-xl">✅</div>
+                </div>
             </div>
 
-            <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:border-yellow-500/30 transition duration-300 hover:-translate-y-1">
-                <div class="text-sm text-slate-400">Aguardando cliente</div>
-                <div class="mt-2 text-3xl font-bold text-yellow-300">{{ $countWaiting }}</div>
-                <div class="mt-2 text-xs text-slate-400">Você já respondeu e espera retorno.</div>
-            </div>
-
-            <div class="rounded-2xl bg-white/5 border border-white/10 p-5 hover:border-emerald-500/30 transition duration-300 hover:-translate-y-1">
-                <div class="text-sm text-slate-400">Finalizados</div>
-                <div class="mt-2 text-3xl font-bold text-emerald-300">{{ $countResolved }}</div>
-                <div class="mt-2 text-xs text-slate-400">Resolvidos ou fechados.</div>
-            </div>
-        </div>
-
-        {{-- GRÁFICOS (Chart.js) --}}
-        <div class="grid lg:grid-cols-3 gap-6 mb-6">
-            {{-- Gráfico 1: Status (Rosca) --}}
             <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
-                <h3 class="text-sm font-semibold text-slate-300 mb-4">Distribuição de Status</h3>
-                <div class="relative h-64">
-                    <canvas id="statusChart"></canvas>
+                <div class="text-slate-400 text-xs font-bold uppercase tracking-wider mb-2">Total Geral</div>
+                <div class="flex items-center justify-between">
+                    <div class="text-3xl font-bold text-white">{{ $stats['total'] }}</div>
+                    <div class="h-10 w-10 rounded-lg bg-white/10 flex items-center justify-center text-xl">📊</div>
                 </div>
             </div>
+        </div>
 
-            {{-- Gráfico 2: Volume Semanal (Barras) --}}
+        <div class="grid lg:grid-cols-3 gap-6">
+            {{-- GRÁFICO SEMANAL --}}
             <div class="lg:col-span-2 rounded-2xl border border-white/10 bg-white/5 p-6">
-                <h3 class="text-sm font-semibold text-slate-300 mb-4">Chamados nos últimos 7 dias</h3>
-                <div class="relative h-64">
+                <h3 class="text-sm font-bold text-white mb-6 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400"></span> Volume Semanal
+                </h3>
+                <div class="relative h-64 w-full">
                     <canvas id="weeklyChart"></canvas>
                 </div>
             </div>
-        </div>
 
-        {{-- LISTA RECENTE --}}
-        <div class="grid lg:grid-cols-3 gap-6">
-            <div class="lg:col-span-2 rounded-2xl bg-white/5 border border-white/10 p-6">
-                <div class="flex items-center justify-between gap-4 flex-wrap">
-                    <h2 class="text-lg font-semibold text-white">Últimas atividades</h2>
-                    <a href="{{ route('admin.tickets.index') }}" class="text-sm text-slate-300 hover:text-white underline">
-                        Ver todos
-                    </a>
-                </div>
-
-                <div class="mt-4 space-y-3">
-                    @forelse($queue as $ticket)
-                        <a href="{{ route('admin.tickets.show', $ticket) }}"
-                           class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition group hover:border-white/20">
-                            <div class="flex items-start justify-between gap-4">
-                                <div>
-                                    <div class="font-semibold text-white group-hover:text-cyan-400 transition">{{ $ticket->subject }}</div>
-                                    <div class="mt-1 text-xs text-slate-400">
-                                        {{ $ticket->user->name }} • {{ $ticket->created_at->format('d/m/Y H:i') }}
-                                    </div>
-                                </div>
-
-                                <span class="text-xs rounded-full px-3 py-1 font-medium {{ $statusColors[$ticket->status->value] ?? 'bg-white/10 text-slate-200' }}">
-                                    {{ $ticket->status->label() }}
+            {{-- LISTA RÁPIDA (Recentes) --}}
+            <div class="rounded-2xl border border-white/10 bg-white/5 p-6 flex flex-col">
+                <h3 class="text-sm font-bold text-white mb-4 flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-indigo-400"></span> Entrada Recente
+                </h3>
+                
+                <div class="flex-1 overflow-y-auto space-y-3 pr-2 custom-scrollbar">
+                    @foreach($latestTickets as $ticket)
+                        <a href="{{ route('admin.tickets.show', $ticket) }}" class="block p-3 rounded-xl bg-slate-900/50 border border-white/5 hover:border-indigo-500/30 transition group">
+                            <div class="flex justify-between items-start mb-1">
+                                <span class="text-[10px] font-bold text-slate-500">#{{ $ticket->id }}</span>
+                                <span class="text-[10px] {{ $ticket->created_at->diffInHours() < 24 ? 'text-green-400' : 'text-slate-500' }}">
+                                    {{ $ticket->created_at->diffForHumans(short: true) }}
                                 </span>
                             </div>
+                            <div class="text-sm font-medium text-slate-200 group-hover:text-white truncate">
+                                {{ $ticket->subject }}
+                            </div>
+                            <div class="mt-2 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-5 w-5 rounded-full bg-slate-700 flex items-center justify-center text-[10px] text-white">
+                                        {{ substr($ticket->user->name, 0, 1) }}
+                                    </div>
+                                    <span class="text-xs text-slate-400 truncate max-w-[80px]">{{ $ticket->user->name }}</span>
+                                </div>
+                                {{-- Badge minimalista --}}
+                                <div class="h-2 w-2 rounded-full 
+                                    {{ match($ticket->status->value) {
+                                        'new' => 'bg-indigo-500',
+                                        'in_progress' => 'bg-cyan-500',
+                                        'waiting_client' => 'bg-yellow-500',
+                                        default => 'bg-slate-500'
+                                    } }}"></div>
+                            </div>
                         </a>
-                    @empty
-                        <div class="text-sm text-slate-300">
-                            Nenhum chamado por enquanto.
-                        </div>
-                    @endforelse
+                    @endforeach
                 </div>
-            </div>
-
-            {{-- Atalhos --}}
-            <div class="rounded-2xl bg-white/5 border border-white/10 p-6 flex flex-col justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-white mb-4">Atalhos</h2>
-                    <div class="space-y-3">
-                        <a href="{{ route('admin.tickets.index') }}"
-                           class="block rounded-2xl border border-white/10 bg-slate-950/30 p-4 hover:bg-slate-950/40 transition hover:border-white/20">
-                            <div class="font-semibold text-white">Abrir fila de chamados</div>
-                            <div class="mt-1 text-sm text-slate-400">Filtrar, responder e atualizar status.</div>
-                        </a>
-                    </div>
-                </div>
-
-                {{-- Logout Button --}}
-                <div class="mt-6 pt-6 border-t border-white/5">
-                    <form method="POST" action="{{ route('logout') }}">
-                        @csrf
-                        <button type="submit" class="w-full flex items-center justify-center gap-2 p-3 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 hover:text-red-300 transition group">
-                            <span>🚪</span> Sair do Painel
-                        </button>
-                    </form>
+                <div class="mt-4 pt-4 border-t border-white/10 text-center">
+                    <a href="{{ route('admin.tickets.index') }}" class="text-xs text-indigo-400 hover:text-indigo-300">Ver todos os chamados &rarr;</a>
                 </div>
             </div>
         </div>
     </div>
-</div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-    Chart.defaults.color = '#94a3b8';
-    Chart.defaults.borderColor = '#334155';
-
-    // Gráfico de Status
-    new Chart(document.getElementById('statusChart'), {
-        type: 'doughnut',
-        data: {
-            labels: ['Novos', 'Em Andamento', 'Resolvidos'],
-            datasets: [{
-                data: [{{ $countNew }}, {{ $countInProgress + $countWaiting }}, {{ $countResolved }}],
-                backgroundColor: ['#818cf8', '#22d3ee', '#34d399'], 
-                borderWidth: 0,
-                hoverOffset: 4
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            plugins: { legend: { position: 'bottom' } }
-        }
-    });
-
-    // Gráfico Semanal
-    new Chart(document.getElementById('weeklyChart'), {
-        type: 'bar',
-        data: {
-            labels: @json($chartLabels),
-            datasets: [{
-                label: 'Chamados',
-                data: @json($chartValues),
-                backgroundColor: '#38bdf8',
-                borderRadius: 4,
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: { beginAtZero: true, grid: { color: '#1e293b' } },
-                x: { grid: { display: false } }
+    {{-- Chart.js --}}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        Chart.defaults.color = '#64748b';
+        Chart.defaults.borderColor = '#334155';
+        
+        new Chart(document.getElementById('weeklyChart'), {
+            type: 'bar',
+            data: {
+                labels: @json($chartLabels),
+                datasets: [{
+                    label: 'Chamados',
+                    data: @json($chartValues),
+                    backgroundColor: '#22d3ee',
+                    borderRadius: 4,
+                    barThickness: 20
+                }]
             },
-            plugins: { legend: { display: false } }
-        }
-    });
-</script>
-@endsection
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: {
+                    y: { beginAtZero: true, grid: { color: '#1e293b' } },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</x-app-layout>

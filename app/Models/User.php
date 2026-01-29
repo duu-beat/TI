@@ -31,12 +31,13 @@ class User extends Authenticatable
         'password',
     ];
 
+    /**
+     * Relacionamento com Tickets
+     */
     public function tickets()
-{
-    return $this->hasMany(\App\Models\Ticket::class);
-}
-
-
+    {
+        return $this->hasMany(\App\Models\Ticket::class);
+    }
 
     /**
      * The attributes that should be hidden for serialization.
@@ -70,5 +71,23 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    // 🔥 NOVOS HELPERS DE ROLE 🔥
+    
+    /**
+     * Verifica se o utilizador é Administrador.
+     */
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    /**
+     * Verifica se o utilizador é Cliente.
+     */
+    public function isClient(): bool
+    {
+        return $this->role === 'client';
     }
 }

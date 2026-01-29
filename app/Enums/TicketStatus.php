@@ -21,7 +21,6 @@ enum TicketStatus: string
         };
     }
 
-    // ✨ NOVO: Cores centralizadas aqui
     public function color(): string
     {
         return match($this) {

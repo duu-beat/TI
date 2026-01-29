@@ -1,13 +1,13 @@
 <x-app-layout>
     @php
         $user = auth()->user();
-        $isAdmin = $user->role === 'admin'; // Ajuste conforme seu campo no DB
+        $isAdmin = $user->role === 'admin'; // Ajuste conforme a tua lógica de role
         $accent = $isAdmin ? 'red' : 'cyan';
     @endphp
 
     <x-slot name="header">
         <h2 class="font-bold text-xl text-white leading-tight">
-            {{ __('Central da Conta') }}
+            {{ __('Minha Conta') }}
         </h2>
     </x-slot>
 
@@ -84,16 +84,16 @@
                 {{-- 5. Deletar Conta --}}
                 @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
                     <div class="md:col-span-2 xl:col-span-1">
+                        {{-- Bloqueio visual para admins não se deletarem por engano --}}
                         @if(!$isAdmin)
                             @livewire('profile.delete-user-form')
                         @else
-                            {{-- Admin não pode deletar --}}
                             <div class="h-full flex flex-col justify-center items-center bg-slate-900/50 border border-red-500/20 rounded-[2rem] p-8 text-center relative overflow-hidden shadow-xl">
                                 <div class="absolute inset-0 bg-red-500/5 pattern-grid-lg opacity-20"></div>
                                 <div class="text-4xl mb-4 grayscale opacity-50">🛡️</div>
-                                <h3 class="text-red-400 font-bold text-lg">Área Protegida</h3>
+                                <h3 class="text-red-400 font-bold text-lg">Conta Protegida</h3>
                                 <p class="text-xs text-slate-500 mt-2 px-4">
-                                    Contas administrativas não podem ser excluídas pelo painel.
+                                    Administradores não podem excluir a conta através deste painel.
                                 </p>
                             </div>
                         @endif

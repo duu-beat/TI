@@ -1,6 +1,6 @@
 <x-form-section submit="updatePassword">
-    <x-slot name="title">{{ __('Alterar Senha') }}</x-slot>
-    <x-slot name="description">{{ __('Use uma senha longa para maior segurança.') }}</x-slot>
+    <x-slot name="title">{{ __('Atualizar Senha') }}</x-slot>
+    <x-slot name="description">{{ __('Certifique-se de que sua conta esteja usando uma senha longa e aleatória para permanecer segura.') }}</x-slot>
 
     <x-slot name="form">
         <div class="col-span-6 sm:col-span-4">
@@ -26,7 +26,7 @@
         </div>
 
         <div class="col-span-6 sm:col-span-4">
-            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">{{ __('Confirmar') }}</label>
+            <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 ml-1">{{ __('Confirmar Senha') }}</label>
             <div class="relative group">
                 <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-500 group-focus-within:text-purple-400 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg>
@@ -38,9 +38,9 @@
     </x-slot>
 
     <x-slot name="actions">
-        <x-action-message class="me-3 text-emerald-400 font-bold text-sm" on="saved">{{ __('Atualizado.') }}</x-action-message>
+        <x-action-message class="me-3 text-emerald-400 font-bold text-sm" on="saved">{{ __('Senha atualizada.') }}</x-action-message>
         <button type="submit" class="rounded-xl bg-white/10 border border-white/10 px-6 py-2 text-sm font-bold text-white hover:bg-white/20 hover:scale-105 transition shadow-lg cursor-pointer">
-            {{ __('Atualizar') }}
+            {{ __('Salvar') }}
         </button>
     </x-slot>
 </x-form-section>

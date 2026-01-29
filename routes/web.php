@@ -6,12 +6,16 @@ use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\LegalController;
+use App\Http\Controllers\Client\DashboardController; // Adicionar no topo do ficheiro
+use App\Http\Controllers\Public\ContactController;
 
 Route::view('/', 'public.home')->name('home');
 Route::view('/servicos', 'public.services')->name('services');
 Route::view('/portfolio', 'public.portfolio')->name('portfolio');
-Route::view('/contato', 'public.contact')->name('contact');
+Route::get('/contato', [ContactController::class, 'index'])->name('contact');
+Route::post('/contato', [ContactController::class, 'submit'])->name('contact.submit'); // Nova rota POST
 Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+Route::view('/sobre', 'public.sobre')->name('sobre');
 
 // Páginas Legais
 Route::get('/termos-de-uso', [LegalController::class, 'terms'])->name('terms');
@@ -23,8 +27,8 @@ Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
  */
 Route::middleware(['auth', 'verified'])->prefix('app')->name('client.')->group(function () {
     
-    // ✅ CORREÇÃO 1: Dashboard agora aponta para o Controller (para carregar stats)
-    Route::get('/', [ClientTicketController::class, 'dashboard'])->name('dashboard');
+    // Dashboard aponta para o Controller
+    Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
     Route::get('/chamados', [ClientTicketController::class, 'index'])->name('tickets.index');
     Route::get('/chamados/criar', [ClientTicketController::class, 'create'])->name('tickets.create');
@@ -32,7 +36,7 @@ Route::middleware(['auth', 'verified'])->prefix('app')->name('client.')->group(f
     Route::get('/chamados/{ticket}', [ClientTicketController::class, 'show'])->name('tickets.show');
     Route::post('/chamados/{ticket}/responder', [ClientTicketController::class, 'reply'])->name('tickets.reply');
     
-    // ✅ CORREÇÃO 2: Rota de Avaliação adicionada
+    // Rota de Avaliação
     Route::post('/chamados/{ticket}/avaliar', [ClientTicketController::class, 'rate'])->name('tickets.rate');
 });
 
@@ -57,12 +61,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // 4. Área Protegida
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
-        Route::view('/dashboard', 'admin.dashboard')->name('dashboard');
+        
+        // 🔥 CORREÇÃO 1: Dashboard agora aponta para o Controller (para carregar os gráficos)
+        Route::get('/dashboard', [AdminTicketController::class, 'dashboard'])->name('dashboard');
         
         // Rotas de Chamados
         Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');
         Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
-        Route::post('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.status');
+
+        // 🔥 CORREÇÃO 2: Rota de Status corrigida para PATCH e com o nome certo
+        Route::patch('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.update-status');
+
         Route::post('/chamados/{ticket}/responder', [AdminTicketController::class, 'reply'])->name('tickets.reply');
         Route::get('/relatorio', [AdminTicketController::class, 'report'])->name('tickets.report');
     });

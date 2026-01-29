@@ -87,7 +87,7 @@
 
                 <div class="relative flex py-2 items-center mb-6">
                     <div class="flex-grow border-t border-white/10"></div>
-                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">Ou com email</span>
+                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">Ou com e-mail</span>
                     <div class="flex-grow border-t border-white/10"></div>
                 </div>
 
@@ -95,7 +95,7 @@
                     @csrf
 
                     <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Email</label>
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">E-mail</label>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -113,7 +113,7 @@
                             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Senha</label>
                             @if (Route::has('password.request'))
                                 <a class="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition" href="{{ route('password.request') }}">
-                                    Esqueceu?
+                                    Esqueceu a senha?
                                 </a>
                             @endif
                         </div>

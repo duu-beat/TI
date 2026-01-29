@@ -45,7 +45,7 @@
                 </div>
 
                 <div class="mt-12 text-xs font-medium text-slate-500 border-t border-white/5 pt-6">
-                    Você pode usar o mesmo email do seu WhatsApp para facilitar.
+                    Você pode usar o mesmo e-mail do seu WhatsApp para facilitar.
                 </div>
             </div>
 
@@ -79,7 +79,7 @@
 
                 <div class="relative flex py-2 items-center mb-6">
                     <div class="flex-grow border-t border-white/10"></div>
-                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">Ou com email</span>
+                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">Ou com e-mail</span>
                     <div class="flex-grow border-t border-white/10"></div>
                 </div>
 
@@ -101,7 +101,7 @@
                     </div>
 
                     <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Email</label>
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">E-mail</label>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
