@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTicketRequest;
+use App\Http\Requests\ReplyTicketRequest; // <--- Importamos o novo Request
 use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
@@ -19,6 +20,7 @@ class TicketController extends Controller
 {
     use AuthorizesRequests;
 
+    // ... dashboard e index (mantêm-se iguais) ...
     public function dashboard(Request $request)
     {
         $user = $request->user();
@@ -35,12 +37,10 @@ class TicketController extends Controller
         return view('client.dashboard', compact('stats', 'recentTickets'));
     }
 
-    // ✅ MÉTODO INDEX ATUALIZADO COM FILTROS
     public function index(Request $request)
     {
         $query = Ticket::where('user_id', $request->user()->id);
 
-        // 1. Filtro de Busca (Assunto ou ID)
         if ($request->filled('search')) {
             $term = $request->search;
             $query->where(function($q) use ($term) {
@@ -49,14 +49,13 @@ class TicketController extends Controller
             });
         }
 
-        // 2. Filtro de Status
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $tickets = $query->latest()
             ->paginate(10)
-            ->withQueryString(); // Mantém os filtros na paginação
+            ->withQueryString();
 
         return view('client.tickets.index', compact('tickets'));
     }
@@ -85,16 +84,9 @@ class TicketController extends Controller
                 'message' => $data['description'],
             ]);
 
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('attachments', 'public');
-                    TicketAttachment::create([
-                        'ticket_message_id' => $message->id,
-                        'file_path' => $path,
-                        'file_name' => $file->getClientOriginalName(),
-                    ]);
-                }
-            }
+            // ✅ DRY: Usa o novo método privado
+            $this->processAttachments($request, $message);
+
             return $ticket;
         });
 
@@ -112,15 +104,12 @@ class TicketController extends Controller
         return view('client.tickets.show', compact('ticket'));
     }
 
-    public function reply(Request $request, Ticket $ticket)
+    // ✅ Typehint atualizado para ReplyTicketRequest
+    public function reply(ReplyTicketRequest $request, Ticket $ticket)
     {
         $this->authorize('view', $ticket);
         
-        $data = $request->validate([
-            'message' => ['required', 'string'],
-            'attachments' => ['nullable', 'array'],
-            'attachments.*' => ['file', 'max:5120'],
-        ]);
+        $data = $request->validated(); // Validação automática via Request class
 
         DB::transaction(function () use ($request, $ticket, $data) {
             $message = TicketMessage::create([
@@ -129,16 +118,8 @@ class TicketController extends Controller
                 'message' => $data['message'],
             ]);
 
-            if ($request->hasFile('attachments')) {
-                foreach ($request->file('attachments') as $file) {
-                    $path = $file->store('attachments', 'public');
-                    TicketAttachment::create([
-                        'ticket_message_id' => $message->id,
-                        'file_path' => $path,
-                        'file_name' => $file->getClientOriginalName(),
-                    ]);
-                }
-            }
+            // ✅ DRY: Usa o mesmo método de upload
+            $this->processAttachments($request, $message);
 
             if (in_array($ticket->status, [TicketStatus::WAITING_CLIENT, TicketStatus::RESOLVED])) {
                 $ticket->update(['status' => TicketStatus::IN_PROGRESS]);
@@ -167,5 +148,24 @@ class TicketController extends Controller
         ]);
 
         return back()->with('success', 'Obrigado pela sua avaliação!');
+    }
+
+    /**
+     * ✅ Método Privado para processar anexos (Clean Code)
+     * Reutilizável no store() e reply()
+     */
+    private function processAttachments(Request $request, TicketMessage $message): void
+    {
+        if ($request->hasFile('attachments')) {
+            foreach ($request->file('attachments') as $file) {
+                $path = $file->store('attachments', 'public');
+                
+                TicketAttachment::create([
+                    'ticket_message_id' => $message->id,
+                    'file_path' => $path,
+                    'file_name' => $file->getClientOriginalName(),
+                ]);
+            }
+        }
     }
 }

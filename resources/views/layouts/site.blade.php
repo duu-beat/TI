@@ -9,10 +9,31 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     {{-- Ajusta a página para ficar responsiva em dispositivos móveis --}}
 
-    <title>{{ config('app.name', 'Suporte TI') }}</title>
-    {{-- Título da aba do navegador. Pega o nome do app do config/app.php, senão usa "Suporte TI" --}}
+    {{-- Favicon (Logo na Aba) --}}
+    <link rel="icon" href="{{ asset('images/logosuporteTI.png') }}" type="image/png">
+
+    {{-- 🔥 1. SEO & REDES SOCIAIS (NOVO) --}}
+    {{-- Permite que cada página defina seu próprio título. Ex: "Contato - Suporte TI" --}}
+    <title>@yield('title', config('app.name', 'Suporte TI'))</title>
     
-    {{-- 1. FONTE OUTFIT --}}
+    {{-- Descrição para o Google --}}
+    <meta name="description" content="@yield('meta_description', 'Suporte TI especializado. Abertura de chamados técnicos, manutenção e consultoria para empresas e particulares.')">
+
+    {{-- Open Graph / Facebook / WhatsApp --}}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', config('app.name', 'Suporte TI'))">
+    <meta property="og:description" content="@yield('meta_description', 'Soluções rápidas em TI. Abra seu chamado agora.')">
+    <meta property="og:image" content="{{ asset('images/logosuporteTI.png') }}">
+
+    {{-- Twitter --}}
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="@yield('title', config('app.name', 'Suporte TI'))">
+    <meta property="twitter:description" content="@yield('meta_description', 'Soluções rápidas em TI.')">
+    <meta property="twitter:image" content="{{ asset('images/logosuporteTI.png') }}">
+
+    {{-- 2. FONTE OUTFIT --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     {{-- Otimização: abre conexão antecipada com o domínio do Google Fonts --}}
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -24,7 +45,7 @@
         body { font-family: 'Outfit', sans-serif; }
         /* Aplica a fonte Outfit em todo o site */
         
-        /* 2. SCROLLBAR DARK */
+        /* 3. SCROLLBAR DARK */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
         /* Define largura/altura da scrollbar (Chrome/Edge/Safari) */
 
@@ -53,7 +74,7 @@
     - flex flex-col min-h-screen: layout em coluna com altura mínima da tela toda
 --}}
 
-    {{-- 3. MESH GRADIENT --}}
+    {{-- 4. MESH GRADIENT --}}
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         {{-- Camada fixa no fundo (tela inteira), não clicável, escondendo overflow para os "glows" não vazarem --}}
         <div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[120px]"></div>
@@ -84,11 +105,12 @@
                     {{-- Linha com logo à esquerda e navegação/btn à direita --}}
                     
                     {{-- LOGO --}}
-                    <a href="{{ route('home') }}" class="flex items-center gap-1 group relative z-50">
+                    <a href="{{ route('home') }}" class="flex items-center gap-1 group relative z-50 -ml-4">
                         {{-- 
                             Link que leva para a rota "home"
                             group permite usar group-hover nos elementos internos
                             z-50 evita que o blur/elementos por trás atrapalhem cliques
+                            -ml-4: Margem negativa à esquerda para puxar o logo
                         --}}
     
                         {{-- Bloco da Imagem --}}
@@ -96,18 +118,15 @@
                             {{-- container relativo para posicionar o glow por trás --}}
                             <div class="absolute inset-0 bg-cyan-500/20 blur-lg rounded-full opacity-0 group-hover:opacity-100 transition duration-500"></div>
                             {{-- glow por trás do logo aparece no hover (opacity 0 -> 100) --}}
+                            
+                            {{-- Logo ajustado (h-12 mobile, h-16 desktop) --}}
                             <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI"
-                                 class="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition" />
-                            {{-- 
-                                Imagem do logo (Laravel asset)
-                                responsiva: 16 no mobile, 20 no md+
-                                object-contain mantém proporção
-                                cresce levemente no hover
-                            --}}
+                                 class="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition" />
                         </div>
 
                         {{-- Bloco do Texto --}}
-                        <div class="leading-tight text-left">
+                        {{-- 🔥 AJUSTE: Adicionado ml-2 para afastar o texto do logo --}}
+                        <div class="leading-tight text-left ml-2">
                             {{-- agrupa o nome e subtítulo com espaçamento compacto --}}
                             <div class="font-bold tracking-tight text-white leading-none text-lg group-hover:text-cyan-400 transition">
                                 Suporte TI
@@ -262,8 +281,9 @@
                         {{-- Coluna com espaçamento vertical --}}
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
+                                {{-- Logo Footer ajustado --}}
                                 <img src="{{ asset('images/logosuporteTI.png') }}" 
-                                class="h-16 md:h-20 w-auto opacity-90 object-contain" alt="Logo">
+                                class="h-12 md:h-16 w-auto opacity-90 object-contain" alt="Logo">
                                 {{-- Logo do footer, leve transparência com opacity-90 --}}
 
                                 {{-- Fonte aumentada para text-3xl --}}

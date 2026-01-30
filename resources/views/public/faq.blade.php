@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO do FAQ --}}
+@section('title', 'FAQ - Suporte TI')
+@section('meta_description', 'Tire suas dúvidas sobre nossos serviços de suporte técnico, contratos de manutenção e atendimento.')
+
 @section('content')
 <div class="relative py-24 min-h-screen">
     

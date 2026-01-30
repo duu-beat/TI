@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO dos Termos --}}
+@section('title', 'Termos de Uso')
+@section('meta_description', 'Regras e condições para utilização dos serviços da Suporte TI.')
+
 @section('content')
 <div class="relative py-20 min-h-screen">
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">

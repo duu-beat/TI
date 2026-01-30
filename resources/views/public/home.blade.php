@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO da Home --}}
+@section('title', 'Suporte TI')
+@section('meta_description', 'Suporte TI empresarial e residencial. Monitoramento, segurança, redes e manutenção de computadores. Aumente a produtividade do seu negócio.')
+
 @section('content')
 
 {{-- ======================================================================

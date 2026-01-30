@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO da Página Sobre --}}
+@section('title', 'Sobre Nós - Suporte TI')
+@section('meta_description', 'Conheça a Suporte TI em Seropédica. Transformamos a tecnologia de empresas com prevenção, monitoramento proativo e agilidade.')
+
 @section('content')
 <div class="relative py-24 min-h-screen overflow-hidden">
     

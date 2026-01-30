@@ -5,7 +5,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Suporte TI') }}</title>
+    {{-- Favicon (Logo na Aba) --}}
+    <link rel="icon" href="{{ asset('images/logosuporteTI.png') }}" type="image/png">
+
+    {{-- 🔥 SEO DINÂMICO --}}
+    <title>@yield('title', config('app.name', 'Suporte TI'))</title>
+    <meta name="description" content="@yield('meta_description', 'Acesse o portal do cliente Suporte TI para abrir chamados e gerenciar serviços.')">
+
+    {{-- Open Graph / Facebook / WhatsApp --}}
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:title" content="@yield('title', config('app.name', 'Suporte TI'))">
+    <meta property="og:description" content="@yield('meta_description', 'Acesse o portal do cliente Suporte TI.')">
+    <meta property="og:image" content="{{ asset('images/logosuporteTI.png') }}">
+
+    {{-- Twitter --}}
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="{{ url()->current() }}">
+    <meta property="twitter:title" content="@yield('title', config('app.name', 'Suporte TI'))">
+    <meta property="twitter:description" content="@yield('meta_description', 'Acesse o portal do cliente Suporte TI.')">
+    <meta property="twitter:image" content="{{ asset('images/logosuporteTI.png') }}">
 
     {{-- Fonte Outfit --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">

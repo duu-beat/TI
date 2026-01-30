@@ -1,3 +1,7 @@
+{{-- Configuração de SEO --}}
+@section('title', 'Criar Conta - Junte-se ao Suporte TI')
+@section('meta_description', 'Cadastre-se gratuitamente para ter acesso a suporte de alta prioridade, gestão de infraestrutura e atendimento rápido.')
+
 <x-guest-layout>
     <div class="w-full max-w-5xl">
         <div class="grid lg:grid-cols-2 rounded-3xl overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-xl shadow-2xl relative">
@@ -13,16 +17,21 @@
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-400 opacity-50"></div>
 
                 <div>
-                    {{-- LOGO PADRONIZADA --}}
-                    <a href="{{ route('home') }}" class="inline-flex items-center gap-1 mb-8 group">
+                    {{-- LOGO PADRONIZADA (AJUSTADA) --}}
+                    {{-- Adicionado -ml-4 para alinhar --}}
+                    <a href="{{ route('home') }}" class="inline-flex items-center gap-1 mb-8 group -ml-4">
                         <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" 
-                             class="h-16 md:h-20 w-auto object-contain group-hover:scale-105 transition duration-300">
-                        <div class="leading-tight text-left">
-                            <div class="text-white font-bold tracking-tight text-xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
-                            <div class="text-[10px] text-slate-400 font-medium uppercase tracking-wider mt-1">Criar Conta</div>
+                             class="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition duration-300">
+                        
+                        {{-- Adicionado ml-2 para afastar texto --}}
+                        <div class="leading-tight text-left ml-2">
+                            {{-- Aumentado para text-2xl --}}
+                            <div class="text-white font-bold tracking-tight text-2xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
+                            {{-- Aumentado para text-xs --}}
+                            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Criar Conta</div>
                         </div>
                     </a>
-                    {{-- FIM LOGO PADRONIZADA --}}
+                    {{-- FIM LOGO --}}
 
                     <h1 class="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
                         Comece em segundos.

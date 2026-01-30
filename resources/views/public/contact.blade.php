@@ -1,5 +1,12 @@
 @extends('layouts.site')
 
+{{-- Define o Título da Aba --}}
+@section('title', 'Contato - Suporte TI')
+
+{{-- Define a descrição para o Google/WhatsApp --}}
+@section('meta_description', 'Precisa de suporte técnico? Entre em contato agora. Atendimento rápido via WhatsApp, E-mail ou Telefone.')
+
+
 @section('content')
 <div class="relative py-20 min-h-screen flex items-center">
     

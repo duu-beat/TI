@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO do Portfólio --}}
+@section('title', 'Portfólio - Suporte TI')
+@section('meta_description', 'Veja como a Suporte TI ajudou empresas a otimizar sua infraestrutura. Cases reais de otimização, segurança, redes e montagem de computadores.')
+
 @section('content')
 <div class="relative py-24 min-h-screen">
     

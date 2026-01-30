@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO da Página Serviços --}}
+@section('title', 'Nossos Serviços - Suporte TI')
+@section('meta_description', 'Serviços completos de TI: Manutenção de computadores, redes corporativas, backup em nuvem e cibersegurança. Planos mensais e avulsos.')
+
 @section('content')
 <div class="relative py-20">
     {{-- Glow --}}

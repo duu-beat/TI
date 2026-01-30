@@ -1,5 +1,9 @@
 @extends('layouts.site')
 
+{{-- SEO do SLA --}}
+@section('title', 'SLA e Prazos de Atendimento')
+@section('meta_description', 'Entenda nossos níveis de serviço (SLA), prazos de resposta e prioridades de atendimento para suporte técnico.')
+
 @section('content')
 <div class="relative py-20 min-h-screen">
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
