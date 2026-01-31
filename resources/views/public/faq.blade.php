@@ -1,13 +1,12 @@
 @extends('layouts.site')
 
-{{-- SEO do FAQ --}}
 @section('title', 'FAQ - Suporte TI')
-@section('meta_description', 'Tire suas dúvidas sobre nossos serviços de suporte técnico, contratos de manutenção e atendimento.')
+@section('meta_description', 'Tire suas dúvidas sobre nossos serviços de suporte técnico.')
 
 @section('content')
 <div class="relative py-24 min-h-screen">
     
-    {{-- Background Glow (Referência Base: Azul/Ciano para Informação) --}}
+    {{-- Background Glow --}}
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none overflow-hidden">
         <div class="absolute top-[10%] right-[20%] w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px]"></div>
         <div class="absolute bottom-[20%] left-[10%] w-[500px] h-[500px] bg-blue-600/10 rounded-full blur-[120px]"></div>
@@ -15,7 +14,6 @@
 
     <div class="relative z-10 max-w-4xl mx-auto px-6">
         
-        {{-- HERO SECTION PADRONIZADA --}}
         <div class="text-center mb-16">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6 hover:bg-cyan-500/20 transition cursor-default">
                 ❓ Tira-Dúvidas
@@ -29,11 +27,9 @@
             </p>
         </div>
 
-        {{-- LISTA DE FAQS (COM ALPINE JS PARA ACORDEÃO) --}}
         <div class="space-y-4" x-data="{ active: null }">
             @forelse($faqs as $index => $faq)
                 <div class="rounded-2xl border border-white/10 bg-slate-900/50 hover:bg-slate-900/80 transition overflow-hidden">
-                    {{-- Pergunta (Botão) --}}
                     <button @click="active = (active === {{ $index }} ? null : {{ $index }})" 
                             class="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
                         <span class="text-lg font-bold text-white group-hover:text-cyan-400 transition pr-8">
@@ -46,12 +42,7 @@
                             </svg>
                         </span>
                     </button>
-
-                    {{-- Resposta (Conteúdo) --}}
-                    <div x-show="active === {{ $index }}" 
-                         x-collapse 
-                         x-cloak
-                         class="border-t border-white/5 bg-white/[0.02]">
+                    <div x-show="active === {{ $index }}" x-collapse x-cloak class="border-t border-white/5 bg-white/[0.02]">
                         <div class="p-6 pt-2 text-slate-400 leading-relaxed">
                             {{ $faq->answer }}
                         </div>
@@ -66,24 +57,51 @@
             @endforelse
         </div>
 
-        {{-- CTA FINAL PADRÃO --}}
-        <div class="mt-20 text-center p-10 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-md">
-            <h3 class="text-2xl font-bold text-white mb-3">Não encontrou o que procura?</h3>
-            <p class="text-slate-400 mb-8 max-w-lg mx-auto">
-                A nossa equipa está pronta para ajudar com dúvidas específicas ou problemas complexos.
-            </p>
-            
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="{{ route('client.tickets.create') }}" 
-                   class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition">
-                    Abrir Chamado
-                </a>
-                <a href="{{ route('contact') }}" 
-                   class="w-full sm:w-auto px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition">
-                    Fale Conosco
-                </a>
+        {{-- CTA FINAL --}}
+        {{-- ESCONDIDO PARA ADMIN --}}
+        @unless(auth()->check() && auth()->user()->role === 'admin')
+            <div class="mt-20 text-center p-10 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-md">
+                
+                <h3 class="text-2xl font-bold text-white mb-3">
+                    @auth
+                        Precisa de suporte especializado?
+                    @else
+                        Não encontrou o que procura?
+                    @endauth
+                </h3>
+
+                <p class="text-slate-400 mb-8 max-w-lg mx-auto">
+                    @auth
+                        Como cliente da Suporte TI, você tem acesso prioritário através do nosso Portal. Utilize-o para abrir e acompanhar os seus chamados com maior agilidade.
+                    @else
+                        A nossa equipa está pronta para ajudar com dúvidas específicas ou problemas complexos.
+                    @endauth
+                </p>
+                
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    
+                    @auth
+                        {{-- CLIENTE LOGADO: Apenas Botão do Portal --}}
+                        <a href="{{ route('client.tickets.create') }}" 
+                           class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition">
+                            Acessar Portal do Cliente
+                        </a>
+                    @else
+                        {{-- VISITANTE: Abrir Chamado + Fale Conosco --}}
+                        <a href="{{ route('contact') }}" 
+                           class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition">
+                            Abrir Chamado
+                        </a>
+
+                        <a href="{{ route('contact') }}" 
+                           class="w-full sm:w-auto px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition">
+                            Fale Conosco
+                        </a>
+                    @endauth
+
+                </div>
             </div>
-        </div>
+        @endunless
 
     </div>
 </div>

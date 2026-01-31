@@ -1,8 +1,15 @@
 import './bootstrap';
+import collapse from '@alpinejs/collapse'; // Importa apenas o plugin
 import 'cropperjs/dist/cropper.css'; 
 import Cropper from 'cropperjs';
 
-const initPhotoCropper = () => {
+// Ouve o evento de inicialização do Alpine (disparado pelo Livewire)
+document.addEventListener('alpine:init', () => {
+    
+    // 1. Regista o plugin Collapse para o FAQ
+    Alpine.plugin(collapse);
+
+    // 2. Define o componente do Cropper (o teu código original)
     Alpine.data('photoCropper', (wire) => ({
         cropping: false,
         cropper: null,
@@ -24,12 +31,10 @@ const initPhotoCropper = () => {
 
         startCropper() {
             this.cropping = true;
-            
-            // Espera o modal (display: block) renderizar para iniciar o Cropper
-            setTimeout(() => {
+            // Usa $nextTick para garantir que o modal existe no DOM
+            this.$nextTick(() => {
                 const imageElement = this.$refs.cropperImage;
                 
-                // Limpa instância anterior se existir
                 if (this.cropper) { 
                     this.cropper.destroy(); 
                     this.cropper = null;
@@ -37,27 +42,25 @@ const initPhotoCropper = () => {
 
                 if (imageElement) {
                     imageElement.src = this.imageUrl;
-                    
-                    // Remove opacidade para mostrar a imagem só agora
                     imageElement.classList.remove('opacity-0');
 
                     this.cropper = new Cropper(imageElement, {
-                        aspectRatio: 1, // Quadrado
-                        viewMode: 1,    // Restringe o corte dentro da tela
+                        aspectRatio: 1, 
+                        viewMode: 1,
                         dragMode: 'move',
                         autoCropArea: 0.9,
-                        guides: false,        // Sem grades
+                        guides: false,
                         center: true,
                         highlight: false,
-                        background: false,    // Tenta remover fundo padrão
-                        modal: true,          // Escurece em volta
+                        background: false,
+                        modal: true,
                         movable: true,
                         zoomable: true,
                         scalable: false,
                         rotatable: false,
                     });
                 }
-            }, 100); 
+            }); 
         },
 
         cancelCrop() {
@@ -69,7 +72,6 @@ const initPhotoCropper = () => {
             this.imageUrl = null;
             this.loading = false;
             
-            // Reseta input e esconde imagem novamente
             if (this.$refs.photoInput) {
                 this.$refs.photoInput.value = null;
             }
@@ -86,21 +88,20 @@ const initPhotoCropper = () => {
             this.cropper.getCroppedCanvas({
                 width: 600, 
                 height: 600,
-                fillColor: '#ffffff', // Fundo branco caso png transparente
+                fillColor: '#ffffff',
                 imageSmoothingEnabled: true,
                 imageSmoothingQuality: 'high',
             }).toBlob((blob) => {
-                // Preview imediato na tela
                 this.photoPreview = URL.createObjectURL(blob);
 
                 if (!wire) {
-                    alert('Erro: Livewire não conectado.');
+                    console.error('Livewire não conectado.');
                     this.loading = false;
                     return;
                 }
 
                 wire.upload('photo', blob, 
-                    () => { this.cancelCrop(); }, // Sucesso
+                    () => { this.cancelCrop(); }, 
                     () => { 
                         alert('Erro no upload.'); 
                         this.loading = false; 
@@ -109,10 +110,4 @@ const initPhotoCropper = () => {
             }, 'image/jpeg', 0.9);
         }
     }));
-};
-
-if (typeof window.Alpine !== 'undefined') {
-    initPhotoCropper();
-} else {
-    document.addEventListener('alpine:init', initPhotoCropper);
-}
+});

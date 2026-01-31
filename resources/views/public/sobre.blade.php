@@ -30,12 +30,13 @@
             </p>
         </div>
 
-        {{-- 2. MANIFESTO (TEXTO DENSO) --}}
+        {{-- 2. MANIFESTO --}}
         <div class="grid md:grid-cols-12 gap-12 items-start mb-32">
             <div class="md:col-span-5 relative">
                 <div class="absolute inset-0 bg-gradient-to-tr from-blue-600 to-purple-600 rounded-3xl rotate-3 opacity-20 blur-lg"></div>
                 <div class="relative h-full min-h-[400px] rounded-3xl bg-slate-900 border border-white/10 p-8 flex flex-col justify-end overflow-hidden">
-                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1550751827-4bd374c3f58b?q=80&w=2070&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
+                    {{-- Imagem de Fundo --}}
+                    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
                     <div class="relative z-10">
                         <h3 class="text-2xl font-bold text-white mb-2">O futuro é agora.</h3>
                         <p class="text-sm text-slate-300">E nós estamos construindo a infraestrutura para ele.</p>
@@ -61,61 +62,30 @@
             </div>
         </div>
 
-        {{-- 3. NOSSA HISTÓRIA (TIMELINE EXPANDIDA) --}}
-        <div class="mb-32">
-            <div class="text-center mb-16">
-                <h2 class="text-3xl font-bold text-white mb-4">A Nossa Jornada</h2>
-                <p class="text-slate-400">De uma pequena sala para a gestão de centenas de endpoints.</p>
-            </div>
-
-            <div class="space-y-12 relative border-l border-white/10 ml-4 md:ml-1/2 md:-translate-x-px">
+        {{-- 3. NOSSA TRAJETÓRIA --}}
+        <div class="mb-32 relative">
+            <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-500/0 via-blue-500/50 to-blue-500/0 hidden md:block"></div>
+            
+            <div class="md:pl-12">
+                <h2 class="text-3xl font-bold text-white mb-8">Nossa Trajetória</h2>
                 
-                {{-- Marco 1 --}}
-                <div class="relative flex flex-col md:flex-row items-center justify-between group">
-                    <div class="absolute left-[-5px] md:left-1/2 md:-ml-[5px] w-[10px] h-[10px] rounded-full bg-indigo-500 ring-4 ring-slate-950 group-hover:scale-150 transition duration-500"></div>
+                <div class="space-y-8 text-lg text-slate-400 leading-relaxed text-justify">
+                    <p>
+                        <span class="text-white font-bold">2018: O Início.</span> Tudo começou de forma modesta, mas ambiciosa, aqui mesmo em Seropédica. Nascemos como um projeto de consultoria técnica focado na qualidade extrema. Naquela época, o nosso marketing era puramente o resultado do nosso trabalho: redes que não caíam e computadores que não travavam. O "boca a boca" foi a nossa primeira alavanca de crescimento, provando que havia espaço para quem trabalhasse com seriedade.
+                    </p>
                     
-                    <div class="md:w-1/2 md:pr-12 md:text-right pl-8 md:pl-0 mb-4 md:mb-0">
-                        <span class="text-indigo-400 font-bold text-sm tracking-widest uppercase">2018</span>
-                        <h3 class="text-xl font-bold text-white mt-1 mb-2">A Fundação</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
-                            Tudo começou como um projeto pessoal de consultoria. O foco inicial era a manutenção de hardware e redes domésticas. A qualidade do serviço gerou um "boca a boca" poderoso na região.
-                        </p>
-                    </div>
-                    <div class="md:w-1/2 md:pl-12 pl-8"></div>
-                </div>
+                    <p>
+                        <span class="text-white font-bold">2021: A Profissionalização (B2B).</span> Ao observar o mercado local, percebemos uma falha grave: as empresas estavam desassistidas. O "sobrinho que conserta computador" não era mais suficiente para negócios que dependiam de dados e velocidade. Foi nesse ano que mudámos o nosso foco 100% para o mercado corporativo. Implementamos contratos de SLA (Níveis de Serviço), ferramentas de Gestão Remota (RMM) e trouxemos processos de multinacionais para o comércio local.
+                    </p>
 
-                {{-- Marco 2 --}}
-                <div class="relative flex flex-col md:flex-row-reverse items-center justify-between group">
-                    <div class="absolute left-[-5px] md:left-1/2 md:-ml-[5px] w-[10px] h-[10px] rounded-full bg-cyan-500 ring-4 ring-slate-950 group-hover:scale-150 transition duration-500"></div>
-                    
-                    <div class="md:w-1/2 md:pl-12 pl-8 mb-4 md:mb-0">
-                        <span class="text-cyan-400 font-bold text-sm tracking-widest uppercase">2021</span>
-                        <h3 class="text-xl font-bold text-white mt-1 mb-2">Pivô para B2B</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
-                            Percebemos que as empresas locais careciam de suporte profissional. Mudámos o foco 100% para o corporativo, implementando contratos de SLA e ferramentas de gestão remota (RMM).
-                        </p>
-                    </div>
-                    <div class="md:w-1/2 md:pr-12 md:text-right"></div>
+                    <p>
+                        <span class="text-white font-bold">2024 e Além: A Era Digital.</span> Hoje, não somos apenas uma empresa de manutenção; somos uma plataforma de inteligência. Com o lançamento do nosso ecossistema digital próprio, os nossos clientes têm transparência total sobre seus ativos. Utilizamos Inteligência Artificial para prever falhas em servidores e automação para corrigir problemas silenciosamente. Crescemos em estrutura, equipa e tecnologia, mas a nossa missão permanece inalterada: garantir a sua paz de espírito tecnológica.
+                    </p>
                 </div>
-
-                {{-- Marco 3 --}}
-                <div class="relative flex flex-col md:flex-row items-center justify-between group">
-                    <div class="absolute left-[-5px] md:left-1/2 md:-ml-[5px] w-[10px] h-[10px] rounded-full bg-emerald-500 ring-4 ring-slate-950 group-hover:scale-150 transition duration-500"></div>
-                    
-                    <div class="md:w-1/2 md:pr-12 md:text-right pl-8 md:pl-0 mb-4 md:mb-0">
-                        <span class="text-emerald-400 font-bold text-sm tracking-widest uppercase">2024</span>
-                        <h3 class="text-xl font-bold text-white mt-1 mb-2">Escala Digital</h3>
-                        <p class="text-slate-400 text-sm leading-relaxed">
-                            Lançamento do nosso ecossistema digital próprio. Agora, os clientes têm controle total via portal, e a nossa equipa utiliza IA para prever falhas em servidores antes que elas aconteçam.
-                        </p>
-                    </div>
-                    <div class="md:w-1/2 md:pl-12 pl-8"></div>
-                </div>
-
             </div>
         </div>
 
-        {{-- 4. METODOLOGIA (NOVO) --}}
+        {{-- 4. METODOLOGIA --}}
         <div class="mb-32">
             <div class="p-10 rounded-[2.5rem] border border-white/10 bg-slate-900/50 relative overflow-hidden">
                 <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] pointer-events-none"></div>
@@ -129,7 +99,7 @@
                         <p class="text-slate-400 text-sm">Não tratamos apenas o sintoma. Investigamos a causa raiz do problema para garantir que ele não volte a acontecer.</p>
                     </div>
                     <div class="text-center relative">
-                        {{-- Seta (apenas desktop) --}}
+                        {{-- Seta --}}
                         <div class="hidden md:block absolute top-8 -right-1/2 w-full h-px bg-gradient-to-r from-transparent via-white/20 to-transparent"></div>
                         
                         <div class="w-16 h-16 mx-auto rounded-2xl bg-indigo-600 border border-indigo-400/30 flex items-center justify-center text-3xl mb-6 shadow-lg shadow-indigo-500/20">⚙️</div>
@@ -166,18 +136,31 @@
             </div>
         </div>
 
-        {{-- CTA FINAL --}}
-        <div class="text-center border-t border-white/10 pt-20">
-            <h2 class="text-3xl font-bold text-white mb-6">A sua empresa merece este nível de suporte.</h2>
-            <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
-                <a href="{{ route('contact') }}" class="px-8 py-3 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-200 transition">
-                    Agendar Reunião
-                </a>
-                <a href="{{ route('portfolio') }}" class="px-8 py-3 rounded-xl text-slate-300 font-medium hover:text-white transition">
-                    Ver Cases de Sucesso &rarr;
-                </a>
+        {{-- CTA FINAL COM LÓGICA PERSONALIZADA --}}
+        {{-- Exibe a secção apenas se NÃO for Admin --}}
+        @unless(auth()->check() && auth()->user()->role === 'admin')
+            <div class="text-center border-t border-white/10 pt-20">
+                <h2 class="text-3xl font-bold text-white mb-6">A sua empresa merece este nível de suporte.</h2>
+                <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+                    
+                    {{-- LÓGICA DE BOTÕES --}}
+                    
+                    {{-- 1. Visitante: Vê botão de Agendar --}}
+                    @guest
+                        <a href="{{ route('contact') }}" class="px-8 py-3 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-200 transition">
+                            Agendar Reunião
+                        </a>
+                    @endguest
+
+                    {{-- 2. Visitante E Cliente: Veem botão de Cases --}}
+                    {{-- (Cliente vê apenas este, Visitante vê este + Agendar) --}}
+                    <a href="{{ route('portfolio') }}" class="px-8 py-3 rounded-xl text-slate-300 font-medium hover:text-white transition">
+                        Ver Cases de Sucesso &rarr;
+                    </a>
+
+                </div>
             </div>
-        </div>
+        @endunless
 
     </div>
 </div>

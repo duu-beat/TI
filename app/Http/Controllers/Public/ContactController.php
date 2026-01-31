@@ -15,7 +15,13 @@ class ContactController extends Controller
 
     public function submit(Request $request)
     {
-        // 1. Validar os dados
+        // 1. Bloqueio de segurança para Admins
+        // Impede que um admin envie o formulário mesmo que force a requisição (ex: via Postman)
+        if (auth()->check() && auth()->user()->role === 'admin') {
+            return back()->withErrors(['message' => 'Administradores não podem abrir chamados por aqui. Utilize o painel.']);
+        }
+
+        // 2. Validar os dados
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255',
@@ -23,7 +29,7 @@ class ContactController extends Controller
             'message' => 'required|string|min:10',
         ]);
 
-        // 2. Lógica de Envio (Aqui podes enviar um email ou salvar na BD)
+        // 3. Lógica de Envio (Aqui podes enviar um email ou salvar na BD)
         // Por enquanto, vamos apenas simular o sucesso.
         
         /* Mail::raw($validated['message'], function($msg) use ($validated) {
@@ -32,7 +38,7 @@ class ContactController extends Controller
         }); 
         */
 
-        // 3. Redirecionar com mensagem de sucesso
+        // 4. Redirecionar com mensagem de sucesso
         return back()->with('success', 'Mensagem enviada com sucesso! Entraremos em contacto em breve.');
     }
 }
