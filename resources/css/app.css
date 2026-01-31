@@ -1,6 +1,9 @@
+
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
 
 [x-cloak] {
     display: none;
@@ -18,4 +21,22 @@
 /* Botão com gradiente animado */
 .btn-primary {
     @apply rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-3 font-bold text-slate-950 transition-all duration-300 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:brightness-110 active:scale-95;
+}
+
+/* ... seus outros estilos ... */
+
+/* GARANTE FUNDO PRETO NO CROPPER */
+.cropper-bg {
+    background: #000000 !important;
+    background-image: none !important;
+}
+
+.cropper-modal {
+    background-color: #000 !important;
+    opacity: 0.8;
+}
+
+/* Opcional: Borda de corte estilizada */
+.cropper-view-box {
+    outline: 2px solid cyan !important;
 }
