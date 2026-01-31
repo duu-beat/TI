@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\Ticket; // Importar a classe Ticket
 
 class User extends Authenticatable
 {
@@ -36,7 +37,7 @@ class User extends Authenticatable
      */
     public function tickets()
     {
-        return $this->hasMany(\App\Models\Ticket::class);
+        return $this->hasMany(Ticket::class); // Uso de ::class em vez de string
     }
 
     /**

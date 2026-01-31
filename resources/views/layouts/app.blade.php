@@ -5,7 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Suporte TI') }}</title>
+    {{-- ✅ Título Dinâmico (Admin vs Cliente) --}}
+    <title>
+        @auth
+            @if(auth()->user()->isAdmin())
+                Admin &middot; {{ config('app.name', 'Suporte TI') }}
+            @else
+                Cliente &middot; {{ config('app.name', 'Suporte TI') }}
+            @endif
+        @else
+            {{ config('app.name', 'Suporte TI') }}
+        @endauth
+    </title>
+
+    {{-- ✅ ADICIONA ISTO AQUI --}}
+    <link rel="icon" href="{{ asset('images/logosuporteTI.png') }}" type="image/png">
 
     {{-- Fonte Outfit --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">

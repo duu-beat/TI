@@ -6,73 +6,106 @@ use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\LegalController;
-use App\Http\Controllers\Client\DashboardController; // Adicionar no topo do ficheiro
+use App\Http\Controllers\Client\DashboardController;
 use App\Http\Controllers\Public\ContactController;
 
-Route::view('/', 'public.home')->name('home');
-Route::view('/servicos', 'public.services')->name('services');
-Route::view('/portfolio', 'public.portfolio')->name('portfolio');
-Route::get('/contato', [ContactController::class, 'index'])->name('contact');
-Route::post('/contato', [ContactController::class, 'submit'])->name('contact.submit'); // Nova rota POST
-Route::get('/faq', [FaqController::class, 'index'])->name('faq');
-Route::view('/sobre', 'public.sobre')->name('sobre');
+/*
+|--------------------------------------------------------------------------
+| Rotas Públicas (Site Institucional)
+|--------------------------------------------------------------------------
+| Estas rotas estão acessíveis a qualquer visitante sem login.
+| Usamos Route::view para páginas estáticas (sem lógica) e Controllers para
+| páginas com formulários ou dados dinâmicos.
+*/
 
-// Páginas Legais
+Route::view('/', 'public.home')->name('home');             // Página Inicial
+Route::view('/servicos', 'public.services')->name('services'); // Lista de Serviços
+Route::view('/portfolio', 'public.portfolio')->name('portfolio'); // Portfólio
+Route::view('/sobre', 'public.sobre')->name('sobre');      // Página Sobre Nós
+
+// Contato (Exibe o formulário e Processa o envio)
+Route::get('/contato', [ContactController::class, 'index'])->name('contact');
+Route::post('/contato', [ContactController::class, 'submit'])->name('contact.submit');
+
+// FAQ (Perguntas Frequentes - Busca dados do banco)
+Route::get('/faq', [FaqController::class, 'index'])->name('faq');
+
+/*
+|--------------------------------------------------------------------------
+| Páginas Legais
+|--------------------------------------------------------------------------
+| Termos, Privacidade e SLA. Importante para conformidade e transparência.
+*/
 Route::get('/termos-de-uso', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacidade', [LegalController::class, 'privacy'])->name('privacy');
 Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
 
-/**
- * CLIENTE
- */
+/*
+|--------------------------------------------------------------------------
+| ÁREA DO CLIENTE (Requer Login)
+|--------------------------------------------------------------------------
+| Middleware 'auth': Só utilizadores logados.
+| Middleware 'verified': Só emails verificados.
+| Prefix 'app': Todas as URLs começam com /app (ex: /app/chamados).
+| Name 'client.': Nomes das rotas começam com client (ex: client.dashboard).
+*/
 Route::middleware(['auth', 'verified'])->prefix('app')->name('client.')->group(function () {
     
-    // Dashboard aponta para o Controller
+    // Painel Principal do Cliente (Resumo dos tickets)
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
 
-    Route::get('/chamados', [ClientTicketController::class, 'index'])->name('tickets.index');
-    Route::get('/chamados/criar', [ClientTicketController::class, 'create'])->name('tickets.create');
-    Route::post('/chamados', [ClientTicketController::class, 'store'])->name('tickets.store');
-    Route::get('/chamados/{ticket}', [ClientTicketController::class, 'show'])->name('tickets.show');
-    Route::post('/chamados/{ticket}/responder', [ClientTicketController::class, 'reply'])->name('tickets.reply');
+    // Gestão de Chamados (Tickets)
+    Route::get('/chamados', [ClientTicketController::class, 'index'])->name('tickets.index');          // Listar
+    Route::get('/chamados/criar', [ClientTicketController::class, 'create'])->name('tickets.create');  // Formulário de Criação
+    Route::post('/chamados', [ClientTicketController::class, 'store'])->name('tickets.store');         // Salvar Novo Ticket
+    Route::get('/chamados/{ticket}', [ClientTicketController::class, 'show'])->name('tickets.show');   // Ver Detalhes
     
-    // Rota de Avaliação
-    Route::post('/chamados/{ticket}/avaliar', [ClientTicketController::class, 'rate'])->name('tickets.rate');
+    // Interações no Chamado
+    Route::post('/chamados/{ticket}/responder', [ClientTicketController::class, 'reply'])->name('tickets.reply'); // Enviar Resposta
+    Route::post('/chamados/{ticket}/avaliar', [ClientTicketController::class, 'rate'])->name('tickets.rate');     // Avaliar Atendimento
 });
 
-/**
- * ADMIN - Autenticação e Painel
- */
+/*
+|--------------------------------------------------------------------------
+| ÁREA DO ADMINISTRADOR
+|--------------------------------------------------------------------------
+| Prefix 'admin': Todas as URLs começam com /admin.
+| Name 'admin.': Nomes das rotas começam com admin.
+*/
 Route::prefix('admin')->name('admin.')->group(function () {
     
-    // 1. Rota Raiz
-    Route::get('/', function () {
-        return redirect()->route('admin.login');
-    });
+    // 1. Redirecionamento da Raiz Admin
+    // ✅ MELHORIA: Usar Route::redirect em vez de Closure permite cache de rotas (php artisan route:cache)
+    // Se acessar /admin, vai para /admin/login
+    Route::redirect('/', '/admin/login');
 
-    // 2. Rotas de Autenticação
+    // 2. Autenticação (Apenas para visitantes/não logados)
     Route::middleware('guest')->group(function () {
-        Route::get('/login', [AdminAuthController::class, 'create'])->name('login');
-        Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store');
+        Route::get('/login', [AdminAuthController::class, 'create'])->name('login'); // Form de Login
+        Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store'); // Processar Login
     });
 
-    // 3. Logout
+    // 3. Logout (Acessível a qualquer logado)
     Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
 
-    // 4. Área Protegida
+    // 4. Painel Protegido (Requer login E ser admin)
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         
-        // 🔥 CORREÇÃO 1: Dashboard agora aponta para o Controller (para carregar os gráficos)
+        // Dashboard Administrativo (Gráficos e KPIs)
         Route::get('/dashboard', [AdminTicketController::class, 'dashboard'])->name('dashboard');
         
-        // Rotas de Chamados
-        Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');
-        Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
-
-        // 🔥 CORREÇÃO 2: Rota de Status corrigida para PATCH e com o nome certo
+        // Gestão de Chamados
+        Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');        // Listagem Geral
+        Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show'); // Ver Detalhes
+        
+        // Ações Administrativas
+        // Atualiza o status (Aberto -> Em Andamento -> Resolvido)
         Route::patch('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.update-status');
-
+        
+        // Responder ao cliente
         Route::post('/chamados/{ticket}/responder', [AdminTicketController::class, 'reply'])->name('tickets.reply');
+        
+        // Relatórios
         Route::get('/relatorio', [AdminTicketController::class, 'report'])->name('tickets.report');
     });
 });

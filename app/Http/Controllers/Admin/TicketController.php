@@ -5,21 +5,26 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Enums\TicketStatus;
-use App\Enums\TicketPriority; // ⚠️ IMPORTANTE: Não te esqueças disto!
+use App\Enums\TicketPriority;
+use App\Notifications\TicketUpdated; // Importar Notificação
+use App\Traits\HandleAttachments;    // Importar Trait
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;      // Importar Rule para validação
 
 class TicketController extends Controller
 {
+    use HandleAttachments; // Usar o Trait
+
     public function index(Request $request)
     {
         $query = Ticket::with('user')->latest();
 
-        if ($request->has('search') && $request->search != '') {
+        if ($request->filled('search')) { // 'filled' é mais limpo que has && != ''
             $query->where('subject', 'like', '%' . $request->search . '%')
                   ->orWhere('id', $request->search);
         }
 
-        if ($request->has('status') && $request->status != '') {
+        if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
@@ -33,21 +38,28 @@ class TicketController extends Controller
         return view('admin.tickets.show', compact('ticket'));
     }
 
+    // MELHORIA: Validação de Enum e Notificação
     public function updateStatus(Request $request, Ticket $ticket)
     {
         $request->validate([
-            'status' => ['required', 'string'],
+            'status' => ['required', Rule::enum(TicketStatus::class)],
         ]);
 
+        $oldStatus = $ticket->status;
+        
         $ticket->update([
             'status' => $request->status,
         ]);
 
-        // Notificar cliente aqui se necessário
+        // Notificar o cliente se o status mudou
+        if ($oldStatus !== $ticket->status) {
+            $ticket->user->notify(new TicketUpdated($ticket, 'status_updated'));
+        }
 
         return back()->with('success', 'Status atualizado com sucesso!');
     }
 
+    // MELHORIA: Uso do Trait HandleAttachments
     public function reply(Request $request, Ticket $ticket)
     {
         $request->validate([
@@ -58,41 +70,46 @@ class TicketController extends Controller
         $message = $ticket->messages()->create([
             'user_id' => auth()->id(),
             'message' => $request->message,
-            'is_internal' => $request->has('is_internal'), // Checkbox do form
+            'is_internal' => $request->has('is_internal'),
         ]);
 
-        // Upload de Anexos
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $path = $file->store('attachments', 'public');
-                $message->attachments()->create([
-                    'file_path' => $path,
-                    'file_name' => $file->getClientOriginalName(),
-                ]);
-            }
-        }
+        // Usa o método do Trait (substitui o código duplicado)
+        $this->processAttachments($request, $message);
 
-        // Se respondeu ao cliente, muda status para "Em Andamento" ou "Aguardando Cliente"
+        // Se respondeu ao cliente (não interno), muda status
         if (!$request->has('is_internal') && $ticket->status === TicketStatus::NEW) {
             $ticket->update(['status' => TicketStatus::IN_PROGRESS]);
+            
+            // Notificar cliente da resposta
+            $ticket->user->notify(new TicketUpdated($ticket, 'replied'));
         }
 
         return back()->with('success', 'Resposta enviada!');
     }
 
-    // 📊 NOVO MÉTODO DASHBOARD (CORRIGIDO)
+    // MELHORIA: Dashboard Otimizado (1 Query em vez de 4)
     public function dashboard()
     {
-        // 1. Stats de Status
+        // 1. Stats de Status (Query Agregada)
+        $rawStats = Ticket::selectRaw("
+            count(*) as total,
+            sum(case when status = ? then 1 else 0 end) as new,
+            sum(case when status in (?, ?) then 1 else 0 end) as in_progress,
+            sum(case when status in (?, ?) then 1 else 0 end) as resolved
+        ", [
+            TicketStatus::NEW->value,
+            TicketStatus::IN_PROGRESS->value, TicketStatus::WAITING_CLIENT->value,
+            TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value
+        ])->first();
+
         $stats = [
-            'new' => Ticket::where('status', TicketStatus::NEW)->count(),
-            'in_progress' => Ticket::whereIn('status', [TicketStatus::IN_PROGRESS, TicketStatus::WAITING_CLIENT])->count(),
-            'resolved' => Ticket::whereIn('status', [TicketStatus::RESOLVED, TicketStatus::CLOSED])->count(),
-            'total' => Ticket::count(),
+            'new' => $rawStats->new,
+            'in_progress' => $rawStats->in_progress,
+            'resolved' => $rawStats->resolved,
+            'total' => $rawStats->total,
         ];
 
-        // 2. Stats de Prioridade (CORREÇÃO DO ERRO)
-        // Certifica-te que tens a coluna 'priority' na DB e o Enum importado
+        // 2. Stats de Prioridade
         $priorityStats = [
             'high' => Ticket::where('priority', TicketPriority::HIGH)
                 ->whereIn('status', [TicketStatus::NEW, TicketStatus::IN_PROGRESS])
@@ -102,7 +119,7 @@ class TicketController extends Controller
                 ->count(),
         ];
 
-        // 3. Últimos Chamados para a lista rápida
+        // 3. Últimos Chamados
         $latestTickets = Ticket::with('user')->latest()->take(5)->get();
 
         // 4. Gráficos (Semanal)
@@ -126,7 +143,6 @@ class TicketController extends Controller
 
     public function report()
     {
-        // Lógica simples de relatório
         $tickets = Ticket::with('user')->latest()->get();
         return view('admin.reports.tickets', compact('tickets'));
     }

@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Client;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTicketRequest;
-use App\Http\Requests\ReplyTicketRequest; // <--- Importamos o novo Request
+use App\Http\Requests\ReplyTicketRequest;
 use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\TicketMessage;
-use App\Models\TicketAttachment;
+use App\Traits\HandleAttachments; // Importa o Trait
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use App\Models\User;
@@ -18,9 +18,8 @@ use Illuminate\Support\Facades\Notification;
 
 class TicketController extends Controller
 {
-    use AuthorizesRequests;
+    use AuthorizesRequests, HandleAttachments; // Usa o Trait aqui
 
-    // ... dashboard e index (mantêm-se iguais) ...
     public function dashboard(Request $request)
     {
         $user = $request->user();
@@ -84,7 +83,7 @@ class TicketController extends Controller
                 'message' => $data['description'],
             ]);
 
-            // ✅ DRY: Usa o novo método privado
+            // ✅ Usa o Trait HandleAttachments
             $this->processAttachments($request, $message);
 
             return $ticket;
@@ -100,16 +99,16 @@ class TicketController extends Controller
     public function show(Ticket $ticket)
     {
         $this->authorize('view', $ticket);
+        // Carrega as relações necessárias para a view
         $ticket->load(['messages.user', 'messages.attachments']);
         return view('client.tickets.show', compact('ticket'));
     }
 
-    // ✅ Typehint atualizado para ReplyTicketRequest
     public function reply(ReplyTicketRequest $request, Ticket $ticket)
     {
         $this->authorize('view', $ticket);
         
-        $data = $request->validated(); // Validação automática via Request class
+        $data = $request->validated();
 
         DB::transaction(function () use ($request, $ticket, $data) {
             $message = TicketMessage::create([
@@ -118,7 +117,7 @@ class TicketController extends Controller
                 'message' => $data['message'],
             ]);
 
-            // ✅ DRY: Usa o mesmo método de upload
+            // ✅ Usa o Trait HandleAttachments
             $this->processAttachments($request, $message);
 
             if (in_array($ticket->status, [TicketStatus::WAITING_CLIENT, TicketStatus::RESOLVED])) {
@@ -148,24 +147,5 @@ class TicketController extends Controller
         ]);
 
         return back()->with('success', 'Obrigado pela sua avaliação!');
-    }
-
-    /**
-     * ✅ Método Privado para processar anexos (Clean Code)
-     * Reutilizável no store() e reply()
-     */
-    private function processAttachments(Request $request, TicketMessage $message): void
-    {
-        if ($request->hasFile('attachments')) {
-            foreach ($request->file('attachments') as $file) {
-                $path = $file->store('attachments', 'public');
-                
-                TicketAttachment::create([
-                    'ticket_message_id' => $message->id,
-                    'file_path' => $path,
-                    'file_name' => $file->getClientOriginalName(),
-                ]);
-            }
-        }
     }
 }
