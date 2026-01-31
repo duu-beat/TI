@@ -1,7 +1,8 @@
 <x-app-layout>
     @php
         $user = auth()->user();
-        $isAdmin = $user->role === 'admin'; // Ajuste conforme a tua lógica de role
+        // ✅ CORREÇÃO: Usar o helper do model para maior segurança
+        $isAdmin = $user->isAdmin(); 
         $accent = $isAdmin ? 'red' : 'cyan';
     @endphp
 
@@ -16,10 +17,8 @@
             
             {{-- HEADER BANNER --}}
             <div class="relative bg-slate-900/80 border border-white/10 rounded-[2.5rem] p-8 mb-8 flex flex-col md:flex-row items-center gap-8 overflow-hidden shadow-2xl">
-                {{-- Glow --}}
                 <div class="absolute top-0 right-0 w-96 h-96 bg-{{ $accent }}-500/20 rounded-full blur-[100px] pointer-events-none"></div>
 
-                {{-- Avatar --}}
                 <div class="relative shrink-0 group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-{{ $accent }}-500 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
                     <img class="relative h-32 w-32 rounded-full object-cover border-4 border-slate-950 shadow-2xl" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" />
@@ -30,7 +29,6 @@
                     </div>
                 </div>
 
-                {{-- Infos --}}
                 <div class="text-center md:text-left z-10 flex-1">
                     <h1 class="text-4xl font-black text-white tracking-tight mb-2">{{ $user->name }}</h1>
                     <div class="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-slate-400">
@@ -39,7 +37,6 @@
                     </div>
                 </div>
 
-                {{-- Stats --}}
                 <div class="flex gap-6 z-10 border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-8 mt-6 md:mt-0">
                     <div class="text-center">
                         <div class="text-2xl font-bold text-white">{{ $user->two_factor_secret ? '100%' : '50%' }}</div>
@@ -84,7 +81,6 @@
                 {{-- 5. Deletar Conta --}}
                 @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
                     <div class="md:col-span-2 xl:col-span-1">
-                        {{-- Bloqueio visual para admins não se deletarem por engano --}}
                         @if(!$isAdmin)
                             @livewire('profile.delete-user-form')
                         @else
@@ -99,7 +95,6 @@
                         @endif
                     </div>
                 @endif
-
             </div>
         </div>
     </div>

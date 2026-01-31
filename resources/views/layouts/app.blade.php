@@ -5,23 +5,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    {{-- ✅ Título Dinâmico (Admin vs Cliente) --}}
     <title>
         @auth
-            @if(auth()->user()->isAdmin())
-                Admin &middot; {{ config('app.name', 'Suporte TI') }}
-            @else
-                Cliente &middot; {{ config('app.name', 'Suporte TI') }}
-            @endif
+            {{ auth()->user()->isAdmin() ? 'Admin' : 'Cliente' }} &middot; {{ config('app.name', 'Suporte TI') }}
         @else
             {{ config('app.name', 'Suporte TI') }}
         @endauth
     </title>
 
-    {{-- ✅ ADICIONA ISTO AQUI --}}
     <link rel="icon" href="{{ asset('images/logosuporteTI.png') }}" type="image/png">
-
-    {{-- Fonte Outfit --}}
+    
+    {{-- Fonts & Styles --}}
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -47,18 +41,14 @@
         <div class="absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] rounded-full bg-purple-600/10 blur-[100px]"></div>
     </div>
 
-    {{-- Layout Wrapper com Controle de Estado (Sidebar + Modal) --}}
     <div class="min-h-screen flex relative z-10" x-data="{ sidebarOpen: false, logoutModalOpen: false }">
 
-        {{-- ✨ NOVA SIDEBAR (Componente) --}}
         <x-sidebar />
 
-        {{-- Conteúdo Principal --}}
         <main class="flex-1 flex flex-col min-h-screen overflow-hidden bg-transparent">
-            {{-- Topbar Sticky --}}
+            {{-- Topbar --}}
             <header class="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-md border-b border-white/10 h-16 flex items-center justify-between px-6">
                 <div class="flex items-center gap-4">
-                    {{-- Trigger Mobile Sidebar --}}
                     <button @click="sidebarOpen = true" class="lg:hidden text-slate-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
@@ -70,19 +60,16 @@
                 </div>
             </header>
 
-            {{-- Slot do Conteúdo --}}
             <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
                 {{ $slot }}
             </div>
         </main>
 
-        {{-- Backdrop Mobile --}}
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"></div>
 
-        {{-- Modal de Logout --}}
+        {{-- Modal de Logout Corrigido --}}
         <div x-show="logoutModalOpen" style="display: none;" class="fixed inset-0 z-[999] flex items-center justify-center p-6" x-cloak>
-            <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" 
-                 x-show="logoutModalOpen" x-transition.opacity @click="logoutModalOpen = false"></div>
+            <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="logoutModalOpen = false"></div>
 
             <div class="relative w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 shadow-2xl p-1"
                  x-show="logoutModalOpen"
@@ -100,15 +87,14 @@
                     </div>
 
                     <div class="flex items-center justify-end gap-3">
-                        <button type="button" @click="logoutModalOpen = false"
-                                class="rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition">
+                        <button type="button" @click="logoutModalOpen = false" class="rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition">
                             Cancelar
                         </button>
 
-                        <form method="POST" action="{{ route('logout') }}">
+                        {{-- ✅ CORREÇÃO: Usa a rota de logout correta baseada no contexto (Admin vs Cliente) --}}
+                        <form method="POST" action="{{ request()->routeIs('admin.*') ? route('admin.logout') : route('logout') }}">
                             @csrf
-                            <button type="submit"
-                                    class="rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">
+                            <button type="submit" class="rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">
                                 Sair agora
                             </button>
                         </form>
@@ -116,17 +102,22 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    {{-- Toast Notification Global --}}
-    @if (session('success') || session('error'))
+    {{-- Toast Notification --}}
+    @if (session('success') || session('error') || session('status'))
         <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition.move
              class="fixed bottom-6 right-6 z-[100] max-w-sm w-full bg-slate-900 border border-white/10 shadow-2xl rounded-2xl p-4 flex items-start gap-3">
-            <div class="shrink-0 text-2xl">{{ session('success') ? '✅' : '⚠️' }}</div>
+            <div class="shrink-0 text-2xl">
+                {{ session('error') ? '⚠️' : '✅' }}
+            </div>
             <div>
-                <div class="font-bold text-white">{{ session('success') ? 'Sucesso' : 'Atenção' }}</div>
-                <div class="text-sm text-slate-400">{{ session('success') ?? session('error') }}</div>
+                <div class="font-bold text-white">
+                    {{ session('error') ? 'Atenção' : 'Sucesso' }}
+                </div>
+                <div class="text-sm text-slate-400">
+                    {{ session('success') ?? session('error') ?? session('status') }}
+                </div>
             </div>
         </div>
     @endif

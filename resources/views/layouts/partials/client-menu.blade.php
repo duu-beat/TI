@@ -17,8 +17,8 @@
     </a>
 
     {{-- Perfil --}}
-    <a href="{{ route('profile.show') }}"
-       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('profile.show') ? $activeClass : $inactiveClass }}">
-        👤 Minha Conta
+    <a href="{{ route('client.profile') }}"
+        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.profile') ? $activeClass : $inactiveClass }}">
+        👤 Meu Perfil
     </a>
 </div>
