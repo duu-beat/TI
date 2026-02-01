@@ -35,18 +35,20 @@ Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
 Route::middleware(['auth', 'verified'])->prefix('cliente')->name('client.')->group(function () {
     
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
-
-    // ✅ ADICIONE ESTA LINHA (Rota de Perfil do Cliente)
-    // Isso cria a rota: /app/perfil (nome: client.profile)
     Route::view('/perfil', 'profile.show')->name('profile');
 
-    // Chamados
-    Route::get('/chamados', [ClientTicketController::class, 'index'])->name('tickets.index');
-    Route::get('/chamados/criar', [ClientTicketController::class, 'create'])->name('tickets.create');
-    Route::post('/chamados', [ClientTicketController::class, 'store'])->name('tickets.store');
-    Route::get('/chamados/{ticket}', [ClientTicketController::class, 'show'])->name('tickets.show');
-    Route::post('/chamados/{ticket}/responder', [ClientTicketController::class, 'reply'])->name('tickets.reply');
-    Route::post('/chamados/{ticket}/avaliar', [ClientTicketController::class, 'rate'])->name('tickets.rate');
+    
+    // ✅ Rotas Simplificadas com Resource
+    Route::resource('chamados', ClientTicketController::class)
+        ->names('tickets')
+        ->parameters(['chamados' => 'ticket']) // 👈 O SEGREDO ESTÁ AQUI
+        ->except(['edit', 'update', 'destroy']);
+
+    // Rotas específicas que não cabem no Resource
+    Route::controller(ClientTicketController::class)->prefix('chamados/{ticket}')->name('tickets.')->group(function () {
+        Route::post('/responder', 'reply')->name('reply');
+        Route::post('/avaliar', 'rate')->name('rate');
+    });
 });
 
 /*
@@ -68,11 +70,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         
         Route::get('/dashboard', [AdminTicketController::class, 'dashboard'])->name('dashboard');
-        
-        // ✅ ADICIONE ESTA LINHA (Rota de Perfil do Admin)
-        // Isso cria a rota: /admin/perfil (nome: admin.profile)
         Route::view('/perfil', 'profile.show')->name('profile');
         
+        // Exemplo de como simplificar o Admin também:
         Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');
         Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
         Route::patch('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.update-status');

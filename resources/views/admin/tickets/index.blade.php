@@ -63,10 +63,9 @@
                     </div>
 
                     <div class="shrink-0 flex flex-col items-end gap-2">
-                        {{-- 🔥 AQUI ESTÁ A MAGIA: Usamos ->color() e ->label() do Enum --}}
-                        <span class="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold border {{ $ticket->status->color() }}">
-                            {{ $ticket->status->label() }}
-                        </span>
+                        {{-- ✅ Componente de Status --}}
+                        <x-ticket-status :status="$ticket->status" />
+                        
                         <span class="text-xs text-slate-500">{{ $ticket->created_at->diffForHumans() }}</span>
                     </div>
                 </div>

@@ -5,7 +5,7 @@
 
     <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 300)">
         
-        {{-- Skeleton Loader (Mantido igual por ser bom) --}}
+        {{-- Skeleton Loader --}}
         <div x-show="!loaded" class="space-y-6 animate-pulse">
             <div class="h-32 bg-white/5 rounded-2xl w-full"></div>
             <div class="grid lg:grid-cols-3 gap-6">
@@ -20,7 +20,7 @@
              x-transition:enter-start="opacity-0 translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0">
 
-            {{-- 🔔 ALERTA DE AÇÃO (Se o suporte respondeu e aguarda o cliente) --}}
+            {{-- 🔔 ALERTA DE AÇÃO --}}
             @if(isset($waitingForUser) && $waitingForUser > 0)
                 <div class="rounded-2xl bg-gradient-to-r from-yellow-500/20 to-orange-500/20 border border-yellow-500/30 p-6 flex flex-col md:flex-row items-center justify-between gap-4">
                     <div class="flex items-center gap-4">
@@ -90,9 +90,10 @@
                                     <div class="text-xs text-slate-500">Atualizado {{ $ticket->updated_at->diffForHumans() }}</div>
                                 </div>
                             </div>
-                            <span class="px-3 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full border {{ $ticket->status->color() }}">
-                                {{ $ticket->status->label() }}
-                            </span>
+                            
+                            {{-- ✅ AQUI ESTÁ A MUDANÇA --}}
+                            <x-ticket-status :status="$ticket->status" />
+                            
                         </a>
                     @empty
                         <div class="text-center py-10 rounded-2xl border border-dashed border-white/10">

@@ -37,9 +37,7 @@
                     </div>
                     
                     {{-- 🔥 USO DO SMART ENUM AQUI --}}
-                    <span class="px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border {{ $ticket->status->color() }}">
-                        {{ $ticket->status->label() }}
-                    </span>
+                    <x-ticket-status :status="$ticket->status"/>
                 </div>
                 <div class="mt-6 pt-6 border-t border-white/10">
                     <div class="text-sm font-semibold text-slate-300 mb-2">Descrição original</div>

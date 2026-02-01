@@ -5,7 +5,7 @@
 
     <div class="space-y-8">
         
-        {{-- 🚨 ALERTA DE PRIORIDADE (Se houver chamados urgentes abertos) --}}
+        {{-- 🚨 ALERTA DE PRIORIDADE --}}
         @if($priorityStats['high'] > 0)
             <div class="rounded-2xl bg-red-500/10 border border-red-500/20 p-4 flex items-center gap-4 animate-pulse">
                 <div class="bg-red-500 text-white h-10 w-10 rounded-full flex items-center justify-center font-bold">!</div>
@@ -88,14 +88,8 @@
                                     </div>
                                     <span class="text-xs text-slate-400 truncate max-w-[80px]">{{ $ticket->user->name }}</span>
                                 </div>
-                                {{-- Badge minimalista --}}
-                                <div class="h-2 w-2 rounded-full 
-                                    {{ match($ticket->status->value) {
-                                        'new' => 'bg-indigo-500',
-                                        'in_progress' => 'bg-cyan-500',
-                                        'waiting_client' => 'bg-yellow-500',
-                                        default => 'bg-slate-500'
-                                    } }}"></div>
+                                {{-- ✅ Componente de Status --}}
+                                <x-ticket-status :status="$ticket->status" />
                             </div>
                         </a>
                     @endforeach

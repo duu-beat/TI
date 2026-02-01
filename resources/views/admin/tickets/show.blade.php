@@ -10,7 +10,7 @@
 
     <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)" class="space-y-6">
 
-        {{-- ⭐ AVALIAÇÃO DO CLIENTE (VISÍVEL APENAS SE AVALIADO) --}}
+        {{-- ⭐ AVALIAÇÃO DO CLIENTE --}}
         @if($ticket->rating)
             <div class="rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 p-4 flex items-center gap-4 animate-fade-in">
                 <div class="text-4xl text-yellow-400 tracking-widest">
@@ -24,12 +24,19 @@
         @endif
 
         <div class="grid lg:grid-cols-3 gap-6">
-            {{-- COLUNA ESQUERDA: Detalhes e Chat --}}
+            {{-- COLUNA ESQUERDA --}}
             <div class="lg:col-span-2 space-y-6">
                 
                 {{-- INFO DO TICKET --}}
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
-                    <h2 class="text-xl font-bold text-white mb-2">{{ $ticket->subject }}</h2>
+                    <div class="flex items-start justify-between gap-4 mb-2">
+                        <h2 class="text-xl font-bold text-white">{{ $ticket->subject }}</h2>
+                        {{-- ✅ Componente de Status --}}
+                        <div class="shrink-0">
+                            <x-ticket-status :status="$ticket->status" />
+                        </div>
+                    </div>
+                    
                     <p class="text-slate-300 whitespace-pre-line">{{ $ticket->description }}</p>
 
                     @if($ticket->attachment)
@@ -45,13 +52,11 @@
                 <div class="space-y-4">
                     @foreach($ticket->messages as $message)
                         <div class="flex gap-4 {{ $message->user_id === auth()->id() ? 'flex-row-reverse' : '' }}">
-                            {{-- Avatar --}}
                             <div class="shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold border border-white/10
                                 {{ $message->is_internal ? 'bg-yellow-500/20 text-yellow-500 border-yellow-500/30' : ($message->user_id === auth()->id() ? 'bg-indigo-600 text-white' : 'bg-slate-700 text-slate-300') }}">
                                 {{ substr($message->user->name, 0, 2) }}
                             </div>
 
-                            {{-- Balão --}}
                             <div class="max-w-[80%] rounded-2xl p-4 border 
                                 {{ $message->is_internal 
                                     ? 'bg-yellow-500/5 border-yellow-500/20 text-yellow-100' 
@@ -87,7 +92,6 @@
                     <form action="{{ route('admin.tickets.reply', $ticket) }}" method="POST" enctype="multipart/form-data">
                         @csrf
                         
-                        {{-- Checkbox Nota Interna --}}
                         <div class="mb-4">
                             <label class="inline-flex items-center gap-2 p-2 pr-4 rounded-lg bg-yellow-500/10 border border-yellow-500/20 cursor-pointer hover:bg-yellow-500/20 transition select-none">
                                 <input type="checkbox" name="is_internal" value="1" class="rounded border-yellow-500/50 bg-slate-900 text-yellow-500 focus:ring-yellow-500 focus:ring-offset-0">
@@ -108,9 +112,8 @@
                 </div>
             </div>
 
-            {{-- COLUNA DIREITA: Ações e Info --}}
+            {{-- COLUNA DIREITA --}}
             <div class="space-y-6">
-                {{-- Card Cliente --}}
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Cliente</h3>
                     <div class="flex items-center gap-3">
@@ -124,7 +127,6 @@
                     </div>
                 </div>
 
-                {{-- Card Status --}}
                 <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
                     <h3 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-4">Gerenciar Status</h3>
                     

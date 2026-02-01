@@ -21,24 +21,15 @@ enum TicketStatus: string
         };
     }
 
-    // ✅ Cores atualizadas para o estilo Neon/Dark
+    // Retorna as classes do Tailwind para cada status
     public function color(): string
     {
         return match($this) {
-            // Azul Ciano para novo
-            self::NEW => 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20',
-            
-            // Amarelo para andamento
-            self::IN_PROGRESS => 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20',
-            
-            // Laranja para aguardando
-            self::WAITING_CLIENT => 'bg-orange-500/10 text-orange-400 border-orange-500/20',
-            
-            // Verde Esmeralda para resolvido
-            self::RESOLVED => 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20',
-            
-            // Cinza para fechado
-            self::CLOSED => 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+            self::NEW => 'border-blue-500 text-blue-400 bg-blue-500/10',
+            self::IN_PROGRESS => 'border-yellow-500 text-yellow-400 bg-yellow-500/10',
+            self::WAITING_CLIENT => 'border-purple-500 text-purple-400 bg-purple-500/10',
+            self::RESOLVED => 'border-emerald-500 text-emerald-400 bg-emerald-500/10',
+            self::CLOSED => 'border-slate-500 text-slate-400 bg-slate-500/10',
         };
     }
 }

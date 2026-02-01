@@ -10,6 +10,8 @@ use App\Notifications\TicketUpdated; // Importar Notificação
 use App\Traits\HandleAttachments;    // Importar Trait
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;      // Importar Rule para validação
+use App\Actions\Ticket\ReplyToTicket;        // <--- Novo Import
+use App\Actions\Ticket\UpdateTicketStatus;
 
 class TicketController extends Controller
 {
@@ -17,19 +19,18 @@ class TicketController extends Controller
 
     public function index(Request $request)
     {
+        // Podes usar o scopeFilter aqui também se quiseres limpar
         $query = Ticket::with('user')->latest();
 
-        if ($request->filled('search')) { // 'filled' é mais limpo que has && != ''
+        if ($request->filled('search')) {
             $query->where('subject', 'like', '%' . $request->search . '%')
                   ->orWhere('id', $request->search);
         }
-
         if ($request->filled('status')) {
             $query->where('status', $request->status);
         }
 
         $tickets = $query->paginate(10);
-
         return view('admin.tickets.index', compact('tickets'));
     }
 
@@ -38,51 +39,35 @@ class TicketController extends Controller
         return view('admin.tickets.show', compact('ticket'));
     }
 
-    // MELHORIA: Validação de Enum e Notificação
-    public function updateStatus(Request $request, Ticket $ticket)
+    // REFATORADO COM ACTION
+    public function updateStatus(Request $request, Ticket $ticket, UpdateTicketStatus $updater)
     {
         $request->validate([
             'status' => ['required', Rule::enum(TicketStatus::class)],
         ]);
 
-        $oldStatus = $ticket->status;
-        
-        $ticket->update([
-            'status' => $request->status,
-        ]);
+        // Converte string para Enum
+        $statusEnum = TicketStatus::tryFrom($request->status);
 
-        // Notificar o cliente se o status mudou
-        if ($oldStatus !== $ticket->status) {
-            $ticket->user->notify(new TicketUpdated($ticket, 'status_updated'));
-        }
+        $updater->execute($ticket, $statusEnum);
 
         return back()->with('success', 'Status atualizado com sucesso!');
     }
 
-    // MELHORIA: Uso do Trait HandleAttachments
-    public function reply(Request $request, Ticket $ticket)
+    // REFATORADO COM ACTION
+    public function reply(Request $request, Ticket $ticket, ReplyToTicket $replier)
     {
         $request->validate([
             'message' => 'required|string',
-            'attachments.*' => 'file|max:10240', // 10MB
+            'attachments.*' => 'file|max:10240',
         ]);
 
-        $message = $ticket->messages()->create([
-            'user_id' => auth()->id(),
+        $data = [
             'message' => $request->message,
             'is_internal' => $request->has('is_internal'),
-        ]);
+        ];
 
-        // Usa o método do Trait (substitui o código duplicado)
-        $this->processAttachments($request, $message);
-
-        // Se respondeu ao cliente (não interno), muda status
-        if (!$request->has('is_internal') && $ticket->status === TicketStatus::NEW) {
-            $ticket->update(['status' => TicketStatus::IN_PROGRESS]);
-            
-            // Notificar cliente da resposta
-            $ticket->user->notify(new TicketUpdated($ticket, 'replied'));
-        }
+        $replier->execute($request->user(), $ticket, $data, $request);
 
         return back()->with('success', 'Resposta enviada!');
     }

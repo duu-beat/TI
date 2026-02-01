@@ -92,10 +92,8 @@
                                 </div>
 
                                 <div class="shrink-0">
-                                    {{-- 🔥 USO DO SMART ENUM AQUI --}}
-                                    <span class="px-3 py-1 rounded-full text-[11px] uppercase tracking-wider font-bold border {{ $ticket->status->color() }}">
-                                        {{ $ticket->status->label() }}
-                                    </span>
+                                    {{-- ✅ AQUI ESTÁ A MUDANÇA --}}
+                                    <x-ticket-status :status="$ticket->status" />
                                 </div>
                             </div>
 
