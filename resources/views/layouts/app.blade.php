@@ -7,7 +7,7 @@
 
     <title>
         @auth
-            {{ auth()->user()->isAdmin() ? 'Admin' : 'Cliente' }} &middot; {{ config('app.name', 'Suporte TI') }}
+            {{ auth()->user()->isMaster() ? 'Segurança' : (auth()->user()->isAdmin() ? 'Admin' : 'Cliente') }} &middot; {{ config('app.name', 'Suporte TI') }}
         @else
             {{ config('app.name', 'Suporte TI') }}
         @endauth
@@ -67,7 +67,7 @@
 
         <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"></div>
 
-        {{-- Modal de Logout Corrigido --}}
+        {{-- Modal de Logout --}}
         <div x-show="logoutModalOpen" style="display: none;" class="fixed inset-0 z-[999] flex items-center justify-center p-6" x-cloak>
             <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="logoutModalOpen = false"></div>
 
@@ -91,8 +91,8 @@
                             Cancelar
                         </button>
 
-                        {{-- ✅ CORREÇÃO: Usa a rota de logout correta baseada no contexto (Admin vs Cliente) --}}
-                        <form method="POST" action="{{ request()->routeIs('admin.*') ? route('admin.logout') : route('logout') }}">
+                        {{-- Logout funciona para Admin e Master usando a rota de Admin --}}
+                        <form method="POST" action="{{ (request()->routeIs('admin.*') || request()->routeIs('master.*')) ? route('admin.logout') : route('logout') }}">
                             @csrf
                             <button type="submit" class="rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">
                                 Sair agora

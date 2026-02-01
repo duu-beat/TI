@@ -137,8 +137,8 @@
         </div>
 
         {{-- CTA FINAL COM LÓGICA PERSONALIZADA --}}
-        {{-- Exibe a secção apenas se NÃO for Admin --}}
-        @unless(auth()->check() && auth()->user()->role === 'admin')
+        {{-- Exibe a secção apenas se NÃO for Admin/Master --}}
+        @unless(auth()->check() && auth()->user()->isAdmin())
             <div class="text-center border-t border-white/10 pt-20">
                 <h2 class="text-3xl font-bold text-white mb-6">A sua empresa merece este nível de suporte.</h2>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">

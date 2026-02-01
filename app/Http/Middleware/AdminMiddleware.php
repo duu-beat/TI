@@ -16,7 +16,8 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
 {
-    if (!Auth::check() || Auth::user()->role !== 'admin') {
+    // Verifica se é Admin OU Master (usando o método que criamos no Model)
+    if (!Auth::check() || !Auth::user()->isAdmin()) {
         abort(403);
     }
     return $next($request);

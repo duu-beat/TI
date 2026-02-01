@@ -167,32 +167,38 @@
                         <div class="h-5 w-px bg-white/10"></div>
                         {{-- Separador vertical entre links e botões de ação --}}
 
-                        @auth
-                            {{-- Se o usuário está logado --}}
-                            @if(auth()->user()->role === 'admin')
-                                {{-- Se o usuário logado tem role admin --}}
+                       @auth
+                            {{-- Lógica Hierárquica de Botões --}}
+                            
+                            {{-- 1. Nível Master (Segurança) --}}
+                            @if(auth()->user()->isMaster())
+                                <a href="{{ route('master.dashboard') }}"
+                                   class="inline-flex items-center rounded-xl bg-red-600 px-5 py-2.5 text-white font-bold hover:bg-red-500 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] transition hover:scale-105 border border-red-500/20">
+                                     Painel Master
+                                </a>
+
+                            {{-- 2. Nível Admin (Atendimento) --}}
+                            @elseif(auth()->user()->isAdmin())
                                 <a href="{{ route('admin.dashboard') }}"
-                                   class="inline-flex items-center rounded-xl bg-white/10 px-5 py-2.5 text-white hover:bg-white/20 transition hover:scale-105 border border-white/5">
+                                   class="inline-flex items-center rounded-xl bg-cyan-600 px-5 py-2.5 text-white font-bold hover:bg-cyan-500 transition hover:scale-105 border border-cyan-500/20">
                                     Painel Admin
                                 </a>
-                                {{-- Botão/Link para dashboard do admin --}}
+
+                            {{-- 3. Nível Cliente (Padrão) --}}
                             @else
-                                {{-- Se não for admin (cliente) --}}
                                 <a href="{{ route('client.dashboard') }}"
                                    class="inline-flex items-center rounded-xl bg-white/10 px-5 py-2.5 text-white hover:bg-white/20 transition hover:scale-105 border border-white/5">
                                     Acessar Portal
                                 </a>
-                                {{-- Botão/Link para dashboard do cliente --}}
                             @endif
+
                         @else
-                            {{-- Se NÃO está logado --}}
+                            {{-- Visitante (Não logado) --}}
                             <a href="{{ route('login') }}" class="hover:text-white transition font-semibold">Login</a>
-                            {{-- Link para login --}}
                             <a href="{{ route('register') }}"
                                class="inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-2.5 font-bold text-slate-950 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:brightness-110 transition active:scale-95">
                                 Começar agora
                             </a>
-                            {{-- Botão call-to-action para cadastro --}}
                         @endauth
                     </nav>
 

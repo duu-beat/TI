@@ -3,7 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
-use App\Http\Middleware\AdminMiddleware;
+use Illuminate\Http\Request; // 👈 Importante adicionar isso
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
@@ -12,11 +12,25 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__.'/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
+    ->withMiddleware(function (Middleware $middleware) {
+        
+        // ✅ AQUI ESTÁ A CORREÇÃO: Registre os dois middlewares
         $middleware->alias([
-            'admin' => AdminMiddleware::class,
+            'admin' => \App\Http\Middleware\AdminMiddleware::class,   // <--- Essa linha estava faltando
+            'master' => \App\Http\Middleware\MasterMiddleware::class,
         ]);
+
+        // 2. REDIRECIONAMENTO INTELIGENTE 🧠
+        // Se tentar acessar "/seguranca" e não estiver logado -> vai para login da segurança
+        // Se for qualquer outra coisa -> vai para login normal
+        $middleware->redirectGuestsTo(function (Request $request) {
+            if ($request->is('seguranca*')) {
+                return route('master.login');
+            }
+            return route('login');
+        });
+
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
     })->create();

@@ -58,8 +58,8 @@
         </div>
 
         {{-- CTA FINAL --}}
-        {{-- ESCONDIDO PARA ADMIN --}}
-        @unless(auth()->check() && auth()->user()->role === 'admin')
+        {{-- ESCONDIDO PARA ADMIN E MASTER --}}
+        @unless(auth()->check() && auth()->user()->isAdmin())
             <div class="mt-20 text-center p-10 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-md">
                 
                 <h3 class="text-2xl font-bold text-white mb-3">

@@ -41,10 +41,8 @@
             @endforeach
         </div>
 
-        {{-- 🔥 AQUI COMEÇA A ALTERAÇÃO 🔥 --}}
-        {{-- O bloco abaixo só aparece se NÃO for admin (Visitantes e Clientes veem) --}}
-        
-        @unless(auth()->check() && auth()->user()->role === 'admin')
+        {{-- 🔥 LÓGICA DE EXIBIÇÃO: Esconde tabela de preços para Admin E Master --}}
+        @unless(auth()->check() && auth()->user()->isAdmin())
         
             {{-- Tabela Comparativa (CTA) --}}
             <div class="max-w-4xl mx-auto">
@@ -64,7 +62,7 @@
                             
                             {{-- BOTÃO LÓGICO AVULSO --}}
                             @auth
-                                {{-- Como o admin está oculto pelo @unless lá em cima, aqui só sobra a lógica do cliente --}}
+                                {{-- Como o admin/master estão ocultos, só cliente vê isso --}}
                                 <a href="{{ route('client.tickets.create') }}" class="block w-full py-3 rounded-xl bg-white/10 text-white font-bold text-center hover:bg-white/20 transition">Abrir no Portal</a>
                             @else
                                 <a href="{{ route('contact') }}" class="block w-full py-3 rounded-xl bg-white/10 text-white font-bold text-center hover:bg-white/20 transition">Solicitar Orçamento</a>
@@ -96,7 +94,6 @@
             </div>
 
         @endunless 
-        {{-- 🔥 FIM DA ALTERAÇÃO (O @endunless fecha o bloco oculto) 🔥 --}}
 
     </div>
 </div>

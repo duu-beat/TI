@@ -14,22 +14,17 @@
     <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)" class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            {{-- 💀 SKELETON LOADING (Layout 2 Colunas) --}}
+            {{-- 💀 SKELETON LOADING --}}
             <div x-show="!loaded" class="grid lg:grid-cols-3 gap-8 animate-pulse">
-                {{-- Coluna Esquerda (Mensagens) --}}
                 <div class="lg:col-span-2 space-y-6">
                     <div class="h-32 bg-white/5 rounded-2xl w-full border border-white/5"></div>
                     <div class="space-y-4">
-                        <div class="h-24 bg-white/5 rounded-2xl w-3/4 mr-auto"></div>
+                        <div class="h-24 bg-white/5 rounded-2xl w-3/4"></div>
                         <div class="h-24 bg-white/5 rounded-2xl w-3/4 ml-auto"></div>
-                        <div class="h-24 bg-white/5 rounded-2xl w-3/4 mr-auto"></div>
                     </div>
                 </div>
-
-                {{-- Coluna Direita (Sidebar) --}}
                 <div class="space-y-6">
                     <div class="h-64 bg-white/5 rounded-2xl w-full border border-white/5"></div>
-                    <div class="h-40 bg-white/5 rounded-2xl w-full border border-white/5"></div>
                 </div>
             </div>
 
@@ -39,18 +34,18 @@
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
 
-                {{-- ⭐ AVALIAÇÃO DO CLIENTE (Se houver) --}}
+                {{-- AVALIAÇÃO DO CLIENTE --}}
                 @if($ticket->rating)
-                    <div class="rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 p-6 flex flex-col md:flex-row items-center gap-6 animate-pulse-slow">
+                    <div class="rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/20 p-6 flex flex-col md:flex-row items-center gap-6">
                         <div class="text-center md:text-left">
-                            <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Avaliação Recebida</div>
+                            <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">Avaliação</div>
                             <div class="text-4xl text-yellow-400 tracking-widest">
                                 {{ str_repeat('★', $ticket->rating) }}<span class="text-slate-600 opacity-30">{{ str_repeat('★', 5 - $ticket->rating) }}</span>
                             </div>
                         </div>
                         @if($ticket->rating_comment)
                             <div class="flex-1 border-l border-emerald-500/20 pl-6">
-                                <p class="text-slate-300 italic text-lg">"{{ $ticket->rating_comment }}"</p>
+                                <p class="text-slate-300 italic">"{{ $ticket->rating_comment }}"</p>
                             </div>
                         @endif
                     </div>
@@ -61,7 +56,7 @@
                     {{-- 🗨️ COLUNA ESQUERDA: Conversa --}}
                     <div class="lg:col-span-2 space-y-6">
                         
-                        {{-- Card da Descrição Original --}}
+                        {{-- Card Descrição --}}
                         <div class="rounded-2xl bg-slate-800 border border-white/10 overflow-hidden">
                             <div class="bg-slate-900/50 p-4 border-b border-white/5 flex items-center justify-between">
                                 <div class="flex items-center gap-3">
@@ -83,43 +78,35 @@
                             </div>
                         </div>
 
-                        {{-- Loop de Mensagens --}}
+                        {{-- Mensagens --}}
                         <div class="space-y-6 relative">
-                            {{-- Linha do tempo (Opcional, decorativa) --}}
                             <div class="absolute left-8 top-0 bottom-0 w-px bg-white/5 -z-10 hidden md:block"></div>
 
                             @foreach($ticket->messages as $message)
                                 <div class="flex gap-4 {{ $message->user_id === auth()->id() ? 'flex-row-reverse' : '' }}">
-                                    
-                                    {{-- Avatar --}}
                                     <div class="h-10 w-10 rounded-full flex items-center justify-center text-xs font-bold border shrink-0 
                                         {{ $message->user_id === auth()->id() 
                                             ? 'bg-blue-600 border-blue-500 text-white' 
-                                            : ($message->user->is_admin ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-700 border-slate-600 text-slate-300') 
+                                            : ($message->user->role === 'admin' || $message->user->role === 'master' ? 'bg-purple-600 border-purple-500 text-white' : 'bg-slate-700 border-slate-600 text-slate-300') 
                                         }}">
                                         {{ substr($message->user->name, 0, 1) }}
                                     </div>
 
-                                    {{-- Balão --}}
                                     <div class="flex-1 max-w-2xl">
                                         <div class="rounded-2xl p-5 shadow-sm relative
                                             {{ $message->user_id === auth()->id() 
                                                 ? 'bg-blue-600/10 border border-blue-500/20 rounded-tr-none' 
                                                 : 'bg-slate-800 border border-white/5 rounded-tl-none' 
                                             }}">
-                                            
                                             <div class="flex items-center justify-between mb-2">
                                                 <span class="text-xs font-bold {{ $message->user_id === auth()->id() ? 'text-blue-400' : 'text-slate-400' }}">
                                                     {{ $message->user->name }}
                                                 </span>
                                                 <span class="text-[10px] text-slate-500">{{ $message->created_at->format('d/m H:i') }}</span>
                                             </div>
-
                                             <div class="prose prose-invert prose-sm max-w-none text-slate-300">
                                                 {!! nl2br(e($message->message)) !!}
                                             </div>
-
-                                            {{-- Anexos na mensagem --}}
                                             @if($message->attachments && $message->attachments->count() > 0)
                                                 <div class="mt-4 pt-4 border-t border-white/5 space-y-2">
                                                     @foreach($message->attachments as $attachment)
@@ -143,32 +130,26 @@
                                     <svg class="w-5 h-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" /></svg>
                                     Responder Chamado
                                 </h3>
-                                
                                 <form action="{{ route('admin.tickets.reply', $ticket) }}" method="POST" enctype="multipart/form-data">
                                     @csrf
                                     <textarea name="message" rows="4" 
                                         class="w-full rounded-xl bg-slate-950 border border-white/10 text-slate-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition p-4 resize-none"
                                         placeholder="Escreva sua resposta técnica aqui..."></textarea>
                                     
-                                    {{-- Upload --}}
-                                    <div class="mt-4 flex items-center gap-4">
+                                    <div class="mt-4 flex items-center justify-between">
                                         <label class="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 border border-white/10 hover:bg-slate-950 transition text-xs text-slate-400">
-                                            <span>📎 Anexar Arquivos</span>
+                                            <span>📎 Anexar</span>
                                             <input type="file" name="attachments[]" multiple class="hidden">
                                         </label>
-                                        <div class="text-[10px] text-slate-600">Max: 5MB (JPG, PNG, PDF)</div>
-                                    </div>
-
-                                    <div class="mt-4 flex justify-end">
                                         <button type="submit" class="px-6 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white font-bold text-sm hover:brightness-110 transition shadow-lg shadow-blue-500/20">
-                                            Enviar Resposta
+                                            Enviar
                                         </button>
                                     </div>
                                 </form>
                             </div>
                         @else
                             <div class="p-6 rounded-2xl bg-slate-800/50 border border-white/5 text-center text-slate-500">
-                                Este chamado foi encerrado e não aceita novas respostas.
+                                Chamado encerrado.
                             </div>
                         @endif
                     </div>
@@ -176,77 +157,76 @@
                     {{-- ⚙️ COLUNA DIREITA: Sidebar --}}
                     <div class="space-y-6">
                         
-                        {{-- Card de Status --}}
+                        {{-- 1. Status --}}
                         <div class="rounded-2xl border border-white/10 bg-slate-800 p-6">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Gerenciar Status</h3>
-                            
                             <form action="{{ route('admin.tickets.update-status', $ticket) }}" method="POST" class="space-y-4">
-                                @csrf
-                                @method('PATCH')
-                                
-                                <div>
-                                    <select name="status" class="w-full rounded-xl bg-slate-950 border border-white/10 text-slate-200 text-sm focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 p-2.5">
-                                        @foreach(\App\Enums\TicketStatus::cases() as $status)
-                                            <option value="{{ $status->value }}" {{ $ticket->status === $status ? 'selected' : '' }}>
-                                                {{ $status->label() }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-
+                                @csrf @method('PATCH')
+                                <select name="status" class="w-full rounded-xl bg-slate-950 border border-white/10 text-slate-200 text-sm focus:border-cyan-500 p-2.5">
+                                    @foreach(\App\Enums\TicketStatus::cases() as $status)
+                                        <option value="{{ $status->value }}" {{ $ticket->status === $status ? 'selected' : '' }}>
+                                            {{ $status->label() }}
+                                        </option>
+                                    @endforeach
+                                </select>
                                 <button type="submit" class="w-full rounded-xl bg-white/5 py-2.5 text-xs font-bold text-white hover:bg-white/10 transition border border-white/5">
                                     Atualizar Status
                                 </button>
                             </form>
                         </div>
 
-                        {{-- Card de Informações --}}
+                        {{-- 2. ESCALONAMENTO (SEGURANÇA) 🚨 --}}
+                        @if(!$ticket->is_escalated)
+                            <div class="rounded-2xl border border-red-500/20 bg-slate-800 p-6 relative overflow-hidden group">
+                                <div class="absolute -right-6 -top-6 w-16 h-16 bg-red-500/10 rounded-full blur-xl group-hover:bg-red-500/20 transition"></div>
+                                <h3 class="text-xs font-bold text-red-400 uppercase tracking-wider mb-2 flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                                    Área de Risco
+                                </h3>
+                                <p class="text-[10px] text-slate-400 mb-4 leading-relaxed">
+                                    Detectou falha de segurança ou incidente crítico? Repasse para o Nível Master.
+                                </p>
+                                
+                                <form action="{{ route('admin.tickets.escalate', $ticket) }}" method="POST" onsubmit="return confirm('ATENÇÃO: Isso notificará a equipe de Segurança (Master). Confirmar?');">
+                                    @csrf
+                                    <button type="submit" class="w-full py-2.5 rounded-xl bg-red-500/10 border border-red-500/30 text-red-400 font-bold text-xs hover:bg-red-500 hover:text-white transition flex items-center justify-center gap-2 shadow-lg shadow-red-900/10">
+                                        Escalar para Segurança
+                                    </button>
+                                </form>
+                            </div>
+                        @else
+                            <div class="rounded-2xl border border-red-500/50 bg-red-500/10 p-4 text-center animate-pulse">
+                                <div class="text-xs font-bold text-red-400 uppercase tracking-widest mb-1">⚠️ ESCALONADO</div>
+                                <p class="text-[10px] text-red-200/80">Em análise pela Segurança.</p>
+                            </div>
+                        @endif
+
+                        {{-- 3. Detalhes --}}
                         <div class="rounded-2xl border border-white/10 bg-slate-800 p-6">
                             <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Detalhes Técnicos</h3>
-                            
                             <div class="space-y-4">
-                                <div>
-                                    <div class="text-[10px] text-slate-500 uppercase">Cliente</div>
-                                    <div class="flex items-center gap-2 mt-1">
-                                        <div class="h-6 w-6 rounded-full bg-slate-700 text-[10px] flex items-center justify-center text-white">
-                                            {{ substr($ticket->user->name, 0, 1) }}
-                                        </div>
-                                        <div class="text-sm text-slate-200">{{ $ticket->user->name }}</div>
-                                    </div>
-                                    <div class="text-xs text-slate-500 ml-8">{{ $ticket->user->email }}</div>
-                                </div>
-
                                 <div>
                                     <div class="text-[10px] text-slate-500 uppercase">Prioridade</div>
                                     <div class="mt-1">
                                         @if($ticket->priority === \App\Enums\TicketPriority::HIGH)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-xs font-bold text-red-400">
-                                                🚨 Alta
-                                            </span>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-red-500/10 border border-red-500/20 text-xs font-bold text-red-400">🚨 Alta</span>
                                         @elseif($ticket->priority === \App\Enums\TicketPriority::MEDIUM)
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-xs font-bold text-yellow-400">
-                                                ⚠️ Média
-                                            </span>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-yellow-500/10 border border-yellow-500/20 text-xs font-bold text-yellow-400">⚠️ Média</span>
                                         @else
-                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-400">
-                                                ℹ️ Baixa
-                                            </span>
+                                            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-xs font-bold text-blue-400">ℹ️ Baixa</span>
                                         @endif
                                     </div>
                                 </div>
-
                                 <div class="pt-4 border-t border-white/5">
-                                    <div class="text-[10px] text-slate-500 uppercase">Anexos do Chamado</div>
+                                    <div class="text-[10px] text-slate-500 uppercase">Anexos Iniciais</div>
                                     @if(method_exists($ticket, 'attachments') && $ticket->attachments->count() > 0)
                                         <div class="mt-2 space-y-2">
                                             @foreach($ticket->attachments as $attachment)
-                                                <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="block text-xs text-cyan-400 hover:underline truncate">
-                                                    📎 {{ $attachment->name }}
-                                                </a>
+                                                <a href="{{ Storage::url($attachment->path) }}" target="_blank" class="block text-xs text-cyan-400 hover:underline truncate">📎 {{ $attachment->name }}</a>
                                             @endforeach
                                         </div>
                                     @else
-                                        <div class="mt-1 text-xs text-slate-600 italic">Sem anexos iniciais.</div>
+                                        <div class="mt-1 text-xs text-slate-600 italic">Nenhum.</div>
                                     @endif
                                 </div>
                             </div>
@@ -254,7 +234,6 @@
 
                     </div>
                 </div>
-
             </div>
         </div>
     </div>

@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="space-y-4">
-                    {{-- Cards de Contato (Email, Zap, Endereço) --}}
+                    {{-- Cards de Contato --}}
                     <div class="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-white/10 transition">
                         <div class="w-12 h-12 rounded-xl bg-indigo-500/20 flex items-center justify-center text-indigo-400 text-xl">📧</div>
                         <div>
@@ -59,8 +59,28 @@
                 <div class="absolute inset-0 rounded-[2.5rem] border border-white/10 pointer-events-none"></div>
 
                 @auth
-                    @if(auth()->user()->role === 'admin')
-                        {{-- VISÃO DO ADMIN --}}
+                    {{-- 🛡️ VISÃO DO MASTER (SEGURANÇA) --}}
+                    @if(auth()->user()->isMaster())
+                        <div class="flex flex-col items-center justify-center text-center h-full min-h-[400px] space-y-6">
+                            <div class="w-20 h-20 rounded-full bg-red-500/10 flex items-center justify-center border border-red-500/30 shadow-[0_0_30px_rgba(220,38,38,0.2)]">
+                                <svg class="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="text-xl font-bold text-white mb-2">Painel de Segurança</h3>
+                                <p class="text-slate-400 max-w-xs mx-auto text-sm">
+                                    Acesso restrito para gerenciamento de sistema e incidentes críticos.
+                                </p>
+                            </div>
+                            <a href="{{ route('master.dashboard') }}" class="px-6 py-3 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition shadow-lg shadow-red-500/20 flex items-center gap-2">
+                                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1" /></svg>
+                                Acessar Dashboard
+                            </a>
+                        </div>
+
+                    {{-- 📊 VISÃO DO ADMIN --}}
+                    @elseif(auth()->user()->isAdmin())
                         <div class="flex flex-col items-center justify-center text-center h-full min-h-[400px] space-y-6">
                             <div class="w-20 h-20 rounded-full bg-indigo-500/10 flex items-center justify-center border border-indigo-500/20">
                                 <svg class="w-10 h-10 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
@@ -76,8 +96,8 @@
                             </a>
                         </div>
 
+                    {{-- 👤 VISÃO DO CLIENTE --}}
                     @else
-                        {{-- VISÃO DO CLIENTE --}}
                         <div class="flex flex-col items-center justify-center text-center h-full min-h-[400px] space-y-6">
                             <div class="w-20 h-20 rounded-full bg-cyan-500/10 flex items-center justify-center border border-cyan-500/20">
                                 <svg class="w-10 h-10 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>
@@ -95,7 +115,7 @@
                     @endif
 
                 @else
-                    {{-- VISÃO DO VISITANTE (Formulário Ativo) --}}
+                    {{-- 🌍 VISÃO DO VISITANTE (Formulário) --}}
                     
                     @if(session('success'))
                         <div class="mb-6 p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center gap-3 text-emerald-400 animate-fade-in">

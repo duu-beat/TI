@@ -155,8 +155,8 @@
         </div>
 
         {{-- CTA FINAL COM LÓGICA INTELIGENTE --}}
-        {{-- ESCONDIDO PARA ADMIN --}}
-        @unless(auth()->check() && auth()->user()->role === 'admin')
+        {{-- ESCONDIDO PARA ADMIN E MASTER --}}
+        @unless(auth()->check() && auth()->user()->isAdmin())
             <div class="text-center">
                 
                 @auth

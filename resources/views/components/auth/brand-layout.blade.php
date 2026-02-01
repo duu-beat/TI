@@ -6,11 +6,15 @@
     'panelHint' => 'Dica: descreva bem o problema no chamado e mande print quando puder.',
 ])
 
+{{-- 🔥 SEO INJECTION: Envia os dados para o <head> do guest.blade.php --}}
+@section('title', $title . ' · ' . config('app.name', 'Suporte TI'))
+@section('meta_description', $description)
+
 <x-guest-layout>
     <div class="w-full max-w-5xl">
         <div class="grid lg:grid-cols-2 rounded-3xl overflow-hidden border border-white/10 bg-slate-900/50 backdrop-blur-xl shadow-2xl relative">
             
-            {{-- Background Glows (Efeito de luz suave) --}}
+            {{-- Background Glows --}}
             <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none z-0">
                 <div class="absolute top-[-10%] right-[-10%] w-64 h-64 bg-indigo-500/10 rounded-full blur-[80px]"></div>
                 <div class="absolute bottom-[-10%] left-[-10%] w-64 h-64 bg-cyan-500/10 rounded-full blur-[80px]"></div>
@@ -47,18 +51,19 @@
                     </p>
 
                     <div class="mt-8 space-y-3">
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400">
-                                🚀
+                        {{-- Exibe features específicas ou padrão --}}
+                        @if(isset($features))
+                            {{ $features }}
+                        @else
+                            <div class="flex items-center gap-3 text-sm text-slate-300">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400">🚀</div>
+                                <span>Atendimento ágil e sem burocracia.</span>
                             </div>
-                            <span>Atendimento ágil e sem burocracia.</span>
-                        </div>
-                        <div class="flex items-center gap-3 text-sm text-slate-300">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400">
-                                🔒
+                            <div class="flex items-center gap-3 text-sm text-slate-300">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400">🔒</div>
+                                <span>Ambiente seguro e criptografado.</span>
                             </div>
-                            <span>Ambiente seguro e criptografado.</span>
-                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -73,16 +78,10 @@
                     <div>
                         <h2 class="text-2xl font-bold text-white">{{ $title }}</h2>
                         <div class="text-sm text-slate-400 mt-1">
-                            @isset($slotSubtitle)
-                                {{ $slotSubtitle }}
-                            @else
-                                Preencha os dados para continuar.
-                            @endisset
+                            Preencha suas credenciais.
                         </div>
                     </div>
-                    <a href="{{ route('home') }}" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition" title="Voltar ao site">
-                        ✕
-                    </a>
+                    <a href="{{ route('home') }}" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition" title="Voltar ao site">✕</a>
                 </div>
 
                 <div class="auth-form-content">

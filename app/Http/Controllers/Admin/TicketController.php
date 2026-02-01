@@ -142,4 +142,18 @@ class TicketController extends Controller
         
         return view('admin.reports.tickets', compact('tickets'));
     }
+
+    // Adicione este método dentro da classe TicketController
+public function escalate(Ticket $ticket)
+{
+    // Marca como escalonado
+    $ticket->update([
+        'is_escalated' => true,
+        // Opcional: Adicionar uma nota interna automática
+        // 'internal_notes' => $ticket->internal_notes . "\n[SISTEMA] Escalado para Segurança."
+    ]);
+
+    return back()->with('success', 'Chamado repassado para análise da equipe de Segurança (Master).');
+}
+
 }

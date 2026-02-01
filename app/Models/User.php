@@ -10,6 +10,7 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
 use Laravel\Jetstream\HasProfilePhoto;
 use Laravel\Sanctum\HasApiTokens;
 use App\Models\Ticket;
+use Illuminate\Database\Eloquent\SoftDeletes; // Recomendado adicionar
 
 class User extends Authenticatable
 {
@@ -18,12 +19,18 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
+    // use SoftDeletes; // Descomente se criou a migration de soft deletes
+
+    // 👑 CONSTANTES DE NÍVEL
+    const ROLE_CLIENT = 'client';
+    const ROLE_ADMIN = 'admin';
+    const ROLE_MASTER = 'master'; // O nível de Segurança
 
     protected $fillable = [
         'name',
         'email',
         'password',
-        'role', // 👈 NECESSÁRIO para salvar se é Admin ou Cliente
+        'role',
     ];
 
     public function tickets()
@@ -50,21 +57,29 @@ class User extends Authenticatable
         ];
     }
 
-    // 🔥 HELPERS 🔥
+    // 🔥 HELPER METHODS 🔥
     
+    // Verifica se é o Mestre Supremo (Segurança/Dev)
+    public function isMaster(): bool
+    {
+        return $this->role === self::ROLE_MASTER;
+    }
+
+    // Verifica se é Admin (O Master também tem acesso de Admin)
     public function isAdmin(): bool
     {
-        return $this->role === 'admin';
+        return in_array($this->role, [self::ROLE_ADMIN, self::ROLE_MASTER]);
     }
 
+    // Verifica se é Cliente
     public function isClient(): bool
     {
-        return $this->role === 'client';
+        return $this->role === self::ROLE_CLIENT;
     }
 
-    // 👇 NECESSÁRIO para as notificações funcionarem
+    // Escopo para queries
     public function scopeAdmins($query)
     {
-        return $query->where('role', 'admin');
+        return $query->whereIn('role', [self::ROLE_ADMIN, self::ROLE_MASTER]);
     }
 }
