@@ -7,7 +7,7 @@ use App\Enums\TicketStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Builder; // Importante para o type hint
+use Illuminate\Database\Eloquent\Builder;
 
 class Ticket extends Model
 {
@@ -31,13 +31,17 @@ class Ticket extends Model
         return $this->hasMany(TicketMessage::class)->latest();
     }
 
-    // ✅ Scope de Filtro (Limpa o Controller)
+    // ✅ ATUALIZADO: Scope de Filtro mais seguro
     public function scopeFilter(Builder $query, array $filters): void
     {
         $query->when($filters['search'] ?? null, function ($q, $search) {
             $q->where(function ($subQ) use ($search) {
-                $subQ->where('subject', 'like', "%{$search}%")
-                     ->orWhere('id', $search);
+                $subQ->where('subject', 'like', "%{$search}%");
+                
+                // Só tenta buscar por ID se o input for realmente um número
+                if (is_numeric($search)) {
+                    $subQ->orWhere('id', $search);
+                }
             });
         });
 

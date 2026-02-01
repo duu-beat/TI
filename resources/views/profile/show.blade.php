@@ -1,8 +1,7 @@
 <x-app-layout>
     @php
         $user = auth()->user();
-        // ✅ CORREÇÃO: Usar o helper do model para maior segurança
-        $isAdmin = $user->isAdmin(); 
+        $isAdmin = method_exists($user, 'isAdmin') ? $user->isAdmin() : ($user->role === 'admin'); 
         $accent = $isAdmin ? 'red' : 'cyan';
     @endphp
 
@@ -12,89 +11,100 @@
         </h2>
     </x-slot>
 
-    <div class="py-10">
+    {{-- ⚡ ALPINE.JS CONTROLLER --}}
+    <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)" class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
-            {{-- HEADER BANNER --}}
-            <div class="relative bg-slate-900/80 border border-white/10 rounded-[2.5rem] p-8 mb-8 flex flex-col md:flex-row items-center gap-8 overflow-hidden shadow-2xl">
-                <div class="absolute top-0 right-0 w-96 h-96 bg-{{ $accent }}-500/20 rounded-full blur-[100px] pointer-events-none"></div>
+            {{-- 💀 SKELETON LOADING --}}
+            <div x-show="!loaded" class="space-y-8 animate-pulse">
+                {{-- Banner Skeleton --}}
+                <div class="h-40 w-full bg-white/5 rounded-[2rem] border border-white/5"></div>
+                
+                {{-- Grid Skeleton (Agora 2 Colunas mais largas) --}}
+                <div class="grid lg:grid-cols-2 gap-8">
+                    <div class="h-80 bg-white/5 rounded-[2rem] border border-white/5"></div>
+                    <div class="h-80 bg-white/5 rounded-[2rem] border border-white/5"></div>
+                    <div class="h-64 bg-white/5 rounded-[2rem] border border-white/5"></div>
+                    <div class="h-64 bg-white/5 rounded-[2rem] border border-white/5"></div>
+                </div>
+            </div>
 
-                <div class="relative shrink-0 group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-{{ $accent }}-500 to-purple-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-1000"></div>
-                    <img class="relative h-32 w-32 rounded-full object-cover border-4 border-slate-950 shadow-2xl" src="{{ $user->profile_photo_url }}" alt="{{ $user->name }}" />
-                    <div class="absolute bottom-0 right-0 bg-slate-950 rounded-full p-1.5 border border-white/10">
-                        <div class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest bg-{{ $accent }}-500 text-slate-950">
-                            {{ $isAdmin ? 'ADMIN' : 'CLIENTE' }}
+            {{-- ✅ CONTEÚDO REAL --}}
+            <div x-show="loaded" style="display: none;"
+                 x-transition:enter="transition ease-out duration-500"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+                
+                {{-- HEADER BANNER (Mais compacto e elegante) --}}
+                <div class="relative bg-slate-900/80 border border-white/10 rounded-[2rem] p-6 mb-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden shadow-2xl">
+                    <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-{{ $accent }}-500/10 to-transparent pointer-events-none"></div>
+
+                    <img class="relative h-24 w-24 rounded-full object-cover border-4 border-slate-950 shadow-lg" 
+                         src="{{ $user->profile_photo_url }}" 
+                         alt="{{ $user->name }}">
+
+                    <div class="relative text-center md:text-left z-10 flex-1">
+                        <h1 class="text-3xl font-black text-white tracking-tight">
+                            {{ $user->name }}
+                        </h1>
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2">
+                            <span class="text-slate-400 text-sm font-medium flex items-center gap-1">
+                                <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                                {{ $user->email }}
+                            </span>
+                            
+                            {{-- Badge Cargo --}}
+                            <span class="px-3 py-1 rounded-full bg-slate-800 border border-white/10 text-[10px] font-bold uppercase tracking-wider text-{{ $accent }}-400">
+                                {{ $isAdmin ? 'Administrador' : 'Cliente' }}
+                            </span>
                         </div>
                     </div>
                 </div>
 
-                <div class="text-center md:text-left z-10 flex-1">
-                    <h1 class="text-4xl font-black text-white tracking-tight mb-2">{{ $user->name }}</h1>
-                    <div class="flex flex-wrap justify-center md:justify-start gap-4 text-sm text-slate-400">
-                        <span class="flex items-center gap-1">📧 {{ $user->email }}</span>
-                        <span class="flex items-center gap-1">📅 Membro desde {{ $user->created_at->format('Y') }}</span>
-                    </div>
-                </div>
-
-                <div class="flex gap-6 z-10 border-t md:border-t-0 md:border-l border-white/10 pt-6 md:pt-0 md:pl-8 mt-6 md:mt-0">
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-white">{{ $user->two_factor_secret ? '100%' : '50%' }}</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest">Segurança</div>
-                    </div>
-                    <div class="text-center">
-                        <div class="text-2xl font-bold text-{{ $accent }}-400">Ativo</div>
-                        <div class="text-[10px] text-slate-500 uppercase tracking-widest">Status</div>
-                    </div>
-                </div>
-            </div>
-
-            {{-- GRID LAYOUT --}}
-            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6 auto-rows-fr">
-
-                {{-- 1. Dados Pessoais --}}
-                <div class="md:col-span-2 xl:col-span-2">
-                    @if (Laravel\Fortify\Features::canUpdateProfileInformation())
+                {{-- GRID DE CONFIGURAÇÕES (2 Colunas = Mais espaço para os forms) --}}
+                <div class="grid lg:grid-cols-2 gap-8">
+                    
+                    {{-- 1. Informações --}}
+                    <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl">
                         @livewire('profile.update-profile-information-form')
-                    @endif
-                </div>
-
-                {{-- 2. Senha --}}
-                <div class="md:col-span-1 xl:col-span-1">
-                    @if (Laravel\Fortify\Features::enabled(Laravel\Fortify\Features::updatePasswords()))
-                        @livewire('profile.update-password-form')
-                    @endif
-                </div>
-
-                {{-- 3. 2FA --}}
-                <div class="md:col-span-1 xl:col-span-1">
-                    @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
-                        @livewire('profile.two-factor-authentication-form')
-                    @endif
-                </div>
-
-                {{-- 4. Sessões --}}
-                <div class="md:col-span-1 xl:col-span-1">
-                    @livewire('profile.logout-other-browser-sessions-form')
-                </div>
-
-                {{-- 5. Deletar Conta --}}
-                @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
-                    <div class="md:col-span-2 xl:col-span-1">
-                        @if(!$isAdmin)
-                            @livewire('profile.delete-user-form')
-                        @else
-                            <div class="h-full flex flex-col justify-center items-center bg-slate-900/50 border border-red-500/20 rounded-[2rem] p-8 text-center relative overflow-hidden shadow-xl">
-                                <div class="absolute inset-0 bg-red-500/5 pattern-grid-lg opacity-20"></div>
-                                <div class="text-4xl mb-4 grayscale opacity-50">🛡️</div>
-                                <h3 class="text-red-400 font-bold text-lg">Conta Protegida</h3>
-                                <p class="text-xs text-slate-500 mt-2 px-4">
-                                    Administradores não podem excluir a conta através deste painel.
-                                </p>
-                            </div>
-                        @endif
                     </div>
-                @endif
+
+                    {{-- 2. Senha --}}
+                    <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl">
+                        @livewire('profile.update-password-form')
+                    </div>
+
+                    {{-- 3. 2FA (Ocupa largura total se quiser destaque, ou coluna) --}}
+                    @if (Laravel\Fortify\Features::canManageTwoFactorAuthentication())
+                        <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl">
+                            @livewire('profile.two-factor-authentication-form')
+                        </div>
+                    @endif
+
+                    {{-- 4. Sessões --}}
+                    <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl">
+                        @livewire('profile.logout-other-browser-sessions-form')
+                    </div>
+
+                    {{-- 5. Deletar Conta (Full Width para segurança e destaque) --}}
+                    @if (Laravel\Jetstream\Jetstream::hasAccountDeletionFeatures())
+                        <div class="lg:col-span-2 mt-4">
+                            @if(!$isAdmin)
+                                <div class="bg-red-500/5 rounded-[2rem] border border-red-500/10 p-2">
+                                    @livewire('profile.delete-user-form')
+                                </div>
+                            @else
+                                <div class="flex flex-col justify-center items-center bg-slate-900/50 border border-white/10 rounded-[2rem] p-8 text-center opacity-75 hover:opacity-100 transition">
+                                    <div class="text-3xl mb-2 grayscale opacity-50">🛡️</div>
+                                    <h3 class="text-slate-400 font-bold text-sm">Conta Protegida</h3>
+                                    <p class="text-xs text-slate-500 max-w-md mx-auto mt-1">
+                                        Contas administrativas possuem proteção extra contra exclusão acidental.
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+                </div>
             </div>
         </div>
     </div>

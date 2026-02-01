@@ -10,6 +10,16 @@ enum TicketStatus: string
     case RESOLVED = 'resolved';
     case CLOSED = 'closed';
 
+    // ✅ NOVO: Método para facilitar queries de "chamados abertos"
+    public static function openStatuses(): array
+    {
+        return [
+            self::NEW->value,
+            self::IN_PROGRESS->value,
+            self::WAITING_CLIENT->value,
+        ];
+    }
+
     public function label(): string
     {
         return match($this) {
@@ -21,7 +31,6 @@ enum TicketStatus: string
         };
     }
 
-    // Retorna as classes do Tailwind para cada status
     public function color(): string
     {
         return match($this) {

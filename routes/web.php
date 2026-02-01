@@ -37,14 +37,13 @@ Route::middleware(['auth', 'verified'])->prefix('cliente')->name('client.')->gro
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('/perfil', 'profile.show')->name('profile');
 
-    
-    // ✅ Rotas Simplificadas com Resource
+    // Rotas Simplificadas com Resource
     Route::resource('chamados', ClientTicketController::class)
         ->names('tickets')
-        ->parameters(['chamados' => 'ticket']) // 👈 O SEGREDO ESTÁ AQUI
+        ->parameters(['chamados' => 'ticket'])
         ->except(['edit', 'update', 'destroy']);
 
-    // Rotas específicas que não cabem no Resource
+    // Rotas específicas
     Route::controller(ClientTicketController::class)->prefix('chamados/{ticket}')->name('tickets.')->group(function () {
         Route::post('/responder', 'reply')->name('reply');
         Route::post('/avaliar', 'rate')->name('rate');
@@ -72,11 +71,20 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::get('/dashboard', [AdminTicketController::class, 'dashboard'])->name('dashboard');
         Route::view('/perfil', 'profile.show')->name('profile');
         
-        // Exemplo de como simplificar o Admin também:
-        Route::get('/chamados', [AdminTicketController::class, 'index'])->name('tickets.index');
-        Route::get('/chamados/{ticket}', [AdminTicketController::class, 'show'])->name('tickets.show');
-        Route::patch('/chamados/{ticket}/status', [AdminTicketController::class, 'updateStatus'])->name('tickets.update-status');
-        Route::post('/chamados/{ticket}/responder', [AdminTicketController::class, 'reply'])->name('tickets.reply');
-        Route::get('/relatorio', [AdminTicketController::class, 'report'])->name('tickets.report');
+        // ✅ ATUALIZADO: Agrupamento limpo para rotas de Admin
+        Route::controller(AdminTicketController::class)
+            ->prefix('chamados')
+            ->name('tickets.')
+            ->group(function () {
+                Route::get('/', 'index')->name('index');
+                Route::get('/relatorio', 'report')->name('report');
+                
+                // Sub-grupo com ID do ticket
+                Route::prefix('{ticket}')->group(function () {
+                    Route::get('/', 'show')->name('show');
+                    Route::patch('/status', 'updateStatus')->name('update-status');
+                    Route::post('/responder', 'reply')->name('reply');
+                });
+            });
     });
 });

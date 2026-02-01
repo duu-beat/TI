@@ -5,130 +5,141 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Enums\TicketStatus;
-use App\Enums\TicketPriority;
-use App\Notifications\TicketUpdated; // Importar Notificação
-use App\Traits\HandleAttachments;    // Importar Trait
+use App\Http\Requests\ReplyTicketRequest;
+use App\Notifications\TicketUpdated;
+use App\Actions\Ticket\ReplyToTicket; // Reutilizando a Action
 use Illuminate\Http\Request;
-use Illuminate\Validation\Rule;      // Importar Rule para validação
-use App\Actions\Ticket\ReplyToTicket;        // <--- Novo Import
-use App\Actions\Ticket\UpdateTicketStatus;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\Rule;
+use App\Enums\TicketPriority;
 
 class TicketController extends Controller
 {
-    use HandleAttachments; // Usar o Trait
+    public function dashboard()
+    {
+        // 👇 Mudei para '_v4' para ignorar qualquer cache antigo ou bugado
+        $dashboardData = Cache::remember('admin_dashboard_stats_v4', 300, function () {
+            
+            // 1. Estatísticas Gerais (Compatível com MySQL e SQLite)
+            $stats = Ticket::selectRaw("
+                count(*) as total,
+                sum(case when status in (?, ?, ?) then 1 else 0 end) as open,
+                sum(case when status = ? then 1 else 0 end) as on_hold,
+                sum(case when status = ? then 1 else 0 end) as resolved
+            ", [
+                TicketStatus::NEW->value, TicketStatus::IN_PROGRESS->value, TicketStatus::WAITING_CLIENT->value,
+                TicketStatus::WAITING_CLIENT->value,
+                TicketStatus::RESOLVED->value
+            ])->first();
+
+            // 2. Alerta de Prioridade Alta
+            $highPriority = Ticket::where('priority', \App\Enums\TicketPriority::HIGH)
+                ->whereIn('status', TicketStatus::openStatuses())
+                ->count();
+
+            // 3. Dados do Gráfico (Universal: Funciona em MySQL, SQLite, Postgres) 📊
+            // Pega os últimos 7 dias
+            $dates = collect(range(6, 0))->map(function ($daysAgo) {
+                return now()->subDays($daysAgo)->format('d/m');
+            });
+
+            // ✅ CORREÇÃO: Busca tudo dos últimos 7 dias e agrupa via PHP
+            // Isso evita o erro de 'DATE_FORMAT' no SQLite
+            $ticketsPerDay = Ticket::where('created_at', '>=', now()->subDays(6)->startOfDay())
+                ->get() // Traz os dados para a memória (são leves, só os últimos 7 dias)
+                ->groupBy(fn($ticket) => $ticket->created_at->format('d/m'))
+                ->map->count();
+
+            // Garante que dias sem chamados mostrem "0"
+            $chartValues = $dates->map(fn($date) => $ticketsPerDay->get($date, 0));
+
+            return [
+                'stats' => $stats,
+                'priorityStats' => ['high' => $highPriority],
+                'chartLabels' => $dates->values(),
+                'chartValues' => $chartValues->values(),
+            ];
+        });
+
+        // Lista de recentes (sempre real-time)
+        $latestTickets = Ticket::with('user')
+            ->latest()
+            ->take(5)
+            ->get();
+
+        return view('admin.dashboard', [
+            'stats' => $dashboardData['stats'],
+            'priorityStats' => $dashboardData['priorityStats'],
+            'chartLabels' => $dashboardData['chartLabels'],
+            'chartValues' => $dashboardData['chartValues'],
+            'latestTickets' => $latestTickets
+        ]);
+    }
 
     public function index(Request $request)
     {
-        // Podes usar o scopeFilter aqui também se quiseres limpar
-        $query = Ticket::with('user')->latest();
+        // ✅ EAGER LOADING: ->with('user') evita fazer uma query extra para cada linha
+        $tickets = Ticket::with('user')
+            ->filter($request->only(['search', 'status']))
+            ->latest()
+            ->paginate(15) // Paginação um pouco maior para admin
+            ->withQueryString();
 
-        if ($request->filled('search')) {
-            $query->where('subject', 'like', '%' . $request->search . '%')
-                  ->orWhere('id', $request->search);
-        }
-        if ($request->filled('status')) {
-            $query->where('status', $request->status);
-        }
-
-        $tickets = $query->paginate(10);
         return view('admin.tickets.index', compact('tickets'));
     }
 
     public function show(Ticket $ticket)
     {
+        // Carrega mensagens, anexos e quem enviou
+        $ticket->load(['user', 'messages.user', 'messages.attachments']);
+        
         return view('admin.tickets.show', compact('ticket'));
     }
 
-    // REFATORADO COM ACTION
-    public function updateStatus(Request $request, Ticket $ticket, UpdateTicketStatus $updater)
+    public function updateStatus(Request $request, Ticket $ticket)
     {
         $request->validate([
             'status' => ['required', Rule::enum(TicketStatus::class)],
         ]);
 
-        // Converte string para Enum
-        $statusEnum = TicketStatus::tryFrom($request->status);
+        $ticket->update(['status' => $request->status]);
 
-        $updater->execute($ticket, $statusEnum);
+        // Notifica o cliente sobre a mudança (opcional, mas recomendado)
+        // $ticket->user->notify(new TicketStatusChanged($ticket));
+
+        // Limpa o cache do dashboard do admin e do cliente específico
+        Cache::forget('admin_dashboard_stats');
+        Cache::forget("dashboard_stats_{$ticket->user_id}");
 
         return back()->with('success', 'Status atualizado com sucesso!');
     }
 
-    // REFATORADO COM ACTION
-    public function reply(Request $request, Ticket $ticket, ReplyToTicket $replier)
+    // Reutiliza a lógica de resposta, mas com suporte a notas internas se precisar
+    public function reply(ReplyTicketRequest $request, Ticket $ticket, ReplyToTicket $replier)
     {
-        $request->validate([
-            'message' => 'required|string',
-            'attachments.*' => 'file|max:10240',
-        ]);
+        // Se você tiver campo de "nota interna" no form, valide aqui
+        // Mas por padrão, vamos usar a Action principal
+        $replier->execute($request->user(), $ticket, $request->validated(), $request);
 
-        $data = [
-            'message' => $request->message,
-            'is_internal' => $request->has('is_internal'),
-        ];
+        // Se o admin respondeu, geralmente muda o status para "Aguardando Cliente"
+        if ($ticket->status !== TicketStatus::RESOLVED && $ticket->status !== TicketStatus::CLOSED) {
+            $ticket->update(['status' => TicketStatus::WAITING_CLIENT]);
+        }
 
-        $replier->execute($request->user(), $ticket, $data, $request);
+        Cache::forget('admin_dashboard_stats');
+        Cache::forget("dashboard_stats_{$ticket->user_id}");
 
         return back()->with('success', 'Resposta enviada!');
     }
 
-    // MELHORIA: Dashboard Otimizado (1 Query em vez de 4)
-    public function dashboard()
-    {
-        // 1. Stats de Status (Query Agregada)
-        $rawStats = Ticket::selectRaw("
-            count(*) as total,
-            sum(case when status = ? then 1 else 0 end) as new,
-            sum(case when status in (?, ?) then 1 else 0 end) as in_progress,
-            sum(case when status in (?, ?) then 1 else 0 end) as resolved
-        ", [
-            TicketStatus::NEW->value,
-            TicketStatus::IN_PROGRESS->value, TicketStatus::WAITING_CLIENT->value,
-            TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value
-        ])->first();
-
-        $stats = [
-            'new' => $rawStats->new,
-            'in_progress' => $rawStats->in_progress,
-            'resolved' => $rawStats->resolved,
-            'total' => $rawStats->total,
-        ];
-
-        // 2. Stats de Prioridade
-        $priorityStats = [
-            'high' => Ticket::where('priority', TicketPriority::HIGH)
-                ->whereIn('status', [TicketStatus::NEW, TicketStatus::IN_PROGRESS])
-                ->count(),
-            'medium' => Ticket::where('priority', TicketPriority::MEDIUM)
-                ->whereIn('status', [TicketStatus::NEW, TicketStatus::IN_PROGRESS])
-                ->count(),
-        ];
-
-        // 3. Últimos Chamados
-        $latestTickets = Ticket::with('user')->latest()->take(5)->get();
-
-        // 4. Gráficos (Semanal)
-        $dailyData = Ticket::selectRaw('DATE(created_at) as date, count(*) as total')
-            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
-            ->groupBy('date')
-            ->orderBy('date')
-            ->pluck('total', 'date');
-
-        $chartLabels = [];
-        $chartValues = [];
-        
-        for ($i = 6; $i >= 0; $i--) {
-            $date = now()->subDays($i)->format('Y-m-d');
-            $chartLabels[] = now()->subDays($i)->format('d/m');
-            $chartValues[] = $dailyData[$date] ?? 0;
-        }
-
-        return view('admin.dashboard', compact('stats', 'priorityStats', 'latestTickets', 'chartLabels', 'chartValues'));
-    }
-
     public function report()
     {
-        $tickets = Ticket::with('user')->latest()->get();
+        // Exemplo simples de relatório sem cache (geralmente é em tempo real)
+        $tickets = Ticket::with('user')->latest()->limit(500)->get();
+        
+        // Se usar PDF (DomPDF ou Snappy), a lógica viria aqui
+        // return Pdf::loadView('admin.reports.tickets', compact('tickets'))->stream();
+        
         return view('admin.reports.tickets', compact('tickets'));
     }
 }
