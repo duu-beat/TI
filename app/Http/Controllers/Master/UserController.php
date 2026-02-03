@@ -63,6 +63,46 @@ class UserController extends Controller
     }
 
     /**
+     * Atualiza os dados do usuário.
+     */
+    public function update(Request $request, User $user)
+    {
+        // Impede edição de outro Master se quem estiver logado não for o próprio (opcional, mas seguro)
+        if ($user->isMaster() && $user->id !== auth()->id()) {
+             // return back()->with('error', 'Apenas o próprio Master pode editar seus dados.');
+             // (Deixei comentado caso queira permitir, mas cuidado com a segurança)
+        }
+
+        $validated = $request->validate([
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
+            'role' => ['required', Rule::in(['client', 'admin', 'master'])],
+            'password' => ['nullable', 'string', 'min:8'], // Senha opcional na edição
+        ]);
+
+        $data = [
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'role' => $validated['role'],
+        ];
+
+        // Só atualiza a senha se foi preenchida
+        if (!empty($validated['password'])) {
+            $data['password'] = Hash::make($validated['password']);
+        }
+
+        $user->update($data);
+
+        AuditLog::record(
+            'User Updated', 
+            "Atualizou o usuário {$user->name} (ID: {$user->id})", 
+            'WARNING'
+        );
+
+        return back()->with('success', 'Usuário atualizado com sucesso.');
+    }
+
+    /**
      * Remove um usuário (Banir/Excluir).
      */
     public function destroy(User $user)

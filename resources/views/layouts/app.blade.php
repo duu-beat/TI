@@ -34,6 +34,39 @@
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased relative selection:bg-cyan-500 selection:text-white font-sans">
 
+    {{-- ✅ 1. DETECTOR DE OFFLINE (NOVIDADE) --}}
+    <div x-data="{ online: navigator.onLine }" 
+         @online.window="online = true" 
+         @offline.window="online = false" 
+         x-show="!online" 
+         x-cloak
+         class="bg-red-600 text-white text-center text-xs font-bold py-1 fixed top-0 w-full z-[100] shadow-lg">
+        📡 VOCÊ ESTÁ OFFLINE - Verifique sua conexão
+    </div>
+
+    {{-- ✅ 2. BANNER GLOBAL (Lógica PHP Direta) --}}
+    @php
+        // Recupera a mensagem global direto do banco (cacheie isso em produção se possível)
+        $globalMsg = \Illuminate\Support\Facades\DB::table('system_settings')->where('key', 'global_message')->value('value');
+        $globalStyle = \Illuminate\Support\Facades\DB::table('system_settings')->where('key', 'global_message_style')->value('value') ?? 'info';
+        
+        $bannerClasses = match($globalStyle) {
+            'warning' => 'bg-orange-500/10 border-orange-500/50 text-orange-400',
+            'danger' => 'bg-red-500/10 border-red-500/50 text-red-400',
+            'success' => 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400',
+            default => 'bg-blue-500/10 border-blue-500/50 text-blue-400',
+        };
+        $icon = match($globalStyle) {
+            'warning' => '⚠️', 'danger' => '🚨', 'success' => '✅', default => 'ℹ️'
+        };
+    @endphp
+
+    @if(!empty($globalMsg))
+        <div class="{{ $bannerClasses }} border-b px-4 py-3 text-center text-sm font-bold relative z-50 backdrop-blur-md">
+            <span class="mr-2">{{ $icon }}</span> {{ $globalMsg }}
+        </div>
+    @endif
+
     {{-- Background Mesh --}}
     <div class="fixed inset-0 z-0 pointer-events-none overflow-hidden">
         <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[50%] rounded-full bg-indigo-600/10 blur-[100px]"></div>
@@ -91,7 +124,6 @@
                             Cancelar
                         </button>
 
-                        {{-- Logout funciona para Admin e Master usando a rota de Admin --}}
                         <form method="POST" action="{{ (request()->routeIs('admin.*') || request()->routeIs('master.*')) ? route('admin.logout') : route('logout') }}">
                             @csrf
                             <button type="submit" class="rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">

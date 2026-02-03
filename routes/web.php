@@ -128,8 +128,9 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::cl
         
         // 3. Gerenciamento de Usuários
         Route::resource('usuarios', \App\Http\Controllers\Master\UserController::class)
-            ->names('users')
-            ->only(['index', 'store', 'destroy']);
+        ->names('users')
+        ->parameters(['usuarios' => 'user']) // ✅ ADICIONE ESSA LINHA
+        ->only(['index', 'store', 'destroy', 'update']);
         
         // 4. Perfil e Controle de Admin
         Route::view('/perfil', 'profile.show')->name('profile');

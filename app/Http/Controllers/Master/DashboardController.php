@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+
 class DashboardController extends Controller
 {
     public function index()
@@ -25,25 +26,33 @@ class DashboardController extends Controller
         return view('master.dashboard', compact('escalatedTickets', 'admins'));
     }
 
-    // --- AUDITORIA ---
-    public function audit()
+    // --- AUDITORIA (ATUALIZADO) ---
+    public function audit(Request $request)
     {
+        $query = AuditLog::with('user');
+
+        // ✅ Permite filtrar logs por um usuário específico (Ex: ver logs de um admin)
+        if ($request->has('user_id')) {
+            $query->where('user_id', $request->user_id);
+        }
+
         // Pega os logs reais do banco (50 por página)
-        $logs = AuditLog::with('user')->latest()->paginate(50);
+        $logs = $query->latest()->paginate(50)->withQueryString();
 
         return view('master.audit', compact('logs'));
     }
 
+    
     // --- CONFIGURAÇÕES ---
     public function settings()
     {
-        // Verifica se o cadastro está bloqueado
-        $isBlocked = DB::table('system_settings')
-            ->where('key', 'registration_blocked')
-            ->value('value');
+        // Busca configurações do banco
+        $settings = DB::table('system_settings')->pluck('value', 'key');
 
         return view('master.settings', [
-            'registrationBlocked' => $isBlocked === '1'
+            'registrationBlocked' => ($settings['registration_blocked'] ?? '0') === '1',
+            'globalMessage'       => $settings['global_message'] ?? null,
+            'globalMessageStyle'  => $settings['global_message_style'] ?? 'info',
         ]);
     }
 
@@ -64,15 +73,16 @@ class DashboardController extends Controller
 
         // 2. Bloqueio de Cadastro
         $blockRegister = $request->has('block_registers') ? '1' : '0';
-        
-        DB::table('system_settings')->updateOrInsert(
-            ['key' => 'registration_blocked'],
-            ['value' => $blockRegister, 'updated_at' => now()]
-        );
+        DB::table('system_settings')->updateOrInsert(['key' => 'registration_blocked'], ['value' => $blockRegister, 'updated_at' => now()]);
 
-        if ($request->has('block_registers')) {
-             AuditLog::record('Settings', 'Bloqueou novos registros', 'WARNING');
-        }
+        // 3. Aviso Global
+        $message = $request->has('global_message_active') ? $request->global_message : null;
+        DB::table('system_settings')->updateOrInsert(['key' => 'global_message'], ['value' => $message, 'updated_at' => now()]);
+        DB::table('system_settings')->updateOrInsert(['key' => 'global_message_style'], ['value' => $request->global_message_style, 'updated_at' => now()]);
+
+        // Logs
+        if ($request->has('block_registers')) AuditLog::record('Settings', 'Bloqueou novos registros', 'WARNING');
+        if ($message) AuditLog::record('Settings', 'Atualizou Aviso Global', 'INFO');
 
         return back()->with('success', 'Configurações atualizadas.');
     }
