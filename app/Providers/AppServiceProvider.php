@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Gate; // 👈 Importante
 use Illuminate\Support\Carbon;
 use App\Models\Ticket;               // 👈 Importante
 use App\Policies\TicketPolicy;       // 👈 Importante
+use App\Observers\TicketObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -28,5 +29,8 @@ class AppServiceProvider extends ServiceProvider
 
         // 👇 REGISTRO OBRIGATÓRIO DA POLICY
         Gate::policy(Ticket::class, TicketPolicy::class);
+
+        // 👇 Ativar o Observer (Isto automatiza o cache!)
+        Ticket::observe(TicketObserver::class);
     }
 }

@@ -13,6 +13,7 @@ class Ticket extends Model
 {
     protected $fillable = [
         'user_id', 
+        'category',
         'subject', 
         'description', 
         'status', 
@@ -38,6 +39,8 @@ class Ticket extends Model
         return $this->hasMany(TicketMessage::class)->latest();
     }
 
+    // 🔍 SCOPES (Filtros e Queries)
+
     public function scopeFilter(Builder $query, array $filters): void
     {
         $query->when($filters['search'] ?? null, function ($q, $search) {
@@ -53,5 +56,23 @@ class Ticket extends Model
         $query->when($filters['status'] ?? null, function ($q, $status) {
             $q->where('status', $status);
         });
+    }
+
+
+    /**
+     * Scope para pegar as estatísticas do dashboard de forma limpa.
+     */
+    public function scopeWithDashboardStats(Builder $query)
+    {
+        return $query->selectRaw("
+            count(*) as total,
+            sum(case when status in (?, ?, ?) then 1 else 0 end) as open,
+            sum(case when status = ? then 1 else 0 end) as in_progress,
+            sum(case when status in (?, ?) then 1 else 0 end) as resolved
+        ", [
+            TicketStatus::NEW->value, TicketStatus::IN_PROGRESS->value, TicketStatus::WAITING_CLIENT->value,
+            TicketStatus::IN_PROGRESS->value, // Nota: Verifiquei que usaste IN_PROGRESS em 'open' e 'in_progress' no teu código original, mantive a lógica.
+            TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value
+        ]);
     }
 }

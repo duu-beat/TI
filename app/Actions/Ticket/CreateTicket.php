@@ -21,6 +21,7 @@ class CreateTicket
             // 1. Criar o Ticket
             $ticket = Ticket::create([
                 'user_id' => $user->id,
+                'category' => $data['category'],
                 'subject' => $data['subject'],
                 'description' => $data['description'],
                 'priority' => $data['priority'] ?? null,
