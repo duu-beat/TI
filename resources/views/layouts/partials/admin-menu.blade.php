@@ -17,6 +17,11 @@
         🎫 Gerenciar Chamados
     </a>
 
+    {{-- Respostas Prontas --}}
+    <a href="{{ route('admin.respostas-prontas.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.respostas-prontas.*') ? $activeClass : $inactiveClass }}">
+        ⚡ Respostas Prontas
+    </a>
     
     {{-- Perfil --}}
     <a href="{{ route('admin.profile') }}"

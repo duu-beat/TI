@@ -5,12 +5,12 @@ use App\Http\Controllers\Client\TicketController as ClientTicketController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Master\AuthController as MasterAuthController;
-use App\Http\Controllers\Master\DashboardController as MasterDashboardController; // ✅ Novo Controller
+use App\Http\Controllers\Master\DashboardController as MasterDashboardController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Client\DashboardController;
 use App\Http\Controllers\Public\ContactController;
-use App\Http\Middleware\MasterMiddleware; // ✅ Middleware
+use App\Http\Controllers\Admin\CannedResponseController; // ✅ Importado
 
 /*
 |--------------------------------------------------------------------------
@@ -66,12 +66,17 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
 
-    // Middleware 'admin' agora permite Master também (veja o Model User)
+    // Middleware 'admin' agora permite Master também
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         
         Route::get('/dashboard', [AdminTicketController::class, 'dashboard'])->name('dashboard');
         Route::view('/perfil', 'profile.show')->name('profile');
         
+        // ✅ 1. CRUD de Respostas Prontas
+        Route::resource('respostas-prontas', CannedResponseController::class)
+            ->parameters(['respostas-prontas' => 'cannedResponse']);
+
+        // ✅ 2. Rotas de Chamados (Com as novas funções)
         Route::controller(AdminTicketController::class)
             ->prefix('chamados')
             ->name('tickets.')
@@ -82,11 +87,16 @@ Route::prefix('admin')->name('admin.')->group(function () {
                 Route::prefix('{ticket}')->group(function () {
                     Route::get('/', 'show')->name('show');
                     Route::patch('/status', 'updateStatus')->name('update-status');
+                    
+                    // Ação de Responder (suporta nota interna agora)
                     Route::post('/responder', 'reply')->name('reply');
                     
-                    // ✅ ROTA DE ESCALONAR (Passar para o Master)
+                    // Escalonar
                     Route::post('/escalar', 'escalate')->name('escalate');
-                    
+
+                    // ✅ Novas Ações: Atribuir e Fundir
+                    Route::patch('/atribuir', 'assign')->name('assign');
+                    Route::post('/fundir', 'merge')->name('merge');
                 });
             });
     });
@@ -97,14 +107,11 @@ Route::prefix('admin')->name('admin.')->group(function () {
 | AUTENTICAÇÃO DE SEGURANÇA (URL: /seguranca/login)
 |--------------------------------------------------------------------------
 */
-// Mudamos o prefixo aqui de 'master' para 'seguranca'
 Route::prefix('seguranca')->name('master.')->group(function () {
-    
     Route::middleware('guest')->group(function () {
         Route::get('/login', [MasterAuthController::class, 'create'])->name('login');
         Route::post('/login', [MasterAuthController::class, 'store'])->name('login.store');
     });
-
     Route::post('/logout', [MasterAuthController::class, 'destroy'])->name('logout');
 });
 
@@ -118,29 +125,23 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::cl
     ->name('master.')
     ->group(function () {
         
-        // 1. Dashboard Principal
         Route::get('/', [MasterDashboardController::class, 'index'])->name('dashboard');
         
-        // 2. Auditoria e Configurações (Core)
         Route::get('/auditoria', [MasterDashboardController::class, 'audit'])->name('audit');
         Route::get('/configuracoes', [MasterDashboardController::class, 'settings'])->name('settings');
         Route::post('/configuracoes', [MasterDashboardController::class, 'updateSettings'])->name('settings.update');
         
-        // 3. Gerenciamento de Usuários
         Route::resource('usuarios', \App\Http\Controllers\Master\UserController::class)
         ->names('users')
-        ->parameters(['usuarios' => 'user']) // ✅ ADICIONE ESSA LINHA
+        ->parameters(['usuarios' => 'user'])
         ->only(['index', 'store', 'destroy', 'update']);
         
-        // 4. Perfil e Controle de Admin
         Route::view('/perfil', 'profile.show')->name('profile');
         Route::patch('/usuarios/{user}/toggle-admin', [MasterDashboardController::class, 'toggleAdmin'])->name('users.toggle-admin');
 
-        // 🔥 5. RESOLUÇÃO RÁPIDA (A rota que estava faltando)
         Route::post('/chamados/{ticket}/resolver-master', [MasterDashboardController::class, 'resolveEscalated'])
-            ->name('tickets.resolve'); // Gera a rota: master.tickets.resolve
+            ->name('tickets.resolve');
 
-        // 6. Logs do Sistema (Backend)
         Route::get('/logs-sistema', [MasterDashboardController::class, 'systemLogs'])->name('system-logs');
         Route::post('/logs-sistema/limpar', [MasterDashboardController::class, 'clearSystemLogs'])->name('system-logs.clear');
 });

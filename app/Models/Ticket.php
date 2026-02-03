@@ -20,18 +20,25 @@ class Ticket extends Model
         'priority', 
         'rating', 
         'rating_comment',
-        'is_escalated', // 👈 ADICIONE ISSO AQUI
+        'is_escalated',
+        'assigned_to', // ✅ ADICIONADO: Necessário para a atribuição funcionar
     ];
 
     protected $casts = [
         'status' => TicketStatus::class,
         'priority' => TicketPriority::class,
-        'is_escalated' => 'boolean', // Opcional, mas recomendado para garantir que venha como true/false
+        'is_escalated' => 'boolean',
     ];
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    // ✅ ADICIONADO: A relação que estava faltando e gerando o erro 500
+    public function assignee(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'assigned_to');
     }
 
     public function messages(): HasMany
@@ -58,7 +65,6 @@ class Ticket extends Model
         });
     }
 
-
     /**
      * Scope para pegar as estatísticas do dashboard de forma limpa.
      */
@@ -71,7 +77,7 @@ class Ticket extends Model
             sum(case when status in (?, ?) then 1 else 0 end) as resolved
         ", [
             TicketStatus::NEW->value, TicketStatus::IN_PROGRESS->value, TicketStatus::WAITING_CLIENT->value,
-            TicketStatus::IN_PROGRESS->value, // Nota: Verifiquei que usaste IN_PROGRESS em 'open' e 'in_progress' no teu código original, mantive a lógica.
+            TicketStatus::IN_PROGRESS->value,
             TicketStatus::RESOLVED->value, TicketStatus::CLOSED->value
         ]);
     }
