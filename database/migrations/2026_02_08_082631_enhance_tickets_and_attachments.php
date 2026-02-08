@@ -19,7 +19,7 @@ return new class extends Migration
 
         // Melhorias na tabela de anexos
         Schema::table('ticket_attachments', function (Blueprint $table) {
-            $table->string('mime_type')->nullable()->after('path');
+            $table->string('mime_type')->nullable()->after('file_name');
             $table->integer('size')->nullable()->after('mime_type'); // em bytes
             $table->string('disk')->default('public')->after('size');
         });
