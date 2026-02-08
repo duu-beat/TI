@@ -10,6 +10,7 @@ use App\Notifications\TicketUpdated;
 use App\Traits\HandleAttachments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use App\Services\SlaService;
 
 class ReplyToTicket
 {
@@ -17,7 +18,9 @@ class ReplyToTicket
 
     public function execute(User $user, Ticket $ticket, array $data, $request): TicketMessage
     {
-        return DB::transaction(function () use ($user, $ticket, $data, $request) {
+        $slaService = app(SlaService::class);
+
+        return DB::transaction(function () use ($user, $ticket, $data, $request, $slaService) {
             
             // 1. Criar a mensagem
             $message = $ticket->messages()->create([
@@ -43,6 +46,10 @@ class ReplyToTicket
                 if ($ticket->status === TicketStatus::NEW) {
                     $ticket->update(['status' => TicketStatus::IN_PROGRESS]);
                 }
+                
+                // Calcular tempo de primeira resposta (se for a primeira resposta do admin)
+                $slaService->calculateFirstResponseTime($ticket);
+                
                 // Notifica o Cliente
                 $ticket->user->notify(new TicketUpdated($ticket, 'replied'));
             }

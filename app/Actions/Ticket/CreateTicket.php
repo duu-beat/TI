@@ -10,6 +10,7 @@ use App\Notifications\TicketUpdated;
 use App\Traits\HandleAttachments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use App\Services\SlaService;
 
 class CreateTicket
 {
@@ -17,7 +18,9 @@ class CreateTicket
 
     public function execute(User $user, array $data, $request): Ticket
     {
-        return DB::transaction(function () use ($user, $data, $request) {
+        $slaService = app(SlaService::class);
+
+        return DB::transaction(function () use ($user, $data, $request, $slaService) {
             // 1. Criar o Ticket
             $ticket = Ticket::create([
                 'user_id' => $user->id,
@@ -37,6 +40,9 @@ class CreateTicket
 
             // 3. Processar Anexos
             $this->processAttachments($request, $message);
+
+            // 4. Calcular e definir SLA
+            $slaService->setSlaForTicket($ticket);
 
             // 4. Notificar Admins (Usa o scope criado no User.php)
             $admins = User::admins()->get();

@@ -145,3 +145,29 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::cl
         Route::get('/logs-sistema', [MasterDashboardController::class, 'systemLogs'])->name('system-logs');
         Route::post('/logs-sistema/limpar', [MasterDashboardController::class, 'clearSystemLogs'])->name('system-logs.clear');
 });
+/*
+|--------------------------------------------------------------------------
+| ROTAS ADICIONADAS - MELHORIAS
+|--------------------------------------------------------------------------
+*/
+
+// Rotas de Tags (Admin)
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::resource('tags', \App\Http\Controllers\Admin\TagController::class)
+        ->only(['index', 'store', 'update', 'destroy']);
+    
+    Route::post('chamados/{ticket}/tags', [\App\Http\Controllers\Admin\TagController::class, 'attachToTicket'])
+        ->name('tickets.tags.attach');
+});
+
+// Rotas de Relatórios (Admin)
+Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/relatorios', [\App\Http\Controllers\Admin\ReportController::class, 'index'])
+        ->name('reports.index');
+    
+    Route::get('/relatorios/exportar-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportPdf'])
+        ->name('reports.export-pdf');
+    
+    Route::get('/relatorios/exportar-excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportExcel'])
+        ->name('reports.export-excel');
+});

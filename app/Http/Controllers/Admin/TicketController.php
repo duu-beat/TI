@@ -14,14 +14,17 @@ use Illuminate\Validation\Rule;
 use App\Enums\TicketPriority;
 use App\Models\CannedResponse; // Importar
 use App\Models\User;            // <--- ADICIONE ESTA LINHA
+use App\Services\SlaService;
 
 
 class TicketController extends Controller
 {
     public function dashboard()
     {
-        // 👇 Mudei para '_v4' para ignorar qualquer cache antigo ou bugado
-        $dashboardData = Cache::remember('admin_dashboard_stats_v4', 300, function () {
+        $slaService = app(SlaService::class);
+
+        // 👇 Mudei para '_v5' com métricas de SLA
+        $dashboardData = Cache::remember('admin_dashboard_stats_v5', 300, function () use ($slaService) {
             
             // 1. Estatísticas Gerais (Compatível com MySQL e SQLite)
             $stats = Ticket::selectRaw("
@@ -56,11 +59,15 @@ class TicketController extends Controller
             // Garante que dias sem chamados mostrem "0"
             $chartValues = $dates->map(fn($date) => $ticketsPerDay->get($date, 0));
 
+            // 4. Métricas de SLA
+            $slaStats = $slaService->getSlaStats();
+
             return [
                 'stats' => $stats,
                 'priorityStats' => ['high' => $highPriority],
                 'chartLabels' => $dates->values(),
                 'chartValues' => $chartValues->values(),
+                'slaStats' => $slaStats,
             ];
         });
 
@@ -75,20 +82,37 @@ class TicketController extends Controller
             'priorityStats' => $dashboardData['priorityStats'],
             'chartLabels' => $dashboardData['chartLabels'],
             'chartValues' => $dashboardData['chartValues'],
+            'slaStats' => $dashboardData['slaStats'],
             'latestTickets' => $latestTickets
         ]);
     }
 
     public function index(Request $request)
     {
-        // ✅ EAGER LOADING: ->with('user') evita fazer uma query extra para cada linha
-        $tickets = Ticket::with('user')
-            ->filter($request->only(['search', 'status']))
+        // ✅ EAGER LOADING com tags
+        $tickets = Ticket::with(['user', 'assignee', 'tags'])
+            ->filter($request->only([
+                'search', 
+                'status', 
+                'priority', 
+                'category', 
+                'assigned_to', 
+                'tag',
+                'date_from',
+                'date_to',
+                'sla_overdue'
+            ]))
             ->latest()
-            ->paginate(15) // Paginação um pouco maior para admin
+            ->paginate(15)
             ->withQueryString();
 
-        return view('admin.tickets.index', compact('tickets'));
+        // Dados para os filtros
+        $tags = \App\Models\Tag::all();
+        $admins = User::whereIn('role', ['admin', 'master'])->get();
+        $statuses = TicketStatus::cases();
+        $priorities = TicketPriority::cases();
+
+        return view('admin.tickets.index', compact('tickets', 'tags', 'admins', 'statuses', 'priorities'));
     }
 
     public function show(Ticket $ticket)
