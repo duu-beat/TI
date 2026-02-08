@@ -22,6 +22,7 @@
 @endphp
 
 <aside class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-950/80 backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto"
+       aria-label="Menu lateral principal"
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
     
     {{-- Logo --}}
@@ -38,7 +39,11 @@
                 </div>
             </div>
         </a>
-        <button @click="sidebarOpen = false" class="lg:hidden text-slate-400 hover:text-white">
+        <button type="button"
+                x-ref="sidebarCloseButton"
+                @click="closeSidebar()"
+                class="lg:hidden text-slate-400 hover:text-white"
+                aria-label="Fechar menu lateral">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
     </div>
@@ -64,8 +69,10 @@
                 <div class="text-xs text-slate-500 truncate group-hover:text-slate-400 transition">{{ $user->email }}</div>
             </a>
             
-            <button type="button" 
-                    @click="logoutModalOpen = true"
+            <button type="button"
+                    @click="openLogoutModal($event.currentTarget)"
+                    :aria-expanded="logoutModalOpen.toString()"
+                    aria-controls="logout-modal"
                     class="rounded-xl bg-white/10 p-2 text-slate-200 hover:bg-white/20 hover:text-red-400 transition" 
                     title="Sair">
                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

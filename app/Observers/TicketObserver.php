@@ -29,5 +29,9 @@ class TicketObserver
     protected function clearDashboardCache($userId): void
     {
         Cache::forget("dashboard_stats_{$userId}");
+        Cache::forget("home:client:{$userId}:stats:v1");
+        Cache::forget('home:admin:stats:v1');
+        Cache::forget('home:master:stats:v1');
+        Cache::forget('admin_dashboard_stats_v5');
     }
 }

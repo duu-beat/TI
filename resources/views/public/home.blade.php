@@ -5,35 +5,14 @@
 
 @section('content')
 
-@auth
-    @php
-        $user = auth()->user();
-        
-        // --- DADOS MASTER (SEGURANÇA) ---
-        if ($user->isMaster()) {
-            // Conta chamados escalonados
-            $escalatedCount = \App\Models\Ticket::where('is_escalated', true)
-                ->where('status', '!=', \App\Enums\TicketStatus::RESOLVED)
-                ->count();
-            // Conta admins ativos (usando string 'admin' direto para evitar erro de constante)
-            $adminsCount = \App\Models\User::where('role', 'admin')->count();
-        }
-        
-        // --- DADOS ADMIN ---
-        elseif ($user->isAdmin()) {
-            $urgentCount = \App\Models\Ticket::where('priority', \App\Enums\TicketPriority::HIGH)
-                ->whereIn('status', [\App\Enums\TicketStatus::NEW, \App\Enums\TicketStatus::IN_PROGRESS])
-                ->count();
-            $openTickets = \App\Models\Ticket::whereIn('status', [\App\Enums\TicketStatus::NEW, \App\Enums\TicketStatus::IN_PROGRESS])->count();
-        } 
-        
-        // --- DADOS CLIENTE ---
-        else {
-            $recentTickets = $user->tickets()->latest()->take(3)->get();
-            $ticketsMonth = $user->tickets()->whereMonth('created_at', now()->month)->count();
-        }
-    @endphp
-@endauth
+@php
+    $escalatedCount = $escalatedCount ?? 0;
+    $adminsCount = $adminsCount ?? 0;
+    $urgentCount = $urgentCount ?? 0;
+    $openTickets = $openTickets ?? 0;
+    $recentTickets = $recentTickets ?? collect();
+    $ticketsMonth = $ticketsMonth ?? 0;
+@endphp
 
 <div class="relative min-h-screen flex flex-col">
     
@@ -201,3 +180,4 @@
     @endauth
 </div>
 @endsection
+

@@ -44,22 +44,7 @@
         📡 VOCÊ ESTÁ OFFLINE - Verifique sua conexão
     </div>
 
-    {{-- ✅ 2. BANNER GLOBAL (Lógica PHP Direta) --}}
-    @php
-        // Recupera a mensagem global direto do banco (cacheie isso em produção se possível)
-        $globalMsg = \Illuminate\Support\Facades\DB::table('system_settings')->where('key', 'global_message')->value('value');
-        $globalStyle = \Illuminate\Support\Facades\DB::table('system_settings')->where('key', 'global_message_style')->value('value') ?? 'info';
-        
-        $bannerClasses = match($globalStyle) {
-            'warning' => 'bg-orange-500/10 border-orange-500/50 text-orange-400',
-            'danger' => 'bg-red-500/10 border-red-500/50 text-red-400',
-            'success' => 'bg-emerald-500/10 border-emerald-500/50 text-emerald-400',
-            default => 'bg-blue-500/10 border-blue-500/50 text-blue-400',
-        };
-        $icon = match($globalStyle) {
-            'warning' => '⚠️', 'danger' => '🚨', 'success' => '✅', default => 'ℹ️'
-        };
-    @endphp
+    {{-- ✅ 2. BANNER GLOBAL (dados compartilhados no AppServiceProvider) --}}
 
     @if(!empty($globalMsg))
         <div class="{{ $bannerClasses }} border-b px-4 py-3 text-center text-sm font-bold relative z-50 backdrop-blur-md">
@@ -74,7 +59,33 @@
         <div class="absolute -bottom-[10%] left-[20%] w-[30%] h-[30%] rounded-full bg-purple-600/10 blur-[100px]"></div>
     </div>
 
-    <div class="min-h-screen flex relative z-10" x-data="{ sidebarOpen: false, logoutModalOpen: false }">
+    <div class="min-h-screen flex relative z-10"
+         x-data="{
+             sidebarOpen: false,
+             logoutModalOpen: false,
+             lastFocusedElement: null,
+             openSidebar(triggerEl) {
+                 this.lastFocusedElement = triggerEl ?? document.activeElement;
+                 this.sidebarOpen = true;
+                 this.$nextTick(() => this.$refs.sidebarCloseButton?.focus());
+             },
+             closeSidebar() {
+                 if (!this.sidebarOpen) return;
+                 this.sidebarOpen = false;
+                 this.$nextTick(() => this.lastFocusedElement?.focus?.());
+             },
+             openLogoutModal(triggerEl) {
+                 this.lastFocusedElement = triggerEl ?? document.activeElement;
+                 this.logoutModalOpen = true;
+                 this.$nextTick(() => this.$refs.logoutCancelButton?.focus());
+             },
+             closeLogoutModal() {
+                 if (!this.logoutModalOpen) return;
+                 this.logoutModalOpen = false;
+                 this.$nextTick(() => this.lastFocusedElement?.focus?.());
+             }
+         }"
+         @keydown.escape.window="closeSidebar(); closeLogoutModal()">
 
         <x-sidebar />
 
@@ -82,7 +93,11 @@
             {{-- Topbar --}}
             <header class="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-md border-b border-white/10 h-16 flex items-center justify-between px-6">
                 <div class="flex items-center gap-4">
-                    <button @click="sidebarOpen = true" class="lg:hidden text-slate-400 hover:text-white">
+                    <button type="button"
+                            @click="openSidebar($event.currentTarget)"
+                            :aria-expanded="sidebarOpen.toString()"
+                            aria-label="Abrir menu lateral"
+                            class="lg:hidden text-slate-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
                     @if (isset($header))
@@ -98,11 +113,18 @@
             </div>
         </main>
 
-        <div x-show="sidebarOpen" @click="sidebarOpen = false" x-transition.opacity class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"></div>
+        <div x-show="sidebarOpen" @click="closeSidebar()" x-transition.opacity class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-40 lg:hidden"></div>
 
         {{-- Modal de Logout --}}
-        <div x-show="logoutModalOpen" style="display: none;" class="fixed inset-0 z-[999] flex items-center justify-center p-6" x-cloak>
-            <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="logoutModalOpen = false"></div>
+        <div id="logout-modal"
+             x-show="logoutModalOpen"
+             style="display: none;"
+             class="fixed inset-0 z-[999] flex items-center justify-center p-6"
+             role="dialog"
+             aria-modal="true"
+             aria-labelledby="logout-modal-title"
+             x-cloak>
+            <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="closeLogoutModal()"></div>
 
             <div class="relative w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 shadow-2xl p-1"
                  x-show="logoutModalOpen"
@@ -114,13 +136,16 @@
                     <div class="flex items-center gap-4 mb-6">
                         <div class="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">👋</div>
                         <div>
-                            <div class="text-lg font-bold text-white">Confirmar saída</div>
+                            <div id="logout-modal-title" class="text-lg font-bold text-white">Confirmar saída</div>
                             <div class="text-sm text-slate-400">Deseja encerrar a sessão?</div>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-end gap-3">
-                        <button type="button" @click="logoutModalOpen = false" class="rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition">
+                        <button type="button"
+                                x-ref="logoutCancelButton"
+                                @click="closeLogoutModal()"
+                                class="rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition">
                             Cancelar
                         </button>
 

@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\AuthController as AdminAuthController;
 use App\Http\Controllers\Master\AuthController as MasterAuthController;
 use App\Http\Controllers\Master\DashboardController as MasterDashboardController;
 use App\Http\Controllers\Public\FaqController;
+use App\Http\Controllers\Public\HomeController;
 use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Client\DashboardController;
 use App\Http\Controllers\Public\ContactController;
@@ -17,7 +18,7 @@ use App\Http\Controllers\Admin\CannedResponseController; // ✅ Importado
 | Rotas Públicas
 |--------------------------------------------------------------------------
 */
-Route::view('/', 'public.home')->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::view('/servicos', 'public.services')->name('services');
 Route::view('/portfolio', 'public.portfolio')->name('portfolio');
 Route::view('/sobre', 'public.sobre')->name('sobre');

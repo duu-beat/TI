@@ -27,10 +27,50 @@
             </p>
         </div>
 
-        <div class="space-y-4" x-data="{ active: null }">
+        <div class="space-y-4"
+             x-data="{
+                 active: null,
+                 toggleItem(index) {
+                     this.active = this.active === index ? null : index;
+                 },
+                 getTriggers() {
+                     return Array.from(this.$el.querySelectorAll('[data-faq-trigger]'));
+                 },
+                 focusTrigger(index) {
+                     const triggers = this.getTriggers();
+                     if (!triggers.length) return;
+                     const safeIndex = (index + triggers.length) % triggers.length;
+                     triggers[safeIndex].focus();
+                 },
+                 focusNext(index) {
+                     this.focusTrigger(index + 1);
+                 },
+                 focusPrevious(index) {
+                     this.focusTrigger(index - 1);
+                 },
+                 focusFirst() {
+                     const triggers = this.getTriggers();
+                     if (!triggers.length) return;
+                     triggers[0].focus();
+                 },
+                 focusLast() {
+                     const triggers = this.getTriggers();
+                     if (!triggers.length) return;
+                     triggers[triggers.length - 1].focus();
+                 }
+             }"
+             @keydown.escape.window="active = null">
             @forelse($faqs as $index => $faq)
                 <div class="rounded-2xl border border-white/10 bg-slate-900/50 hover:bg-slate-900/80 transition overflow-hidden">
-                    <button @click="active = (active === {{ $index }} ? null : {{ $index }})" 
+                    <button @click="toggleItem({{ $index }})"
+                            @keydown.down.prevent="focusNext({{ $index }})"
+                            @keydown.up.prevent="focusPrevious({{ $index }})"
+                            @keydown.home.prevent="focusFirst()"
+                            @keydown.end.prevent="focusLast()"
+                            data-faq-trigger
+                            id="faq-trigger-{{ $index }}"
+                            :aria-expanded="(active === {{ $index }}).toString()"
+                            aria-controls="faq-panel-{{ $index }}"
                             class="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
                         <span class="text-lg font-bold text-white group-hover:text-cyan-400 transition pr-8">
                             {{ $faq->question }}
@@ -42,7 +82,13 @@
                             </svg>
                         </span>
                     </button>
-                    <div x-show="active === {{ $index }}" x-collapse x-cloak class="border-t border-white/5 bg-white/[0.02]">
+                    <div x-show="active === {{ $index }}"
+                         id="faq-panel-{{ $index }}"
+                         role="region"
+                         aria-labelledby="faq-trigger-{{ $index }}"
+                         x-collapse
+                         x-cloak
+                         class="border-t border-white/5 bg-white/[0.02]">
                         <div class="p-6 pt-2 text-slate-400 leading-relaxed">
                             {{ $faq->answer }}
                         </div>

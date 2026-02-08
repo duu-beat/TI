@@ -2,8 +2,9 @@
 
 namespace App\Services;
 
-use App\Models\Ticket;
 use App\Enums\TicketPriority;
+use App\Enums\TicketStatus;
+use App\Models\Ticket;
 use Carbon\Carbon;
 
 class SlaService
@@ -147,12 +148,20 @@ class SlaService
      */
     public function getSlaStats(): array
     {
-        $openTickets = Ticket::whereNotIn('status', ['resolved', 'closed'])->get();
+        $openStatuses = TicketStatus::openStatuses();
+        $todayStart = now()->startOfDay();
+        $todayEnd = now()->endOfDay();
 
-        $overdue = $openTickets->filter(fn($t) => $this->isSlaOverdue($t))->count();
-        $dueToday = $openTickets->filter(function($t) {
-            return $t->sla_due_at && $t->sla_due_at->isToday();
-        })->count();
+        $overdue = Ticket::query()
+            ->whereIn('status', $openStatuses)
+            ->whereNotNull('sla_due_at')
+            ->where('sla_due_at', '<', now())
+            ->count();
+
+        $dueToday = Ticket::query()
+            ->whereIn('status', $openStatuses)
+            ->whereBetween('sla_due_at', [$todayStart, $todayEnd])
+            ->count();
 
         $avgResponseTime = Ticket::whereNotNull('response_time_minutes')
             ->avg('response_time_minutes');

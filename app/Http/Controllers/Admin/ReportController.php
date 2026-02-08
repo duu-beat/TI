@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Enums\TicketPriority;
+use App\Enums\TicketStatus;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\User;
-use App\Enums\TicketStatus;
-use App\Enums\TicketPriority;
-use Illuminate\Http\Request;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Http\Request;
 
 class ReportController extends Controller
 {
@@ -89,11 +89,11 @@ class ReportController extends Controller
             'Content-Disposition' => "attachment; filename=\"{$filename}\"",
         ];
 
-        $callback = function() use ($tickets) {
+        $callback = function () use ($tickets) {
             $file = fopen('php://output', 'w');
-            
+
             // BOM para UTF-8
-            fprintf($file, chr(0xEF).chr(0xBB).chr(0xBF));
+            fprintf($file, chr(0xEF) . chr(0xBB) . chr(0xBF));
 
             // Cabeçalho
             fputcsv($file, [
@@ -172,18 +172,42 @@ class ReportController extends Controller
      */
     private function calculateStats($query)
     {
-        // Clone a query para não afetar a original
-        $statsQuery = clone $query;
+        $baseQuery = (clone $query)->reorder();
 
-        $total = $statsQuery->count();
-        
-        $byStatus = (clone $query)->get()->groupBy(fn($t) => $t->status->label())->map->count();
-        $byPriority = (clone $query)->get()->groupBy(fn($t) => $t->priority->label())->map->count();
-        
-        $avgResponseTime = (clone $query)->whereNotNull('response_time_minutes')->avg('response_time_minutes');
-        $avgResolutionTime = (clone $query)->whereNotNull('resolution_time_minutes')->avg('resolution_time_minutes');
-        
-        $avgRating = (clone $query)->whereNotNull('rating')->avg('rating');
+        $total = (clone $baseQuery)->count();
+
+        $byStatusRaw = (clone $baseQuery)
+            ->selectRaw('status, COUNT(*) as total')
+            ->groupBy('status')
+            ->pluck('total', 'status');
+
+        $byPriorityRaw = (clone $baseQuery)
+            ->selectRaw('priority, COUNT(*) as total')
+            ->whereNotNull('priority')
+            ->groupBy('priority')
+            ->pluck('total', 'priority');
+
+        $byStatus = $byStatusRaw->mapWithKeys(function ($count, $status) {
+            $label = TicketStatus::tryFrom((string) $status)?->label() ?? (string) $status;
+            return [$label => (int) $count];
+        });
+
+        $byPriority = $byPriorityRaw->mapWithKeys(function ($count, $priority) {
+            $label = TicketPriority::tryFrom((string) $priority)?->label() ?? (string) $priority;
+            return [$label => (int) $count];
+        });
+
+        $avgResponseTime = (clone $baseQuery)
+            ->whereNotNull('response_time_minutes')
+            ->avg('response_time_minutes');
+
+        $avgResolutionTime = (clone $baseQuery)
+            ->whereNotNull('resolution_time_minutes')
+            ->avg('resolution_time_minutes');
+
+        $avgRating = (clone $baseQuery)
+            ->whereNotNull('rating')
+            ->avg('rating');
 
         return [
             'total' => $total,

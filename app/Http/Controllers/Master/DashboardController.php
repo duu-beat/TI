@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Master;
 
 use App\Http\Controllers\Controller;
-use App\Models\User;
+use App\Models\AuditLog;
 use App\Models\Ticket;
-use App\Models\AuditLog; // ✅ Importante
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 
@@ -31,7 +32,7 @@ class DashboardController extends Controller
     {
         $query = AuditLog::with('user');
 
-        // ✅ Permite filtrar logs por um usuário específico (Ex: ver logs de um admin)
+        // Permite filtrar logs por um usuário específico
         if ($request->has('user_id')) {
             $query->where('user_id', $request->user_id);
         }
@@ -42,17 +43,15 @@ class DashboardController extends Controller
         return view('master.audit', compact('logs'));
     }
 
-    
     // --- CONFIGURAÇÕES ---
     public function settings()
     {
-        // Busca configurações do banco
         $settings = DB::table('system_settings')->pluck('value', 'key');
 
         return view('master.settings', [
             'registrationBlocked' => ($settings['registration_blocked'] ?? '0') === '1',
-            'globalMessage'       => $settings['global_message'] ?? null,
-            'globalMessageStyle'  => $settings['global_message_style'] ?? 'info',
+            'globalMessage' => $settings['global_message'] ?? null,
+            'globalMessageStyle' => $settings['global_message_style'] ?? 'info',
         ]);
     }
 
@@ -79,24 +78,33 @@ class DashboardController extends Controller
         $message = $request->has('global_message_active') ? $request->global_message : null;
         DB::table('system_settings')->updateOrInsert(['key' => 'global_message'], ['value' => $message, 'updated_at' => now()]);
         DB::table('system_settings')->updateOrInsert(['key' => 'global_message_style'], ['value' => $request->global_message_style, 'updated_at' => now()]);
+        Cache::forget('ui:global_banner:v1');
 
         // Logs
-        if ($request->has('block_registers')) AuditLog::record('Settings', 'Bloqueou novos registros', 'WARNING');
-        if ($message) AuditLog::record('Settings', 'Atualizou Aviso Global', 'INFO');
+        if ($request->has('block_registers')) {
+            AuditLog::record('Settings', 'Bloqueou novos registros', 'WARNING');
+        }
+
+        if ($message) {
+            AuditLog::record('Settings', 'Atualizou Aviso Global', 'INFO');
+        }
 
         return back()->with('success', 'Configurações atualizadas.');
     }
 
     public function toggleAdmin(Request $request, User $user)
     {
-        if ($user->id === auth()->id()) return back()->with('error', 'Ação inválida.');
+        if ($user->id === auth()->id()) {
+            return back()->with('error', 'Ação inválida.');
+        }
 
         $newRole = ($user->role === User::ROLE_ADMIN) ? User::ROLE_CLIENT : User::ROLE_ADMIN;
         $user->update(['role' => $newRole]);
-        
+        Cache::forget('home:master:stats:v1');
+
         AuditLog::record('User Role', "Alterou papel de {$user->name} para {$newRole}", 'WARNING');
 
-        return back()->with('success', "Papel do usuário atualizado.");
+        return back()->with('success', 'Papel do usuário atualizado.');
     }
 
     /**
@@ -110,10 +118,10 @@ class DashboardController extends Controller
         if (File::exists($logFile)) {
             // Lê o arquivo em um array (cada linha é um item)
             $fileContent = file($logFile, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            
+
             // Pega as últimas 200 linhas para não travar a tela
             $logs = array_slice($fileContent, -200);
-            
+
             // Inverte para ver o erro mais recente no topo
             $logs = array_reverse($logs);
         }
@@ -127,10 +135,10 @@ class DashboardController extends Controller
     public function clearSystemLogs()
     {
         $logFile = storage_path('logs/laravel.log');
-        
+
         if (File::exists($logFile)) {
             File::put($logFile, ''); // Esvazia o arquivo
-            
+
             // Registra na auditoria que alguém limpou os rastros
             AuditLog::record('System', 'Limpou os logs de erro do sistema (laravel.log)', 'WARNING');
         }
@@ -146,10 +154,10 @@ class DashboardController extends Controller
         // 1. Atualiza o status para RESOLVIDO
         $ticket->update([
             'status' => \App\Enums\TicketStatus::RESOLVED,
-            'is_escalated' => false // Remove o alerta de escalonamento pois foi resolvido
+            'is_escalated' => false, // Remove o alerta de escalonamento pois foi resolvido
         ]);
 
-        // 2. (Opcional) Adiciona uma mensagem automática no chat avisando o cliente
+        // 2. Adiciona uma mensagem automática no chat avisando o cliente
         $ticket->messages()->create([
             'user_id' => auth()->id(),
             'message' => "Chamado resolvido pela equipe de Segurança/Infraestrutura.\n\nSolução Técnica: " . ($request->solution ?? 'Intervenção direta no sistema.'),
@@ -157,8 +165,8 @@ class DashboardController extends Controller
 
         // 3. Grava no Log de Auditoria
         AuditLog::record(
-            'Ticket Resolved', 
-            "Master resolveu o chamado #{$ticket->id} via Painel de Controle.", 
+            'Ticket Resolved',
+            "Master resolveu o chamado #{$ticket->id} via Painel de Controle.",
             'SUCCESS'
         );
 

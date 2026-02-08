@@ -57,6 +57,8 @@
 
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         /* Cor do thumb ao passar o mouse */
+
+        [x-cloak] { display: none !important; }
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -87,7 +89,30 @@
     </div>
 
     {{-- Conteúdo (Relative z-10) --}}
-    <div class="relative z-10 flex flex-col flex-1" x-data="{ mobileMenuOpen: false }">
+    <div class="relative z-10 flex flex-col flex-1"
+         x-data="{
+             mobileMenuOpen: false,
+             lastMobileTrigger: null,
+             openMobileMenu(triggerEl) {
+                 this.lastMobileTrigger = triggerEl ?? document.activeElement;
+                 this.mobileMenuOpen = true;
+                 this.$nextTick(() => this.$refs.mobileFirstLink?.focus());
+             },
+             closeMobileMenu() {
+                 if (!this.mobileMenuOpen) return;
+                 this.mobileMenuOpen = false;
+                 this.$nextTick(() => this.lastMobileTrigger?.focus?.());
+             },
+             toggleMobileMenu(triggerEl) {
+                 if (this.mobileMenuOpen) {
+                     this.closeMobileMenu();
+                     return;
+                 }
+
+                 this.openMobileMenu(triggerEl);
+             }
+         }"
+         @keydown.escape.window="closeMobileMenu()">
         {{-- 
             Camada principal acima do fundo (z-10)
             x-data do Alpine.js cria estado local:
@@ -203,7 +228,13 @@
                     </nav>
 
                     {{-- MOBILE MENU BUTTON --}}
-                    <button @click="mobileMenuOpen = !mobileMenuOpen" class="md:hidden text-slate-300 hover:text-white focus:outline-none z-50">
+                    <button type="button"
+                            x-ref="mobileMenuToggle"
+                            @click="toggleMobileMenu($event.currentTarget)"
+                            :aria-expanded="mobileMenuOpen.toString()"
+                            aria-controls="mobile-main-menu"
+                            aria-label="Alternar menu principal"
+                            class="md:hidden text-slate-300 hover:text-white focus:outline-none z-50">
                         {{-- 
                             Botão aparece só no mobile (md:hidden)
                             @click Alpine alterna mobileMenuOpen
@@ -220,7 +251,10 @@
             </div>
 
             {{-- MOBILE MENU DROPDOWN --}}
-            <div x-show="mobileMenuOpen" 
+            <div id="mobile-main-menu"
+                 x-show="mobileMenuOpen"
+                 x-cloak
+                 @click.outside="closeMobileMenu()"
                  x-transition:enter="transition ease-out duration-200"
                  x-transition:enter-start="opacity-0 -translate-y-2"
                  x-transition:enter-end="opacity-100 translate-y-0"
@@ -239,15 +273,15 @@
                  --}}
                  
                 {{-- 🔥 Link SOBRE adicionado aqui --}}
-                <a class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('sobre') }}">Sobre</a>
+                <a x-ref="mobileFirstLink" @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('sobre') }}">Sobre</a>
                 {{-- Link Sobre no menu mobile --}}
-                <a class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('services') }}">Serviços</a>
+                <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('services') }}">Serviços</a>
                 {{-- Link Serviços no menu mobile --}}
-                <a class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('faq') }}">FAQ</a>
+                <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('faq') }}">FAQ</a>
                 {{-- Link FAQ no menu mobile --}}
-                <a class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('portfolio') }}">Portfólio</a>
+                <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('portfolio') }}">Portfólio</a>
                 {{-- Link Portfólio no menu mobile --}}
-                <a class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('contact') }}">Contato</a>
+                <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('contact') }}">Contato</a>
                 {{-- Link Contato no menu mobile --}}
                 
                 <div class="h-px w-full bg-white/10 my-2"></div>
@@ -255,13 +289,18 @@
 
                 @auth
                     {{-- Se está logado, mostra CTA para acessar --}}
-                    <a href="{{ route('home') }}" class="w-full text-center rounded-xl bg-white/10 px-4 py-3 text-white font-bold">Acessar Portal</a>
-                    {{-- Aqui está indo pra home. Se quiser, dá pra trocar por client.dashboard/admin.dashboard como no desktop --}}
+                    @if(auth()->user()->isMaster())
+                        <a @click="closeMobileMenu()" href="{{ route('master.dashboard') }}" class="w-full text-center rounded-xl bg-red-600 px-4 py-3 text-white font-bold">Painel Master</a>
+                    @elseif(auth()->user()->isAdmin())
+                        <a @click="closeMobileMenu()" href="{{ route('admin.dashboard') }}" class="w-full text-center rounded-xl bg-cyan-600 px-4 py-3 text-white font-bold">Painel Admin</a>
+                    @else
+                        <a @click="closeMobileMenu()" href="{{ route('client.dashboard') }}" class="w-full text-center rounded-xl bg-white/10 px-4 py-3 text-white font-bold">Acessar Portal</a>
+                    @endif
                 @else
                     {{-- Se não está logado --}}
-                    <a href="{{ route('login') }}" class="text-center text-slate-300 hover:text-white py-2">Login</a>
+                    <a @click="closeMobileMenu()" href="{{ route('login') }}" class="text-center text-slate-300 hover:text-white py-2">Login</a>
                     {{-- Link Login --}}
-                    <a href="{{ route('register') }}" class="w-full text-center rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-4 py-3 font-bold text-slate-950">Criar Conta</a>
+                    <a @click="closeMobileMenu()" href="{{ route('register') }}" class="w-full text-center rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-4 py-3 font-bold text-slate-950">Criar Conta</a>
                     {{-- Botão Cadastro --}}
                 @endauth
             </div>
@@ -370,7 +409,7 @@
                         {{-- REDES SOCIAIS --}}
                         <div class="flex gap-4">
                             {{-- Linha de botões sociais --}}
-                            <a href="https://x.com/duu_beat" target="_blank" 
+                            <a href="https://x.com/duu_beat" target="_blank" rel="noopener noreferrer"
                                class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white hover:scale-110 transition"
                                aria-label="X (Twitter)">
                                 {{-- Botão para X/Twitter, abre em nova aba --}}
@@ -380,7 +419,7 @@
                                 </svg>
                             </a>
 
-                            <a href="https://www.instagram.com/duu_beat/" target="_blank" 
+                            <a href="https://www.instagram.com/duu_beat/" target="_blank" rel="noopener noreferrer"
                                class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white hover:scale-110 transition"
                                aria-label="Instagram">
                                 {{-- Botão Instagram --}}
@@ -390,7 +429,7 @@
                                 </svg>
                             </a>
 
-                            <a href="https://www.linkedin.com/in/eduardosilvadealmeida/" target="_blank" 
+                            <a href="https://www.linkedin.com/in/eduardosilvadealmeida/" target="_blank" rel="noopener noreferrer"
                                class="h-10 w-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-slate-400 hover:bg-white/10 hover:text-white hover:scale-110 transition"
                                aria-label="LinkedIn">
                                 {{-- Botão LinkedIn --}}
