@@ -21,7 +21,8 @@
     }
 @endphp
 
-<aside class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-950/80 backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto"
+<aside role="navigation" 
+       class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-950/80 backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto"
        aria-label="Menu lateral principal"
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
     

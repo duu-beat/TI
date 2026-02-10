@@ -1,0 +1,288 @@
+/* ===================================
+   ACESSIBILIDADE - WCAG 2.1 Nível AA
+   =================================== */
+
+/* 1. FOCO VISÍVEL MELHORADO */
+*:focus {
+    outline: 2px solid #6366f1; /* Indigo-500 */
+    outline-offset: 2px;
+    border-radius: 4px;
+}
+
+*:focus:not(:focus-visible) {
+    outline: none;
+}
+
+*:focus-visible {
+    outline: 3px solid #6366f1;
+    outline-offset: 3px;
+}
+
+/* Foco em botões */
+button:focus-visible,
+a:focus-visible {
+    outline: 3px solid #6366f1;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+}
+
+/* Foco em inputs */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+    outline: 2px solid #6366f1;
+    outline-offset: 0;
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+/* 2. SKIP LINKS */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 0;
+    background: #6366f1;
+    color: white;
+    padding: 12px 24px;
+    text-decoration: none;
+    font-weight: bold;
+    border-radius: 0 0 8px 0;
+    z-index: 9999;
+    transition: top 0.2s;
+}
+
+.skip-link:focus {
+    top: 0;
+    outline: 3px solid white;
+    outline-offset: -3px;
+}
+
+/* 3. SCREEN READER ONLY */
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+    position: static;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+}
+
+/* 4. CONTRASTE MELHORADO */
+.high-contrast {
+    filter: contrast(1.2);
+}
+
+.high-contrast-mode {
+    --bg-primary: #000000;
+    --bg-secondary: #1a1a1a;
+    --text-primary: #ffffff;
+    --text-secondary: #e0e0e0;
+    --border-color: #ffffff;
+}
+
+/* 5. INDICADORES DE ESTADO */
+[aria-disabled="true"],
+[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+[aria-expanded="true"] svg {
+    transform: rotate(180deg);
+}
+
+[aria-selected="true"] {
+    background-color: rgba(99, 102, 241, 0.2);
+    border-color: #6366f1;
+}
+
+/* 6. LINKS ACESSÍVEIS */
+a {
+    text-decoration-skip-ink: auto;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+a:not([class]) {
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-decoration-thickness: 1px;
+}
+
+/* 7. BOTÕES ACESSÍVEIS */
+button {
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* 8. TABELAS ACESSÍVEIS */
+table {
+    border-collapse: collapse;
+}
+
+th {
+    text-align: left;
+    font-weight: bold;
+}
+
+/* 9. FORMULÁRIOS ACESSÍVEIS */
+label {
+    cursor: pointer;
+}
+
+input[type="checkbox"],
+input[type="radio"] {
+    cursor: pointer;
+}
+
+/* Mensagens de erro */
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+[aria-invalid="true"] {
+    border-color: #ef4444;
+}
+
+/* 10. MODAIS ACESSÍVEIS */
+[role="dialog"] {
+    position: fixed;
+    z-index: 9999;
+}
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    z-index: 9998;
+}
+
+/* 11. ANIMAÇÕES RESPEITANDO PREFERÊNCIAS */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+    }
+}
+
+/* 12. DARK MODE ACESSÍVEL */
+@media (prefers-color-scheme: dark) {
+    :root {
+        color-scheme: dark;
+    }
+}
+
+/* 13. TAMANHO DE FONTE RESPONSIVO */
+html {
+    font-size: 16px;
+}
+
+@media (max-width: 640px) {
+    html {
+        font-size: 14px;
+    }
+}
+
+/* 14. ÁREAS CLICÁVEIS MÍNIMAS (44x44px WCAG) */
+button,
+a,
+input[type="checkbox"],
+input[type="radio"],
+select {
+    min-height: 44px;
+    min-width: 44px;
+}
+
+/* Exceção para elementos inline pequenos */
+.btn-sm,
+.link-sm {
+    min-height: 32px;
+    min-width: 32px;
+}
+
+/* 15. TOOLTIPS ACESSÍVEIS */
+[role="tooltip"] {
+    position: absolute;
+    z-index: 9999;
+    padding: 8px 12px;
+    background: #1e293b;
+    color: white;
+    border-radius: 6px;
+    font-size: 0.875rem;
+    pointer-events: none;
+}
+
+/* 16. LIVE REGIONS */
+[aria-live="polite"],
+[aria-live="assertive"] {
+    position: absolute;
+    left: -10000px;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* 17. NAVEGAÇÃO POR TECLADO */
+.keyboard-user *:focus {
+    outline: 3px solid #6366f1;
+    outline-offset: 2px;
+}
+
+/* 18. ESTADOS HOVER/FOCUS COMBINADOS */
+a:hover,
+a:focus,
+button:hover,
+button:focus {
+    opacity: 0.9;
+}
+
+/* 19. CONTRASTE DE TEXTO */
+.text-contrast-low {
+    color: #94a3b8; /* Slate-400 */
+}
+
+.text-contrast-medium {
+    color: #cbd5e1; /* Slate-300 */
+}
+
+.text-contrast-high {
+    color: #f1f5f9; /* Slate-100 */
+}
+
+/* 20. MODO ALTO CONTRASTE */
+@media (prefers-contrast: high) {
+    * {
+        border-color: currentColor !important;
+    }
+    
+    button,
+    a {
+        border: 2px solid currentColor;
+    }
+}
