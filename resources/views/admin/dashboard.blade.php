@@ -33,7 +33,67 @@
                 <div class="h-32 bg-white/5 rounded-2xl border border-white/5"></div>
             </div>
 
-            {{-- Skeleton Gráfico e Lista --}}
+            {{-- 3. ALERTA DE TICKETS NÃO ATRIBUÍDOS --}}
+            @if(isset($unassignedCount) && $unassignedCount > 0)
+                <div class="bg-amber-500/10 border border-amber-500/30 rounded-2xl p-5">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <div class="p-3 rounded-xl bg-amber-500/20 text-amber-400">
+                                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                                </svg>
+                            </div>
+                            <div>
+                                <h3 class="font-bold text-white">{{ $unassignedCount }} {{ $unassignedCount === 1 ? 'Chamado' : 'Chamados' }} Sem Responsável</h3>
+                                <p class="text-sm text-amber-200/80">Atribua agentes para melhorar o tempo de resposta</p>
+                            </div>
+                        </div>
+                        <a href="{{ route('admin.tickets.index', ['assigned_to' => 'unassigned']) }}" 
+                           class="px-6 py-2 rounded-lg bg-amber-600 hover:bg-amber-500 text-white font-bold text-sm transition">
+                            Ver Chamados
+                        </a>
+                    </div>
+                </div>
+            @endif
+
+            {{-- 4. RANKING DE AGENTES --}}
+            @if(isset($agentStats) && count($agentStats) > 0)
+                <div class="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"></path>
+                            </svg>
+                            Top Agentes
+                        </h3>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        @foreach($agentStats as $index => $agent)
+                            <div class="flex items-center gap-4 p-3 rounded-xl bg-slate-800/50 border border-white/5 hover:border-indigo-500/30 transition">
+                                <div class="flex items-center justify-center w-8 h-8 rounded-full {{ $index === 0 ? 'bg-yellow-500/20 text-yellow-400' : ($index === 1 ? 'bg-slate-400/20 text-slate-300' : 'bg-amber-700/20 text-amber-500') }} font-bold text-sm">
+                                    {{ $index + 1 }}
+                                </div>
+                                <div class="flex-1">
+                                    <div class="font-semibold text-white text-sm">{{ $agent->name }}</div>
+                                    <div class="text-xs text-slate-400">
+                                        {{ $agent->resolved_count }} resolvidos de {{ $agent->assigned_tickets_count }} atribuídos
+                                        @if($agent->avg_rating)
+                                            • ⭐ {{ number_format($agent->avg_rating, 1) }}
+                                        @endif
+                                    </div>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-lg font-bold text-emerald-400">{{ $agent->resolved_count > 0 ? round(($agent->resolved_count / $agent->assigned_tickets_count) * 100) : 0 }}%</div>
+                                    <div class="text-[10px] text-slate-500 uppercase">Taxa</div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
+
+            {{-- 5. GRID: GRÁFICO + LISTA --}}
             <div class="grid lg:grid-cols-3 gap-8">
                 <div class="lg:col-span-2 h-96 bg-white/5 rounded-3xl border border-white/5"></div>
                 <div class="space-y-4">

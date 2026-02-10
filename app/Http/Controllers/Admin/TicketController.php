@@ -77,13 +77,34 @@ class TicketController extends Controller
             ->take(5)
             ->get();
 
+        // Estatísticas por Agente
+        $agentStats = User::where('role', 'admin')
+            ->withCount([
+                'assignedTickets',
+                'assignedTickets as resolved_count' => function ($query) {
+                    $query->where('status', TicketStatus::RESOLVED);
+                },
+            ])
+            ->withAvg('assignedTickets as avg_rating', 'rating')
+            ->having('assigned_tickets_count', '>', 0)
+            ->orderByDesc('resolved_count')
+            ->take(5)
+            ->get();
+
+        // Tickets não atribuídos
+        $unassignedCount = Ticket::whereNull('assigned_to')
+            ->whereIn('status', TicketStatus::openStatuses())
+            ->count();
+
         return view('admin.dashboard', [
             'stats' => $dashboardData['stats'],
             'priorityStats' => $dashboardData['priorityStats'],
             'chartLabels' => $dashboardData['chartLabels'],
             'chartValues' => $dashboardData['chartValues'],
             'slaStats' => $dashboardData['slaStats'],
-            'latestTickets' => $latestTickets
+            'latestTickets' => $latestTickets,
+            'agentStats' => $agentStats,
+            'unassignedCount' => $unassignedCount,
         ]);
     }
 
