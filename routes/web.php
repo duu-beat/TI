@@ -39,6 +39,7 @@ Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
 Route::middleware(['auth', 'verified'])->prefix('cliente')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('/perfil', 'profile.show')->name('profile');
+    Route::get('/faq', [\App\Http\Controllers\Client\FaqController::class, 'index'])->name('faq');
 
     Route::resource('chamados', ClientTicketController::class)
         ->names('tickets')

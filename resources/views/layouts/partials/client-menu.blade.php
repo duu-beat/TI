@@ -16,6 +16,12 @@
         🎫 Meus Chamados
     </a>
 
+    {{-- FAQ --}}
+    <a href="{{ route('client.faq') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.faq') ? $activeClass : $inactiveClass }}">
+        ❓ Perguntas Frequentes
+    </a>
+
     {{-- Perfil --}}
     <a href="{{ route('client.profile') }}"
         class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.profile') ? $activeClass : $inactiveClass }}">

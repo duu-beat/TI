@@ -34,6 +34,9 @@
 </head>
 <body class="bg-slate-950 text-slate-100 antialiased relative selection:bg-cyan-500 selection:text-white font-sans">
 
+    {{-- Skip Link para Acessibilidade --}}
+    <x-skip-link />
+
     {{-- ✅ 1. DETECTOR DE OFFLINE (NOVIDADE) --}}
     <div x-data="{ online: navigator.onLine }" 
          @online.window="online = true" 
@@ -89,7 +92,7 @@
 
         <x-sidebar />
 
-        <main class="flex-1 flex flex-col min-h-screen overflow-hidden bg-transparent">
+        <main id="main-content" role="main" class="flex-1 flex flex-col min-h-screen overflow-hidden bg-transparent">
             {{-- Topbar --}}
             <header class="sticky top-0 z-40 bg-slate-950/70 backdrop-blur-md border-b border-white/10 h-16 flex items-center justify-between px-6">
                 <div class="flex items-center gap-4">
