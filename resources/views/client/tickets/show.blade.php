@@ -2,7 +2,7 @@
     <x-slot name="header">
         <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div class="flex items-center gap-4">
-                <a href="{{ route('admin.tickets.index') }}" 
+                <a href="{{ route('client.tickets.index') }}" 
                    class="group flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 border border-white/10 text-slate-400 transition hover:bg-indigo-600 hover:text-white hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/30">
                     <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </a>
@@ -226,89 +226,54 @@
 
                 </div>
 
-                {{-- 👉 COLUNA DIREITA (Sidebar de Controle) --}}
+                {{-- 👉 COLUNA DIREITA (Sidebar de Informações) --}}
                 <div class="lg:col-span-4 space-y-6">
                     
-                    {{-- 1. Painel de Status --}}
+                    {{-- 1. Informações do Chamado --}}
                     <div class="bg-slate-800/80 backdrop-blur border border-white/10 rounded-2xl p-5 shadow-xl sticky top-6">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-white/5 pb-2">Controle do Chamado</h3>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-white/5 pb-2">Informações do Chamado</h3>
                         
-                        <form action="{{ route('admin.tickets.update-status', $ticket) }}" method="POST" class="space-y-4">
-                            @csrf @method('PATCH')
-                            
-                            {{-- Status --}}
+                        <div class="space-y-4">
+                            {{-- Status Atual (Somente Leitura) --}}
                             <div>
-                                <label class="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Status Atual</label>
-                                <div class="relative">
-                                    <select name="status" class="w-full appearance-none rounded-xl bg-slate-950 border border-white/10 text-slate-200 text-sm focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 p-2.5 pr-8 cursor-pointer hover:bg-slate-900 transition">
-                                        @foreach(\App\Enums\TicketStatus::cases() as $status)
-                                            <option value="{{ $status->value }}" {{ $ticket->status === $status ? 'selected' : '' }}>
-                                                {{ $status->label() }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    <div class="absolute inset-y-0 right-0 flex items-center px-2 pointer-events-none text-slate-500">
-                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-                                    </div>
+                                <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block">Status Atual</label>
+                                <div class="flex items-center gap-2">
+                                    <x-ticket-status :status="$ticket->status"/>
                                 </div>
                             </div>
 
-                            <button type="submit" class="w-full rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold py-2 transition shadow-lg shadow-indigo-500/20">
-                                Salvar Alteração
-                            </button>
-                        </form>
-
-                        {{-- Atribuição --}}
-                        <div class="mt-6 pt-6 border-t border-white/5">
-                            <h4 class="text-[10px] text-slate-500 uppercase font-bold mb-2">Responsável</h4>
-                            <form action="{{ route('admin.tickets.assign', $ticket) }}" method="POST" class="flex gap-2">
-                                @csrf @method('PATCH')
-                                <select name="assigned_to" class="w-full text-xs rounded-lg bg-slate-950 border border-white/10 text-slate-300 focus:border-indigo-500 focus:ring-indigo-500">
-                                    <option value="">-- Não Atribuído --</option>
-                                    @if(isset($admins))
-                                        @foreach($admins as $admin)
-                                            <option value="{{ $admin->id }}" {{ $ticket->assigned_to == $admin->id ? 'selected' : '' }}>
-                                                {{ $admin->name }}
-                                            </option>
-                                        @endforeach
+                            {{-- Prioridade --}}
+                            <div class="pt-4 border-t border-white/5">
+                                <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block">Prioridade</label>
+                                <div class="text-sm text-slate-300">
+                                    @if($ticket->priority === 'high')
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-red-500/10 text-red-400 border border-red-500/20">
+                                            🔴 Alta
+                                        </span>
+                                    @elseif($ticket->priority === 'medium')
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-yellow-500/10 text-yellow-400 border border-yellow-500/20">
+                                            🟡 Média
+                                        </span>
+                                    @else
+                                        <span class="inline-flex items-center gap-1 px-2 py-1 rounded bg-green-500/10 text-green-400 border border-green-500/20">
+                                            🟢 Baixa
+                                        </span>
                                     @endif
-                                </select>
-                                <button type="submit" class="px-2 bg-slate-700 hover:bg-slate-600 rounded-lg text-white">
-                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                </button>
-                            </form>
-                        </div>
-
-                        {{-- Merge & Escalar --}}
-                        <div class="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 gap-3">
-                             <div x-data="{ open: false }" class="relative">
-                                <button @click="open = !open" class="w-full py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-xs text-slate-200 font-bold border border-white/5 transition">
-                                    Mesclar
-                                </button>
-                                
-                                {{-- Dropdown Merge --}}
-                                <div x-show="open" @click.away="open = false" class="absolute left-0 top-full mt-2 w-48 bg-slate-800 border border-white/10 rounded-xl shadow-xl p-3 z-50">
-                                    <p class="text-[10px] text-slate-500 mb-2">ID do Ticket Destino:</p>
-                                    <form action="{{ route('admin.tickets.merge', $ticket) }}" method="POST">
-                                        @csrf
-                                        <input type="number" name="target_ticket_id" class="w-full text-xs bg-slate-950 border-white/10 rounded mb-2 text-white" placeholder="ID #">
-                                        <button type="submit" class="w-full bg-indigo-600 text-white text-xs py-1 rounded">Confirmar</button>
-                                    </form>
                                 </div>
-                             </div>
+                            </div>
 
-                             @if(!$ticket->is_escalated)
-                                <form action="{{ route('admin.tickets.escalate', $ticket) }}" method="POST" onsubmit="return confirm('Escalar para Segurança?');">
-                                    @csrf
-                                    <button class="w-full py-2 rounded-lg bg-red-500/10 hover:bg-red-500/20 text-xs text-red-400 hover:text-red-300 font-bold border border-red-500/20 transition">
-                                        Escalar 🚨
-                                    </button>
-                                </form>
-                             @else
-                                <div class="w-full py-2 rounded-lg bg-red-500 text-white text-xs font-bold text-center opacity-80 cursor-not-allowed">
-                                    Escalonado
+                            {{-- Responsável (se atribuído) --}}
+                            @if($ticket->assignedTo)
+                                <div class="pt-4 border-t border-white/5">
+                                    <label class="text-[10px] text-slate-500 uppercase font-bold mb-2 block">Responsável</label>
+                                    <div class="flex items-center gap-2 text-sm text-slate-300">
+                                        <div class="h-8 w-8 rounded-lg bg-indigo-500/20 flex items-center justify-center text-indigo-400 font-bold">
+                                            {{ substr($ticket->assignedTo->name, 0, 1) }}
+                                        </div>
+                                        <span>{{ $ticket->assignedTo->name }}</span>
+                                    </div>
                                 </div>
-                             @endif
+                            @endif
                         </div>
                     </div>
 
@@ -327,7 +292,7 @@
                             @if(isset($clientHistory['last_ticket']))
                                 <div class="pt-2 mt-2 border-t border-white/5">
                                     <span class="block mb-1">Último chamado:</span>
-                                    <a href="{{ route('admin.tickets.show', $clientHistory['last_ticket']) }}" class="flex items-center gap-2 text-indigo-400 hover:underline bg-indigo-500/5 p-2 rounded">
+                                    <a href="{{ route('client.tickets.show', $clientHistory['last_ticket']) }}" class="flex items-center gap-2 text-indigo-400 hover:underline bg-indigo-500/5 p-2 rounded">
                                         <span class="font-mono">#{{ $clientHistory['last_ticket']->id }}</span>
                                         <span class="truncate">{{ Str::limit($clientHistory['last_ticket']->subject, 15) }}</span>
                                     </a>
@@ -344,47 +309,19 @@
                 <div class="fixed bottom-0 left-0 right-0 z-40 pb-6 px-4 pointer-events-none">
                     <div class="max-w-4xl mx-auto pointer-events-auto">
                         
-                        {{-- Tabs Visual --}}
-                        <div class="flex items-end ml-4 mb-[-1px] relative z-10 gap-1">
-                            <button @click="replyMode = 'public'" 
-                                    class="px-4 py-1.5 rounded-t-lg text-xs font-bold transition-all border-t border-x"
-                                    :class="replyMode === 'public' 
-                                        ? 'bg-slate-900 text-white border-white/10 border-b-slate-900' 
-                                        : 'bg-slate-950/50 text-slate-500 border-transparent hover:text-slate-300'">
-                                Resposta Pública
-                            </button>
-                            <button @click="replyMode = 'internal'" 
-                                    class="px-4 py-1.5 rounded-t-lg text-xs font-bold transition-all border-t border-x flex items-center gap-2"
-                                    :class="replyMode === 'internal' 
-                                        ? 'bg-amber-950/90 text-amber-500 border-amber-500/30' 
-                                        : 'bg-slate-950/50 text-slate-500 border-transparent hover:text-amber-500/70'">
-                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                                Nota Interna
-                            </button>
+                        {{-- Título da Área de Resposta --}}
+                        <div class="flex items-end ml-4 mb-[-1px] relative z-10">
+                            <div class="px-4 py-1.5 rounded-t-lg text-xs font-bold bg-slate-900 text-white border-t border-x border-white/10 border-b-slate-900">
+                                Enviar Mensagem
+                            </div>
                         </div>
 
-                        <form method="POST" action="{{ route('admin.tickets.reply', $ticket) }}" enctype="multipart/form-data" 
-                              class="relative rounded-2xl border shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden"
-                              :class="replyMode === 'internal' 
-                                ? 'bg-amber-950/90 border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.15)]' 
-                                : 'bg-slate-900/95 border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]'">
+                        <form method="POST" action="{{ route('client.tickets.reply', $ticket) }}" enctype="multipart/form-data" 
+                              class="relative rounded-2xl border shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden bg-slate-900/95 border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]">
                             @csrf
-                            
-                            {{-- Hidden Inputs --}}
-                            <input type="hidden" name="is_internal" :value="replyMode === 'internal' ? 1 : 0">
 
                             {{-- Toolbar --}}
                             <div class="flex items-center gap-3 p-2 border-b border-white/5 bg-black/10">
-                                {{-- Respostas Prontas --}}
-                                <select id="cannedSelect" onchange="document.querySelector('textarea[name=message]').value += this.value + '\n'; this.value='';" 
-                                        class="bg-transparent text-xs border-none focus:ring-0 text-slate-400 hover:text-white cursor-pointer w-40">
-                                    <option value="">⚡ Respostas Prontas...</option>
-                                    @if(isset($cannedResponses))
-                                        @foreach($cannedResponses as $canned)
-                                            <option value="{{ $canned->content }}">{{ $canned->title }}</option>
-                                        @endforeach
-                                    @endif
-                                </select>
 
                                 <div class="h-4 w-px bg-white/10"></div>
 

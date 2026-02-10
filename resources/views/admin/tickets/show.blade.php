@@ -336,7 +336,67 @@
                         </div>
                     </div>
 
-                    {{-- 2. Histórico Rápido --}}
+                    {{-- 2. Tags --}}
+                    <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-5" x-data="{ showTagModal: false }">
+                        <div class="flex items-center justify-between mb-3">
+                            <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider">🏷️ Tags</h3>
+                            <button @click="showTagModal = true" class="text-xs text-indigo-400 hover:text-indigo-300 transition">
+                                + Adicionar
+                            </button>
+                        </div>
+                        
+                        <div class="flex flex-wrap gap-2">
+                            @forelse($ticket->tags ?? [] as $tag)
+                                <span class="inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium border" 
+                                      style="background-color: {{ $tag->color }}20; color: {{ $tag->color }}; border-color: {{ $tag->color }}40;">
+                                    {{ $tag->name }}
+                                    <form action="{{ route('admin.tickets.tags.detach', [$ticket, $tag]) }}" method="POST" class="inline">
+                                        @csrf @method('DELETE')
+                                        <button type="submit" class="hover:opacity-70 transition">
+                                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                                        </button>
+                                    </form>
+                                </span>
+                            @empty
+                                <span class="text-xs text-slate-500 italic">Nenhuma tag atribuída</span>
+                            @endforelse
+                        </div>
+
+                        {{-- Modal de Tags --}}
+                        <div x-show="showTagModal" @click.away="showTagModal = false" 
+                             style="display: none;"
+                             class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm">
+                            <div @click.stop class="bg-slate-800 border border-white/10 rounded-2xl p-6 max-w-md w-full mx-4 shadow-2xl">
+                                <h3 class="text-lg font-bold text-white mb-4">Adicionar Tags</h3>
+                                <form action="{{ route('admin.tickets.tags.attach', $ticket) }}" method="POST">
+                                    @csrf
+                                    <div class="space-y-2 max-h-64 overflow-y-auto mb-4">
+                                        @foreach($tags ?? [] as $availableTag)
+                                            <label class="flex items-center gap-2 p-2 rounded hover:bg-white/5 cursor-pointer transition">
+                                                <input type="checkbox" name="tags[]" value="{{ $availableTag->id }}" 
+                                                       {{ $ticket->tags->contains($availableTag->id) ? 'checked' : '' }}
+                                                       class="rounded border-white/20 bg-slate-900 text-indigo-500 focus:ring-indigo-500">
+                                                <span class="inline-block w-3 h-3 rounded" style="background-color: {{ $availableTag->color }}"></span>
+                                                <span class="text-sm text-slate-300">{{ $availableTag->name }}</span>
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                    <div class="flex gap-2">
+                                        <button type="button" @click="showTagModal = false" 
+                                                class="flex-1 px-4 py-2 rounded-lg bg-slate-700 hover:bg-slate-600 text-white text-sm transition">
+                                            Cancelar
+                                        </button>
+                                        <button type="submit" 
+                                                class="flex-1 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold transition">
+                                            Salvar
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- 3. Histórico Rápido --}}
                     <div class="bg-slate-900/50 border border-white/5 rounded-2xl p-5">
                         <h3 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Contexto</h3>
                         <div class="space-y-2 text-xs text-slate-400">

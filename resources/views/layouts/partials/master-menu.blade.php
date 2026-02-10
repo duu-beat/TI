@@ -40,6 +40,18 @@
        👥 Gerenciar Usuários
     </a>
 
+    {{-- Tags --}}
+    <a href="{{ route('admin.tags.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm mb-1 {{ request()->routeIs('admin.tags.*') ? $activeClass : $inactiveClass }}">
+       🏷️ Tags
+    </a>
+
+    {{-- Relatórios --}}
+    <a href="{{ route('admin.reports.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm mb-1 {{ request()->routeIs('admin.reports.*') ? $activeClass : $inactiveClass }}">
+       📊 Relatórios
+    </a>
+
     {{-- Perfil --}}
     <a href="{{ route('master.profile') }}"
        class="block rounded-xl px-4 py-2.5 text-sm mb-1 {{ request()->routeIs('master.profile') ? $activeClass : $inactiveClass }}">
