@@ -6,7 +6,7 @@
         </h2>
     </x-slot>
 
-    <div class="py-12">
+    <div class="py-12" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 grid lg:grid-cols-3 gap-8">
             
             {{-- 1. Formulário de Criação (Coluna Esquerda) --}}
@@ -40,6 +40,32 @@
 
             {{-- 2. Lista de Respostas (Coluna Direita) --}}
             <div class="lg:col-span-2 space-y-4">
+                
+                {{-- Skeleton Loader --}}
+                <div x-show="!loaded" class="space-y-4 animate-pulse">
+                    @for($i = 0; $i < 5; $i++)
+                    <div class="bg-slate-800/50 border border-white/5 rounded-2xl p-5">
+                        <div class="flex justify-between items-start gap-4 mb-4">
+                            <div class="flex-1 space-y-2">
+                                <div class="h-6 w-48 bg-slate-700/50 rounded"></div>
+                                <div class="h-4 w-32 bg-slate-700/50 rounded"></div>
+                            </div>
+                            <div class="flex gap-2">
+                                <div class="h-9 w-20 bg-slate-700/50 rounded-lg"></div>
+                                <div class="h-9 w-20 bg-slate-700/50 rounded-lg"></div>
+                            </div>
+                        </div>
+                        <div class="space-y-2">
+                            <div class="h-3 bg-slate-700/50 rounded w-full"></div>
+                            <div class="h-3 bg-slate-700/50 rounded w-5/6"></div>
+                            <div class="h-3 bg-slate-700/50 rounded w-4/6"></div>
+                        </div>
+                    </div>
+                    @endfor
+                </div>
+                
+                {{-- Conteúdo Real --}}
+                <div x-show="loaded" style="display: none;">
                 @if($responses->count() > 0)
                     @foreach($responses as $response)
                         <div class="group bg-slate-800/50 hover:bg-slate-800 border border-white/5 hover:border-indigo-500/30 rounded-2xl p-5 transition-all duration-300">
@@ -69,6 +95,7 @@
                         <p class="text-slate-400 text-sm mt-2">Use o formulário ao lado para criar seus modelos de resposta.</p>
                     </div>
                 @endif
+                </div>
             </div>
 
         </div>

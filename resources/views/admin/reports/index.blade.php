@@ -10,7 +10,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8 space-y-6">
             
             <!-- Filtros -->
@@ -95,8 +95,29 @@
                 </form>
             </div>
 
+            <!-- Skeleton Loader -->
+            <div x-show="!loaded" class="space-y-6">
+                <!-- Skeleton Estatísticas -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 animate-pulse">
+                    @for($i = 0; $i < 4; $i++)
+                    <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+                        <div class="flex items-center justify-between mb-2">
+                            <div class="h-4 w-32 bg-slate-700/50 rounded"></div>
+                            <div class="h-8 w-8 bg-slate-700/50 rounded"></div>
+                        </div>
+                        <div class="h-9 w-24 bg-slate-700/50 rounded"></div>
+                    </div>
+                    @endfor
+                </div>
+                
+                <!-- Skeleton Tabela -->
+                <div class="bg-white/5 border border-white/10 rounded-2xl p-6">
+                    <x-skeleton-table :rows="5" :columns="6" />
+                </div>
+            </div>
+
             <!-- Estatísticas -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div x-show="loaded" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div class="bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-xl p-6">
                     <div class="flex items-center justify-between mb-2">
                         <span class="text-sm text-slate-400">Total de Chamados</span>
@@ -213,6 +234,7 @@
                     {{ $tickets->links() }}
                 </div>
                 @endif
+            </div>
             </div>
         </div>
     </div>

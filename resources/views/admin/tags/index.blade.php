@@ -17,7 +17,7 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div class="py-8" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             @if(session('success'))
@@ -36,8 +36,31 @@
             </div>
             @endif
 
+            <!-- Skeleton Loader -->
+            <div x-show="!loaded" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 animate-pulse">
+                @for($i = 0; $i < 6; $i++)
+                <div class="bg-white/5 border border-white/10 rounded-xl p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-4 h-4 bg-slate-700/50 rounded-full"></div>
+                            <div class="h-5 w-32 bg-slate-700/50 rounded"></div>
+                        </div>
+                        <div class="h-5 w-16 bg-slate-700/50 rounded-full"></div>
+                    </div>
+                    <div class="space-y-2 mb-4">
+                        <div class="h-3 bg-slate-700/50 rounded w-full"></div>
+                        <div class="h-3 bg-slate-700/50 rounded w-3/4"></div>
+                    </div>
+                    <div class="flex gap-2">
+                        <div class="h-9 flex-1 bg-slate-700/50 rounded-lg"></div>
+                        <div class="h-9 flex-1 bg-slate-700/50 rounded-lg"></div>
+                    </div>
+                </div>
+                @endfor
+            </div>
+
             <!-- Grid de Tags -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div x-show="loaded" style="display: none;" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 @forelse($tags as $tag)
                 <div class="bg-white/5 backdrop-blur-sm border border-white/10 rounded-xl p-6 hover:bg-white/10 transition">
                     <div class="flex items-start justify-between mb-4">

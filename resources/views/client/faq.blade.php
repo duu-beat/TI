@@ -8,7 +8,7 @@
         </div>
     </x-slot>
 
-    <div class="space-y-8" x-data="{ openItem: null }">
+    <div class="space-y-8" x-data="{ openItem: null, loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
         
         {{-- Busca e Filtros --}}
         <div class="bg-slate-900/50 border border-white/10 rounded-2xl p-6">
@@ -46,7 +46,35 @@
             </form>
         </div>
 
+        {{-- Skeleton Loader --}}
+        <div x-show="!loaded" class="space-y-6 animate-pulse">
+            @for($i = 0; $i < 3; $i++)
+                <div class="space-y-4">
+                    {{-- Header da categoria --}}
+                    <div class="flex items-center gap-3 px-2">
+                        <div class="h-8 w-8 bg-slate-700/50 rounded"></div>
+                        <div class="h-7 w-48 bg-slate-700/50 rounded"></div>
+                        <div class="h-6 w-20 bg-slate-700/50 rounded-full"></div>
+                    </div>
+                    
+                    {{-- Perguntas --}}
+                    <div class="space-y-3">
+                        @for($j = 0; $j < 4; $j++)
+                            <div class="bg-slate-900/50 border border-white/5 rounded-xl p-5">
+                                <div class="h-5 bg-slate-700/50 rounded w-3/4 mb-3"></div>
+                                <div class="space-y-2">
+                                    <div class="h-3 bg-slate-700/50 rounded w-full"></div>
+                                    <div class="h-3 bg-slate-700/50 rounded w-5/6"></div>
+                                </div>
+                            </div>
+                        @endfor
+                    </div>
+                </div>
+            @endfor
+        </div>
+
         {{-- Resultados --}}
+        <div x-show="loaded" style="display: none;">
         @if(count($faqs) > 0)
             @foreach($faqs as $categoryData)
                 <div class="space-y-4">
@@ -108,9 +136,9 @@
                     </svg>
                     Ver Todas as Perguntas
                 </a>
-            </div>
+             </div>
         @endif
-
+        </div>
         {{-- CTA: Não encontrou? --}}
         <div class="bg-gradient-to-r from-indigo-600/20 to-purple-600/20 border border-indigo-500/30 rounded-2xl p-8 text-center">
             <h3 class="text-2xl font-bold text-white mb-3">Não encontrou o que procurava?</h3>
