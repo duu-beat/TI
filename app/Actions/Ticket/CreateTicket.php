@@ -11,6 +11,7 @@ use App\Traits\HandleAttachments;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Services\SlaService;
+// use App\Jobs\GenerateAiSuggestion; // <--- COMENTADO: IA Desativada
 
 class CreateTicket
 {
@@ -44,7 +45,15 @@ class CreateTicket
             // 4. Calcular e definir SLA
             $slaService->setSlaForTicket($ticket);
 
-            // 4. Notificar Admins (Usa o scope criado no User.php)
+            /* // 5. IA DESATIVADA (Sem custo)
+            try {
+                 GenerateAiSuggestion::dispatch($ticket);
+            } catch (\Exception $e) {
+                 \Illuminate\Support\Facades\Log::error('Falha ao disparar IA: ' . $e->getMessage());
+            }
+            */
+
+            // 6. Notificar Admins
             $admins = User::admins()->get();
             Notification::send($admins, new TicketUpdated($ticket, 'created'));
 

@@ -10,7 +10,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-bold text-indigo-400 uppercase tracking-wider bg-indigo-500/10 px-2 py-0.5 rounded border border-indigo-500/20">
-                            {{ $ticket->category ?? 'Suporte' }}
+                            {{ $ticket->category->name ?? $ticket->category ?? 'Suporte' }}
                         </span>
                         <span class="text-slate-500 text-[10px] flex items-center gap-1">
                             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
@@ -42,8 +42,18 @@
     {{-- WRAPPER PRINCIPAL --}}
     <div x-data="{ 
             loaded: false, 
-            replyMode: 'public', // 'public' or 'internal'
-            toggleMode() { this.replyMode = this.replyMode === 'public' ? 'internal' : 'public' }
+            replyMode: 'public',
+            replyMessage: '', 
+            toggleMode() { this.replyMode = this.replyMode === 'public' ? 'internal' : 'public' },
+            useAiResponse(text) {
+                this.replyMessage = text; 
+                this.replyMode = 'public'; 
+                // Foca no textarea
+                setTimeout(() => {
+                    document.querySelector('textarea[name=message]').focus();
+                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                }, 100);
+            }
          }" 
          x-init="setTimeout(() => loaded = true, 300)" 
          class="py-8 pb-24 min-h-screen">
@@ -106,7 +116,7 @@
                         <div class="p-6 sm:p-8">
                             <h1 class="text-xl sm:text-2xl font-bold text-white mb-4 leading-snug">{{ $ticket->subject }}</h1>
                             <div class="prose prose-invert max-w-none text-slate-300 bg-slate-950/50 p-5 rounded-xl border border-white/5">
-                                {!! nl2br(e($ticket->description)) !!}
+                                {!! nl2br(e($ticket->description ?? $ticket->messages->first()->message)) !!}
                             </div>
 
                             @if(count($ticket->messages) > 0 && $ticket->messages->first()->attachments->count() > 0)
@@ -137,17 +147,61 @@
                         @foreach($ticket->messages->skip(1) as $message)
                             @php 
                                 $isMe = $message->user_id === auth()->id();
-                                $isAdmin = $message->user->role === 'admin' || $message->user->role === 'master';
+                                $user = $message->user; // Usa o withDefault do Model
+                                $isAdmin = $user->role === 'admin' || $user->role === 'master';
                                 $isInternal = $message->is_internal;
-                                // Detecta mensagem de sistema (começa com emoji ou padrão específico)
+                                
+                                // DETECÇÃO DE IA E SISTEMA
+                                $isAi = $message->user_id === null || \Illuminate\Support\Str::contains($message->message, '🤖 **Sugestão da IA:**');
                                 $isSystem = $isInternal && \Illuminate\Support\Str::startsWith($message->message, ['⚡', '👤', '🚨', 'System:']);
+                                
+                                // Limpa msg IA para uso no botão
+                                $cleanAiMessage = $isAi ? str_replace(['🤖 **Sugestão da IA:**<br>', '<br>'], ['', "\n"], $message->message) : '';
                             @endphp
 
-                            @if($isSystem)
+                            @if($isAi)
+                                {{-- ✨ CARD DA INTELIGÊNCIA ARTIFICIAL ✨ --}}
+                                <div class="flex gap-4 animate-fade-in-up group">
+                                    {{-- Avatar IA --}}
+                                    <div class="h-10 w-10 rounded-xl flex items-center justify-center text-lg bg-gradient-to-br from-violet-600 to-indigo-600 text-white shadow-lg shadow-indigo-500/30 ring-4 ring-slate-900 z-10 shrink-0">
+                                        ✨
+                                    </div>
+
+                                    <div class="flex-1 max-w-3xl">
+                                        <div class="rounded-2xl rounded-tl-sm p-1 bg-gradient-to-r from-violet-500/30 to-indigo-500/30 border border-indigo-500/30 shadow-lg relative overflow-hidden">
+                                            {{-- Conteúdo do Card --}}
+                                            <div class="bg-slate-900/90 rounded-xl p-5 backdrop-blur-sm">
+                                                <div class="flex items-center justify-between mb-3">
+                                                    <span class="text-xs font-bold text-transparent bg-clip-text bg-gradient-to-r from-violet-400 to-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                                                        <svg class="w-3 h-3 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+                                                        Sugestão da IA
+                                                    </span>
+                                                    <span class="text-[10px] text-slate-500">{{ $message->created_at->format('H:i') }}</span>
+                                                </div>
+
+                                                <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed">
+                                                    {{-- Não usa e() para permitir HTML da IA --}}
+                                                    {!! nl2br($message->message) !!} 
+                                                </div>
+
+                                                {{-- Botão de Ação --}}
+                                                <div class="mt-4 pt-3 border-t border-white/5 flex justify-end">
+                                                    <button @click="useAiResponse(`{{ $cleanAiMessage }}`)" 
+                                                            class="flex items-center gap-2 px-4 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition shadow-lg shadow-indigo-500/20 group/btn">
+                                                        <span>Usar esta resposta</span>
+                                                        <svg class="w-3 h-3 transition-transform group-hover/btn:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            @elseif($isSystem)
                                 {{-- ESTILO: Mensagem de Sistema --}}
                                 <div class="flex justify-center py-2 animate-fade-in">
                                     <div class="px-4 py-1.5 rounded-full bg-slate-900/80 border border-white/5 text-[11px] text-slate-400 font-medium flex items-center gap-2 backdrop-blur-sm">
-                                        <span class="font-bold text-slate-300">{{ $message->user->name }}</span>
+                                        <span class="font-bold text-slate-300">{{ $user->name }}</span>
                                         <span class="prose prose-invert prose-xs max-w-none text-slate-400 inline">
                                             {!! \Illuminate\Support\Str::markdown($message->message) !!}
                                         </span>
@@ -166,24 +220,24 @@
                                                 ? ($isMe ? 'bg-indigo-600 border-indigo-500 text-white ring-4 ring-slate-900' : 'bg-slate-700 border-slate-600 text-indigo-300 ring-4 ring-slate-900') 
                                                 : 'bg-slate-800 border-slate-700 text-slate-400 ring-4 ring-slate-900') 
                                         }}">
-                                        {{ $isInternal ? '🔒' : substr($message->user->name, 0, 1) }}
+                                        {{ $isInternal ? '🔒' : substr($user->name, 0, 1) }}
                                     </div>
 
                                     <div class="flex-1 max-w-3xl">
                                         {{-- Bolha --}}
                                         <div class="rounded-2xl p-5 shadow-sm relative border transition-all duration-200 hover:shadow-md
                                             {{ $isInternal
-                                                ? 'bg-amber-950/30 border-amber-500/20 rounded-tl-sm' // Nota Interna
+                                                ? 'bg-amber-950/30 border-amber-500/20 rounded-tl-sm'
                                                 : ($isMe 
-                                                    ? 'bg-indigo-500/10 border-indigo-500/20 rounded-tr-sm' // Eu (Admin)
-                                                    : ($isAdmin ? 'bg-slate-800 border-white/10 rounded-tl-sm' : 'bg-slate-900 border-white/5 rounded-tl-sm') // Outros
+                                                    ? 'bg-indigo-500/10 border-indigo-500/20 rounded-tr-sm'
+                                                    : ($isAdmin ? 'bg-slate-800 border-white/10 rounded-tl-sm' : 'bg-slate-900 border-white/5 rounded-tl-sm')
                                                 )
                                             }}">
                                             
                                             <div class="flex items-center justify-between mb-2">
                                                 <div class="flex items-center gap-2">
                                                     <span class="text-xs font-bold {{ $isInternal ? 'text-amber-500' : ($isAdmin ? 'text-indigo-400' : 'text-white') }}">
-                                                        {{ $message->user->name }}
+                                                        {{ $user->name }}
                                                     </span>
                                                     @if($isInternal)
                                                         <span class="px-1.5 py-0.5 rounded bg-amber-500/10 text-[9px] font-bold text-amber-500 border border-amber-500/20 uppercase">Nota Interna</span>
@@ -452,8 +506,7 @@
                               class="relative rounded-2xl border shadow-2xl backdrop-blur-xl transition-all duration-300 overflow-hidden"
                               :class="replyMode === 'internal' 
                                 ? 'bg-amber-950/90 border-amber-500/30 shadow-[0_0_50px_rgba(245,158,11,0.15)]' 
-                                : 'bg-slate-900/95 border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]'"
-                              x-data="{ message: '' }"> {{-- ✨ AlpineJS para controlar o texto --}}
+                                : 'bg-slate-900/95 border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.5)]'">
                             @csrf
                             
                             <input type="hidden" name="is_internal" :value="replyMode === 'internal' ? 1 : 0">
@@ -467,9 +520,8 @@
                                         <svg class="w-3 h-3 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                                     </div>
                                     <select id="cannedSelect" 
-                                            @change="message += $event.target.value + '\n'; $event.target.value='';"
+                                            @change="replyMessage += $event.target.value + '\n'; $event.target.value='';"
                                             class="bg-transparent text-xs border-none focus:ring-0 text-slate-300 font-medium cursor-pointer pl-7 pr-8 py-1 hover:text-white transition w-48 appearance-none">
-                                        {{-- Classes bg-slate-900 garantem legibilidade no dark mode --}}
                                         <option value="" class="bg-slate-900 text-slate-500">Inserir Resposta Pronta</option>
                                         @if(isset($cannedResponses))
                                             @foreach($cannedResponses as $canned)
@@ -504,8 +556,8 @@
                                     </label>
                                 </div>
 
-                                {{-- Textarea (Vinculado ao Alpine x-model) --}}
-                                <textarea name="message" rows="1" x-model="message"
+                                {{-- Textarea (Vinculado ao Alpine x-model global) --}}
+                                <textarea name="message" rows="1" x-model="replyMessage"
                                           class="w-full bg-transparent border-0 text-white placeholder:text-slate-500 focus:ring-0 resize-none py-3 max-h-60 overflow-y-auto custom-scrollbar"
                                           :placeholder="replyMode === 'internal' ? 'Escreva uma nota visível apenas para a equipe...' : 'Escreva uma resposta técnica para o cliente...'" 
                                           required

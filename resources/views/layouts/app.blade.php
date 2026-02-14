@@ -184,5 +184,117 @@
 
     @stack('modals')
     @livewireScripts
+
+
+
+    {{-- ✨ SPOTLIGHT SEARCH (CTRL + K) --}}
+    <div x-data="spotlight()" 
+         x-init="init()"
+         @keydown.window.prevent.ctrl.k="toggle()"
+         @keydown.window.prevent.cmd.k="toggle()"
+         @keydown.escape.window="isOpen = false"
+         class="relative z-[9999]" 
+         style="display: none;" 
+         x-show="isOpen">
+        
+        {{-- Backdrop Escuro --}}
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" 
+             x-show="isOpen"
+             x-transition:enter="ease-out duration-200"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="ease-in duration-150"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="isOpen = false"></div>
+
+        {{-- Janela de Busca --}}
+        <div class="fixed inset-0 z-10 overflow-y-auto p-4 sm:p-6 md:p-20">
+            <div class="mx-auto max-w-2xl transform divide-y divide-white/5 overflow-hidden rounded-2xl bg-slate-900 shadow-2xl ring-1 ring-white/10 transition-all"
+                 x-show="isOpen"
+                 x-transition:enter="ease-out duration-300"
+                 x-transition:enter-start="opacity-0 scale-95"
+                 x-transition:enter-end="opacity-100 scale-100"
+                 x-transition:leave="ease-in duration-200"
+                 x-transition:leave-start="opacity-100 scale-100"
+                 x-transition:leave-end="opacity-0 scale-95">
+                
+                {{-- Campo de Input --}}
+                <div class="relative">
+                    <svg class="pointer-events-none absolute left-4 top-3.5 h-5 w-5 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </svg>
+                    <input type="text" 
+                           x-ref="searchInput"
+                           x-model="query"
+                           @input.debounce.300ms="search()"
+                           class="h-14 w-full border-0 bg-transparent pl-12 pr-4 text-white placeholder:text-slate-500 focus:ring-0 sm:text-sm" 
+                           placeholder="Buscar chamados, clientes... (Pressione ESC para sair)">
+                </div>
+
+                {{-- Lista de Resultados --}}
+                <ul x-show="results.length > 0" class="max-h-96 scroll-py-3 overflow-y-auto p-2">
+                    <template x-for="(item, index) in results" :key="index">
+                        <li class="group flex cursor-pointer select-none rounded-xl p-3 hover:bg-white/5 transition"
+                            @click="window.location = item.url">
+                            <div class="flex h-10 w-10 flex-none items-center justify-center rounded-lg border border-white/10"
+                                 :class="item.type === 'ticket' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-emerald-500/20 text-emerald-400'">
+                                <template x-if="item.type === 'ticket'">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" /></svg>
+                                </template>
+                                <template x-if="item.type === 'user'">
+                                    <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
+                                </template>
+                            </div>
+                            <div class="ml-4 flex-auto">
+                                <p class="truncate text-sm font-medium text-white" x-text="item.title"></p>
+                                <p class="truncate text-xs text-slate-400" x-text="item.subtitle"></p>
+                            </div>
+                            <svg class="ml-3 h-5 w-5 flex-none text-slate-600 opacity-0 group-hover:opacity-100 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </li>
+                    </template>
+                </ul>
+
+                {{-- Estado Vazio / Instruções --}}
+                <div x-show="query.length < 2" class="px-6 py-14 text-center sm:px-14">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded bg-white/5 border border-white/10 text-xs text-slate-400 mb-4">
+                        <kbd class="font-sans font-bold">CTRL</kbd> + <kbd class="font-sans font-bold">K</kbd>
+                    </div>
+                    <p class="text-sm text-slate-500">Digite para buscar em todo o sistema.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function spotlight() {
+            return {
+                isOpen: false,
+                query: '',
+                results: [],
+                toggle() {
+                    this.isOpen = !this.isOpen;
+                    if (this.isOpen) {
+                        this.$nextTick(() => this.$refs.searchInput.focus());
+                        this.query = '';
+                        this.results = [];
+                    }
+                },
+                search() {
+                    if (this.query.length < 2) {
+                        this.results = [];
+                        return;
+                    }
+                    // Faz a busca na rota que criamos
+                    fetch(`{{ route('admin.global-search') }}?query=${encodeURIComponent(this.query)}`)
+                        .then(res => res.json())
+                        .then(data => { this.results = data; });
+                }
+            }
+        }
+    </script>
+
 </body>
 </html>

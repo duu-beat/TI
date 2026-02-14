@@ -1,5 +1,5 @@
 @php
-    // Estilo ligeiramente diferente para Admin (Vermelho/Laranja se quiseres, ou manter o padrão)
+    // Estilo ligeiramente diferente para Admin
     $activeClass = 'bg-gradient-to-r from-indigo-500/10 to-cyan-500/10 text-white border border-white/10 shadow-lg shadow-indigo-500/10 font-medium';
     $inactiveClass = 'text-slate-400 hover:bg-white/5 hover:text-white transition-colors border border-transparent';
 @endphp
@@ -11,10 +11,17 @@
        📊 Dashboard
     </a>
 
-    {{-- Chamados --}}
+    {{-- Chamados (Lista) --}}
+    {{-- Ajustei o routeIs para não marcar como ativo quando estiver no Kanban --}}
     <a href="{{ route('admin.tickets.index') }}"
-       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.tickets.*') ? $activeClass : $inactiveClass }}">
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.tickets.index', 'admin.tickets.show') ? $activeClass : $inactiveClass }}">
         🎫 Gerenciar Chamados
+    </a>
+
+    {{-- Kanban (Novo) --}}
+    <a href="{{ route('admin.tickets.kanban') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.tickets.kanban') ? $activeClass : $inactiveClass }}">
+        📋 Quadro Kanban
     </a>
 
     {{-- Respostas Prontas --}}
