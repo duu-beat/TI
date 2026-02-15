@@ -14,26 +14,17 @@
 
             {{-- Brand Panel (Esquerda) --}}
             <div class="relative p-8 lg:p-12 flex flex-col justify-between z-10 border-r border-white/5 bg-slate-950/30">
-                
-                {{-- Neon Line Top --}}
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-400 opacity-50"></div>
 
                 <div>
-                    {{-- LOGO PADRONIZADA (AJUSTADA) --}}
-                    {{-- Adicionado -ml-4 para alinhar à esquerda como no site --}}
                     <a href="{{ route('home') }}" class="inline-flex items-center gap-1 mb-8 group -ml-4">
                         <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" 
                              class="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition duration-300">
-                        
-                        {{-- Adicionado ml-2 para afastar texto --}}
                         <div class="leading-tight text-left ml-2">
-                            {{-- Aumentado para text-2xl --}}
                             <div class="text-white font-bold tracking-tight text-2xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
-                            {{-- Aumentado para text-xs --}}
                             <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Portal do Cliente</div>
                         </div>
                     </a>
-                    {{-- FIM LOGO --}}
 
                     <h1 class="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
                         Bem-vindo de volta!
@@ -44,15 +35,11 @@
 
                     <div class="mt-8 space-y-3">
                         <div class="flex items-center gap-3 text-sm text-slate-300">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400">
-                                🚀
-                            </div>
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400">🚀</div>
                             <span>Acesso rápido ao suporte técnico.</span>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-slate-300">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400">
-                                🔒
-                            </div>
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400">🔒</div>
                             <span>Ambiente seguro e criptografado.</span>
                         </div>
                     </div>
@@ -81,20 +68,20 @@
                     </div>
                 @endif
 
-                {{-- Social Login Buttons --}}
+                {{-- Social Login Buttons (Atualizados com Links) --}}
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <button type="button" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
+                    <a href="{{ route('social.redirect', 'google') }}" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
                         <svg class="h-5 w-5 opacity-70 group-hover:opacity-100 transition" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
                         </svg>
                         Google
-                    </button>
-                    <button type="button" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
+                    </a>
+                    <a href="{{ route('social.redirect', 'github') }}" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
                         <svg class="h-5 w-5 opacity-70 group-hover:opacity-100 transition" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.42-1.305.763-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
                         GitHub
-                    </button>
+                    </a>
                 </div>
 
                 <div class="relative flex py-2 items-center mb-6">
@@ -103,7 +90,8 @@
                     <div class="flex-grow border-t border-white/10"></div>
                 </div>
 
-                <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ showPassword: false }">
+                {{-- Form Início --}}
+                <form method="POST" action="{{ route('login') }}" class="space-y-5" x-data="{ showPassword: false, processing: false }" @submit="processing = true">
                     @csrf
 
                     <div>
@@ -152,8 +140,21 @@
                         </label>
                     </div>
 
-                    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                        Entrar na Conta
+                    {{-- Botão com Loading State --}}
+                    <button type="submit" 
+                            :disabled="processing"
+                            :class="{ 'opacity-75 cursor-not-allowed': processing }"
+                            class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-2">
+                        
+                        <span x-show="!processing">Entrar na Conta</span>
+                        
+                        <span x-show="processing" style="display: none;" class="flex items-center gap-2">
+                            <svg class="animate-spin h-5 w-5 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Entrando...
+                        </span>
                     </button>
                 </form>
 

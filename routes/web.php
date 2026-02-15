@@ -1,6 +1,13 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
+use Laravel\Socialite\Facades\Socialite;
+use App\Models\User;
+
+// Controllers
 use App\Http\Controllers\Client\TicketController as ClientTicketController;
 use App\Http\Controllers\Admin\TicketController as AdminTicketController;
 use App\Http\Controllers\Admin\AuthController as AdminAuthController;
@@ -30,6 +37,35 @@ Route::get('/faq', [FaqController::class, 'index'])->name('faq');
 Route::get('/termos-de-uso', [LegalController::class, 'terms'])->name('terms');
 Route::get('/privacidade', [LegalController::class, 'privacy'])->name('privacy');
 Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
+
+/*
+|--------------------------------------------------------------------------
+| LOGIN SOCIAL (Google / GitHub)
+|--------------------------------------------------------------------------
+*/
+Route::get('/auth/{provider}/redirect', function ($provider) {
+    return Socialite::driver($provider)->redirect();
+})->name('social.redirect');
+
+Route::get('/auth/{provider}/callback', function ($provider) {
+    try {
+        $socialUser = Socialite::driver($provider)->user();
+        
+        $user = User::updateOrCreate([
+            'email' => $socialUser->getEmail(),
+        ], [
+            'name' => $socialUser->getName(),
+            // Gera uma senha aleatória segura se for um novo utilizador
+            'password' => Auth::check() ? Auth::user()->password : Hash::make(Str::random(24)),
+        ]);
+    
+        Auth::login($user);
+    
+        return redirect()->route('client.dashboard');
+    } catch (\Exception $e) {
+        return redirect()->route('login')->with('status', 'Erro ao logar com ' . ucfirst($provider));
+    }
+})->name('social.callback');
 
 /*
 |--------------------------------------------------------------------------
@@ -72,9 +108,10 @@ Route::prefix('admin')->name('admin.')->group(function () {
         
         Route::get('/dashboard', [AdminTicketController::class, 'dashboard'])->name('dashboard');
         Route::view('/perfil', 'profile.show')->name('profile');
+        
         // ✅ ROTA NOVA: Busca Global
-    Route::get('/global-search', [\App\Http\Controllers\Admin\TicketController::class, 'globalSearch'])
-    ->name('global-search');
+        Route::get('/global-search', [\App\Http\Controllers\Admin\TicketController::class, 'globalSearch'])
+            ->name('global-search');
         
         // 1. CRUD de Respostas Prontas
         Route::resource('respostas-prontas', CannedResponseController::class)
@@ -139,7 +176,7 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::cl
         Route::post('/logs-sistema/limpar', [MasterDashboardController::class, 'clearSystemLogs'])->name('system-logs.clear');
 });
 
-// Rotas Extras
+// Rotas Extras (Admin)
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class)
         ->only(['index', 'store', 'update', 'destroy']);

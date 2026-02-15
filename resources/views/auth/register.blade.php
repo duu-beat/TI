@@ -17,21 +17,14 @@
                 <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-indigo-500 to-cyan-400 opacity-50"></div>
 
                 <div>
-                    {{-- LOGO PADRONIZADA (AJUSTADA) --}}
-                    {{-- Adicionado -ml-4 para alinhar --}}
                     <a href="{{ route('home') }}" class="inline-flex items-center gap-1 mb-8 group -ml-4">
                         <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" 
                              class="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition duration-300">
-                        
-                        {{-- Adicionado ml-2 para afastar texto --}}
                         <div class="leading-tight text-left ml-2">
-                            {{-- Aumentado para text-2xl --}}
                             <div class="text-white font-bold tracking-tight text-2xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
-                            {{-- Aumentado para text-xs --}}
                             <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Criar Conta</div>
                         </div>
                     </a>
-                    {{-- FIM LOGO --}}
 
                     <h1 class="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
                         Comece em segundos.
@@ -42,15 +35,11 @@
 
                     <div class="mt-8 space-y-3">
                         <div class="flex items-center gap-3 text-sm text-slate-300">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400">
-                                ✓
-                            </div>
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400">✓</div>
                             <span>Histórico completo de soluções.</span>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-slate-300">
-                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400">
-                                ✓
-                            </div>
+                            <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-emerald-500/20 text-emerald-400">✓</div>
                             <span>Notificações em tempo real.</span>
                         </div>
                     </div>
@@ -73,20 +62,20 @@
 
                 <x-validation-errors class="mb-4 text-red-200 bg-red-500/10 p-3 rounded-xl border border-red-500/20 text-sm" />
 
-                {{-- Login Social (Placeholders) --}}
+                {{-- Links Sociais Atualizados --}}
                 <div class="grid grid-cols-2 gap-4 mb-6">
-                    <button type="button" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
+                    <a href="{{ route('social.redirect', 'google') }}" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
                         <svg class="h-5 w-5 opacity-70 group-hover:opacity-100 transition" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12.545,10.239v3.821h5.445c-0.712,2.315-2.647,3.972-5.445,3.972c-3.332,0-6.033-2.701-6.033-6.032s2.701-6.032,6.033-6.032c1.498,0,2.866,0.549,3.921,1.453l2.814-2.814C17.503,2.988,15.139,2,12.545,2C7.021,2,2.543,6.477,2.543,12s4.478,10,10.002,10c8.396,0,10.249-7.85,9.426-11.748L12.545,10.239z"/>
                         </svg>
                         Google
-                    </button>
-                    <button type="button" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
+                    </a>
+                    <a href="{{ route('social.redirect', 'github') }}" class="flex items-center justify-center gap-2 py-2.5 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition text-sm font-medium text-white group">
                         <svg class="h-5 w-5 opacity-70 group-hover:opacity-100 transition" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61-.546-1.387-1.333-1.756-1.333-1.756-1.09-.745.083-.729.083-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.42-1.305.763-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 21.795 24 17.295 24 12c0-6.63-5.37-12-12-12"/>
                         </svg>
                         GitHub
-                    </button>
+                    </a>
                 </div>
 
                 <div class="relative flex py-2 items-center mb-6">
@@ -95,7 +84,19 @@
                     <div class="flex-grow border-t border-white/10"></div>
                 </div>
 
-                <form method="POST" action="{{ route('register') }}" class="space-y-4" x-data="{ showPassword: false }">
+                <form method="POST" action="{{ route('register') }}" class="space-y-4" x-data="{ 
+                    showPassword: false, 
+                    processing: false,
+                    password: '',
+                    get strength() {
+                        let s = 0;
+                        if(this.password.length > 7) s++; 
+                        if(/[A-Z]/.test(this.password)) s++; 
+                        if(/[0-9]/.test(this.password)) s++; 
+                        if(/[^A-Za-z0-9]/.test(this.password)) s++; 
+                        return s;
+                    }
+                }" @submit="processing = true">
                     @csrf
 
                     <div>
@@ -126,6 +127,7 @@
                         </div>
                     </div>
 
+                    {{-- Senha com Medidor de Força --}}
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Senha</label>
@@ -135,7 +137,7 @@
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                                     </svg>
                                 </div>
-                                <input id="password" :type="showPassword ? 'text' : 'password'" name="password" required autocomplete="new-password"
+                                <input id="password" x-model="password" :type="showPassword ? 'text' : 'password'" name="password" required autocomplete="new-password"
                                     class="w-full rounded-xl border border-white/10 bg-slate-950/50 pl-11 pr-10 py-3 text-slate-100 placeholder:text-slate-600 focus:border-cyan-400/50 focus:ring-4 focus:ring-cyan-400/10 transition-all outline-none"
                                     placeholder="••••••••">
                                 <button type="button" @click="showPassword = !showPassword" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-500 hover:text-white focus:outline-none">
@@ -143,7 +145,22 @@
                                     <svg x-show="showPassword" style="display: none;" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.542-7a10.059 10.059 0 011.591-2.714M9.828 9.828a3 3 0 114.242 4.242M3 3l18 18" /></svg>
                                 </button>
                             </div>
+                            
+                            {{-- Barras de Força --}}
+                            <div class="flex gap-1 h-1 mt-2 transition-all duration-300" x-show="password.length > 0">
+                                <div class="h-full rounded-full flex-1 transition-colors duration-300" :class="strength >= 1 ? 'bg-red-500' : 'bg-slate-700'"></div>
+                                <div class="h-full rounded-full flex-1 transition-colors duration-300" :class="strength >= 2 ? 'bg-orange-500' : 'bg-slate-700'"></div>
+                                <div class="h-full rounded-full flex-1 transition-colors duration-300" :class="strength >= 3 ? 'bg-yellow-400' : 'bg-slate-700'"></div>
+                                <div class="h-full rounded-full flex-1 transition-colors duration-300" :class="strength >= 4 ? 'bg-emerald-500' : 'bg-slate-700'"></div>
+                            </div>
+                            <p class="text-[10px] mt-1 text-right" :class="{
+                                'text-red-400': strength <= 1,
+                                'text-orange-400': strength == 2,
+                                'text-yellow-400': strength == 3,
+                                'text-emerald-400': strength == 4
+                            }" x-text="['Muito Fraca', 'Fraca', 'Média', 'Forte', 'Excelente'][strength] || ''"></p>
                         </div>
+
                         <div>
                             <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Confirmar</label>
                             <div class="relative mt-1">
@@ -170,8 +187,20 @@
                         </div>
                     @endif
 
-                    <button type="submit" class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300">
-                        Criar Conta
+                    <button type="submit" 
+                        :disabled="processing"
+                        :class="{ 'opacity-75 cursor-not-allowed': processing }"
+                        class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-2">
+                        
+                        <span x-show="!processing">Criar Conta</span>
+                        
+                        <span x-show="processing" style="display: none;" class="flex items-center gap-2">
+                            <svg class="animate-spin h-5 w-5 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            Processando...
+                        </span>
                     </button>
                 </form>
 
