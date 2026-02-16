@@ -1,15 +1,21 @@
 @php
+    /**
+     * Componente Sidebar (Menu Lateral)
+     * 
+     * Este componente renderiza o menu lateral dinamicamente com base no papel (role) do usuário logado.
+     * Ele gerencia badges de identificação, rotas de perfil e inclui os menus parciais específicos.
+     */
     $user = auth()->user();
     
-    // Verifica os níveis
+    // Identificação de níveis de acesso para lógica de UI
     $isMaster = $user?->isMaster() ?? false;
     $isAdmin = $user?->isAdmin() ?? false;
     
-    // Define Badge, Cor e Rota de Perfil
+    // Configuração visual do Badge e definição da rota de perfil correta por hierarquia
     if ($isMaster) {
         $badge = 'Segurança';
         $badgeClass = 'bg-red-500/10 text-red-400 border-red-500/20 shadow-[0_0_15px_rgba(239,68,68,0.2)] font-bold';
-        $profileRoute = route('master.profile'); // Rota dedicada
+        $profileRoute = route('master.profile');
     } elseif ($isAdmin) {
         $badge = 'Admin';
         $badgeClass = 'bg-cyan-500/10 text-cyan-200 border-cyan-500/20';
@@ -26,7 +32,7 @@
        aria-label="Menu lateral principal"
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
     
-    {{-- Logo --}}
+    {{-- Seção de Logo e Identificação do Sistema --}}
     <div class="p-6 border-b border-white/10 flex items-center justify-between">
         <a href="{{ route('home') }}" class="flex items-center gap-4 group">
             <img src="{{ asset('images/logosuporteTI.png') }}" alt="Suporte TI" 
@@ -40,6 +46,7 @@
                 </div>
             </div>
         </a>
+        {{-- Botão de fechar visível apenas em dispositivos móveis --}}
         <button type="button"
                 x-ref="sidebarCloseButton"
                 @click="closeSidebar()"
@@ -49,7 +56,7 @@
         </button>
     </div>
 
-    {{-- Menu Dinâmico --}}
+    {{-- Navegação Dinâmica: Inclui o menu parcial correspondente ao nível de acesso --}}
     <nav class="flex-1 p-4 space-y-1 text-sm overflow-y-auto">
         @if($isMaster)
             @include('layouts.partials.master-menu')
@@ -60,16 +67,17 @@
         @endif
     </nav>
 
-    {{-- Footer Sidebar --}}
+    {{-- Rodapé do Menu: Informações do Usuário e Botão de Logout --}}
     <div class="p-4 border-t border-white/10 bg-white/5">
         <div class="flex items-center justify-between gap-3">
             
-            {{-- ✅ CORREÇÃO: Link para o perfil correto --}}
+            {{-- Link para o perfil do usuário --}}
             <a href="{{ $profileRoute }}" class="overflow-hidden group cursor-pointer block flex-1">
                 <div class="text-sm text-slate-200 font-semibold truncate group-hover:text-white transition">{{ $user->name }}</div>
                 <div class="text-xs text-slate-500 truncate group-hover:text-slate-400 transition">{{ $user->email }}</div>
             </a>
             
+            {{-- Botão de Logout com acionamento de modal Alpine.js --}}
             <button type="button"
                     @click="openLogoutModal($event.currentTarget)"
                     :aria-expanded="logoutModalOpen.toString()"

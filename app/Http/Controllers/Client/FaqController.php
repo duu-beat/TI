@@ -5,17 +5,29 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
+/**
+ * Controller de FAQ (Perguntas Frequentes)
+ * 
+ * Gerencia a exibição e filtragem de perguntas frequentes para os clientes.
+ * Atualmente utiliza dados estáticos, mas está preparado para integração com banco de dados.
+ */
 class FaqController extends Controller
 {
+    /**
+     * Exibe a página de FAQ com suporte a busca e filtragem por categoria.
+     * 
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
         $search = $request->get('search');
         $category = $request->get('category');
 
-        // FAQ estruturado por categorias
+        // Obtém a estrutura completa do FAQ
         $faqs = $this->getFaqData();
 
-        // Filtrar por busca
+        // Lógica de busca: Filtra itens que contenham o termo na pergunta ou resposta
         if ($search) {
             $faqs = collect($faqs)->map(function ($category) use ($search) {
                 $category['items'] = collect($category['items'])->filter(function ($item) use ($search) {
@@ -28,18 +40,24 @@ class FaqController extends Controller
             })->values()->all();
         }
 
-        // Filtrar por categoria
+        // Lógica de categoria: Filtra apenas a categoria selecionada via slug
         if ($category) {
             $faqs = collect($faqs)->filter(function ($cat) use ($category) {
                 return $cat['slug'] === $category;
             })->values()->all();
         }
 
+        // Lista de categorias para o menu lateral/filtros
         $categories = $this->getCategories();
 
         return view('client.faq', compact('faqs', 'categories', 'search', 'category'));
     }
 
+    /**
+     * Retorna a base de dados estática do FAQ.
+     * 
+     * @return array
+     */
     private function getFaqData()
     {
         return [
@@ -146,6 +164,11 @@ class FaqController extends Controller
         ];
     }
 
+    /**
+     * Retorna a lista simplificada de categorias para filtros.
+     * 
+     * @return array
+     */
     private function getCategories()
     {
         return [
