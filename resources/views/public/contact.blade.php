@@ -5,13 +5,37 @@
 @section('meta_description', 'Precisa de suporte técnico? Entre em contato agora. Atendimento rápido via WhatsApp, E-mail ou Telefone.')
 
 @section('content')
-<div class="relative py-20 min-h-screen flex items-center">
+{{-- ✅ WRAPPER ALPINE ADICIONADO --}}
+<div class="relative py-20 min-h-screen flex items-center" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
     
     {{-- Background --}}
     <div class="absolute top-0 right-0 w-1/2 h-full bg-gradient-to-l from-white/5 to-transparent pointer-events-none hidden lg:block"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6 w-full">
-        <div class="grid lg:grid-cols-2 gap-16 items-start">
+        
+        {{-- 💀 SKELETON LOADER --}}
+        <div x-show="!loaded" class="grid lg:grid-cols-2 gap-16 items-start animate-pulse">
+            <div class="space-y-8">
+                <div class="space-y-4">
+                    <div class="h-12 w-3/4 bg-white/5 rounded-xl"></div>
+                    <div class="h-12 w-1/2 bg-white/5 rounded-xl"></div>
+                </div>
+                <div class="h-24 w-full bg-white/5 rounded-xl"></div>
+                <div class="space-y-4">
+                    @for($i=0; $i<3; $i++)
+                    <div class="h-20 w-full bg-white/5 rounded-2xl border border-white/5"></div>
+                    @endfor
+                </div>
+            </div>
+            <div class="h-[500px] w-full bg-slate-900/50 rounded-[2.5rem] border border-white/5"></div>
+        </div>
+
+        {{-- ✅ CONTEÚDO REAL --}}
+        <div x-show="loaded" style="display: none;" 
+             class="grid lg:grid-cols-2 gap-16 items-start"
+             x-transition:enter="transition ease-out duration-500"
+             x-transition:enter-start="opacity-0 translate-y-4"
+             x-transition:enter-end="opacity-100 translate-y-0">
             
             {{-- Lado Esquerdo: Infos --}}
             <div class="space-y-8">

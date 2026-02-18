@@ -12,9 +12,8 @@
             </h2>
             
             {{-- Controles --}}
-            <div class="flex items-center gap-3" x-data>
+            <div class="flex items-center gap-3">
                 <div class="h-6 w-px bg-white/10 mx-1"></div>
-
                 <a href="{{ route('admin.tickets.index') }}" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition border border-white/5" title="Ver Lista">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                 </a>
@@ -25,11 +24,42 @@
         </div>
     </x-slot>
 
-    <div class="py-6 h-[calc(100vh-140px)] overflow-hidden">
+    {{-- ✅ WRAPPER ALPINE ADICIONADO --}}
+    <div class="py-6 h-[calc(100vh-140px)] overflow-hidden" 
+         x-data="{ loaded: false }" 
+         x-init="setTimeout(() => loaded = true, 500)">
+        
         <div class="h-full px-4 sm:px-6 lg:px-8 overflow-x-auto custom-scrollbar">
             
-            {{-- Container das Colunas --}}
-            <div class="inline-flex h-full gap-6 pb-4 min-w-full" id="kanban-board">
+            {{-- 💀 SKELETON LOADER (Simula as colunas) --}}
+            <div x-show="!loaded" class="inline-flex h-full gap-6 pb-4 min-w-full animate-pulse">
+                @for($i = 0; $i < 4; $i++)
+                <div class="w-80 flex flex-col shrink-0 rounded-2xl border border-white/5 bg-slate-800/50">
+                    {{-- Header Skeleton --}}
+                    <div class="p-4 border-b border-white/5 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <div class="w-2 h-2 rounded-full bg-slate-700"></div>
+                            <div class="h-4 w-24 bg-slate-700 rounded"></div>
+                        </div>
+                        <div class="h-5 w-8 bg-slate-700 rounded-lg"></div>
+                    </div>
+                    {{-- Cards Skeleton --}}
+                    <div class="p-3 space-y-3">
+                        <div class="h-32 bg-slate-700/20 rounded-xl border border-white/5"></div>
+                        <div class="h-32 bg-slate-700/20 rounded-xl border border-white/5"></div>
+                        <div class="h-24 bg-slate-700/20 rounded-xl border border-white/5"></div>
+                    </div>
+                </div>
+                @endfor
+            </div>
+
+            {{-- ✅ CONTEÚDO REAL --}}
+            <div x-show="loaded" style="display: none;" 
+                 class="inline-flex h-full gap-6 pb-4 min-w-full" 
+                 id="kanban-board"
+                 x-transition:enter="transition ease-out duration-500"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
                 
                 @foreach($statuses as $status)
                     @php
@@ -71,22 +101,20 @@
                                     };
                                 @endphp
 
-                                {{-- CARD KANBAN COM AÇÕES --}}
+                                {{-- CARD KANBAN --}}
                                 <div class="kanban-card group relative bg-slate-800 hover:bg-slate-750 p-4 rounded-xl border border-white/5 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-200 cursor-grab active:cursor-grabbing border-l-4 {{ $priorityColor }}"
                                      data-id="{{ $ticket->id }}">
                                     
-                                    {{-- 🚀 OVERLAY DE AÇÕES RÁPIDAS (Só aparece no Hover) --}}
+                                    {{-- OVERLAY DE AÇÕES --}}
                                     <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center gap-2 rounded-xl z-20"
                                          onclick="if(event.target === this) window.location='{{ route('admin.tickets.show', $ticket) }}'">
                                          
-                                         {{-- Botão Ver --}}
                                          <a href="{{ route('admin.tickets.show', $ticket) }}" 
                                             class="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-md transition transform hover:scale-110 border border-white/10" 
                                             title="Abrir Chamado">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                          </a>
 
-                                         {{-- Botão "Pegar para mim" (Se não tiver dono) --}}
                                          @if(!$ticket->assigned_to)
                                              <form action="{{ route('admin.tickets.assign', $ticket) }}" method="POST" class="inline no-drag">
                                                 @csrf @method('PATCH')
@@ -100,7 +128,6 @@
                                          @endif
                                     </div>
 
-                                    {{-- CONTEÚDO NORMAL DO CARD --}}
                                     <div class="flex justify-between items-start mb-2">
                                         <span class="text-[10px] font-mono text-slate-500 group-hover:text-indigo-400 transition">#{{ $ticket->id }}</span>
                                         @if($ticket->tags->isNotEmpty())
@@ -140,7 +167,6 @@
                                         </div>
                                     </div>
                                 </div>
-
                             @empty
                                 <div class="empty-placeholder text-center py-10 opacity-40 border-2 border-dashed border-white/5 rounded-xl">
                                     <p class="text-xs text-slate-400">Sem chamados</p>
@@ -153,27 +179,22 @@
         </div>
     </div>
 
-    {{-- SCRIPTS PARA DRAG & DROP --}}
+    {{-- SCRIPTS KANBAN --}}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // 1. Inicializa SortableJS em todas as colunas
             const columns = document.querySelectorAll('.kanban-column');
-            
             columns.forEach(column => {
                 new Sortable(column, {
-                    group: 'shared', // Permite mover entre colunas
+                    group: 'shared',
                     animation: 150,
-                    ghostClass: 'bg-indigo-500/10', // Classe do "fantasma" ao arrastar
-                    delay: 100, // Previne cliques acidentais
+                    ghostClass: 'bg-indigo-500/10',
+                    delay: 100,
                     delayOnTouchOnly: true,
-                    
                     onEnd: function (evt) {
                         const itemEl = evt.item;
                         const newStatus = evt.to.getAttribute('data-status');
                         const ticketId = itemEl.getAttribute('data-id');
                         const oldStatus = evt.from.getAttribute('data-status');
-
-                        // Se mudou de coluna
                         if (newStatus !== oldStatus) {
                             updateTicketStatus(ticketId, newStatus);
                         }
@@ -181,11 +202,7 @@
                 });
             });
 
-            // 2. Função para salvar no banco via AJAX
             function updateTicketStatus(ticketId, status) {
-                // Notificação visual simples (opcional)
-                const originalColor = document.querySelector(`[data-id="${ticketId}"]`).style.borderColor;
-                
                 fetch(`/admin/chamados/${ticketId}/status`, {
                     method: 'PATCH',
                     headers: {
@@ -197,34 +214,16 @@
                 })
                 .then(response => {
                     if (!response.ok) throw new Error('Erro ao atualizar');
-                    // Sucesso: Toca um som ou mostra toast (opcional)
                     console.log(`Ticket #${ticketId} movido para ${status}`);
                 })
                 .catch(error => {
                     alert('Erro ao mover chamado. Recarregue a página.');
-                    location.reload(); // Reverte visualmente em caso de erro
+                    location.reload();
                 });
             }
         });
-
-        // 3. Função de Filtro Rápido (Front-end puro)
-        function filterCards(text) {
-            text = text.toLowerCase();
-            const cards = document.querySelectorAll('.kanban-card');
-            
-            cards.forEach(card => {
-                const content = card.innerText.toLowerCase();
-                if (content.includes(text)) {
-                    card.style.display = 'block';
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-        }
     </script>
-
     <style>
-        /* Estilos extras para scrollbar e drag */
         .custom-scrollbar::-webkit-scrollbar { height: 8px; width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 4px; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 4px; }

@@ -3,7 +3,8 @@
         Novo Chamado
     </x-slot>
 
-    <div class="py-6">
+    {{-- ✅ WRAPPER ALPINE ADICIONADO --}}
+    <div class="py-6" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 300)">
         <div class="max-w-4xl mx-auto">
             
             <div class="mb-8 text-center sm:text-left">
@@ -15,7 +16,38 @@
                 </p>
             </div>
 
-            <div class="bg-slate-900/50 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 sm:rounded-2xl border border-white/10">
+            {{-- 💀 SKELETON LOADER (Simula o formulário) --}}
+            <div x-show="!loaded" class="bg-slate-900/50 rounded-2xl border border-white/5 p-8 animate-pulse">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div class="space-y-2">
+                        <div class="h-4 w-32 bg-slate-700/50 rounded"></div>
+                        <div class="h-12 w-full bg-slate-700/20 rounded-xl"></div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="h-4 w-32 bg-slate-700/50 rounded"></div>
+                        <div class="h-12 w-full bg-slate-700/20 rounded-xl"></div>
+                    </div>
+                </div>
+                <div class="space-y-2 mb-8">
+                    <div class="h-4 w-40 bg-slate-700/50 rounded"></div>
+                    <div class="h-12 w-full bg-slate-700/20 rounded-xl"></div>
+                </div>
+                <div class="space-y-2 mb-8">
+                    <div class="h-4 w-40 bg-slate-700/50 rounded"></div>
+                    <div class="h-40 w-full bg-slate-700/20 rounded-xl"></div>
+                </div>
+                <div class="flex justify-end pt-4">
+                    <div class="h-12 w-40 bg-slate-700/20 rounded-xl"></div>
+                </div>
+            </div>
+
+            {{-- ✅ CONTEÚDO REAL --}}
+            <div x-show="loaded" style="display: none;" 
+                 class="bg-slate-900/50 backdrop-blur-md overflow-hidden shadow-2xl shadow-black/50 sm:rounded-2xl border border-white/10"
+                 x-transition:enter="transition ease-out duration-500"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+
                 <div class="p-8 sm:p-10">
                     
                     <form action="{{ route('client.tickets.store') }}" 

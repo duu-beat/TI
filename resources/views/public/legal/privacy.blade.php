@@ -5,8 +5,9 @@
 @section('meta_description', 'Como coletamos, usamos e protegemos os seus dados pessoais. Compromisso com a segurança da informação e conformidade com a LGPD.')
 
 @section('content')
-<div class="relative py-20 min-h-screen print:bg-white print:text-black">
-    {{-- Background Glow (Oculto na impressão) --}}
+{{-- ✅ WRAPPER ALPINE --}}
+<div class="relative py-20 min-h-screen print:bg-white print:text-black" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 300)">
+    {{-- Background Glow --}}
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none print:hidden">
         <div class="absolute top-[10%] right-[10%] w-96 h-96 bg-cyan-500/10 rounded-full blur-[100px]"></div>
     </div>
@@ -15,9 +16,21 @@
         
         <div class="grid lg:grid-cols-4 gap-12">
             
-            {{-- SIDEBAR DE NAVEGAÇÃO --}}
+            {{-- SIDEBAR --}}
             <div class="lg:col-span-1 space-y-6 print:hidden">
-                <div class="sticky top-24">
+                {{-- Skeleton Sidebar --}}
+                <div x-show="!loaded" class="sticky top-24 space-y-6 animate-pulse">
+                    <div class="h-6 w-32 bg-white/5 rounded"></div>
+                    <div class="h-4 w-20 bg-white/5 rounded"></div>
+                    <div class="space-y-2">
+                        <div class="h-10 w-full bg-white/5 rounded-xl"></div>
+                        <div class="h-10 w-full bg-white/5 rounded-xl"></div>
+                        <div class="h-10 w-full bg-white/5 rounded-xl"></div>
+                    </div>
+                </div>
+
+                {{-- Real Sidebar --}}
+                <div x-show="loaded" style="display: none;" class="sticky top-24">
                     {{-- Botão Voltar --}}
                     <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition group">
                         <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
@@ -52,56 +65,79 @@
 
             {{-- CONTEÚDO --}}
             <div class="lg:col-span-3">
-                <div class="mb-8 border-b border-white/10 pb-8 print:border-black/10">
-                    <h1 class="text-4xl font-bold text-white mb-2 print:text-black">Política de Privacidade</h1>
-                    <p class="text-slate-400 print:text-gray-600">Última atualização: {{ date('d/m/Y') }}</p>
+                {{-- Skeleton Conteúdo --}}
+                <div x-show="!loaded" class="animate-pulse space-y-8">
+                    <div class="h-10 w-3/4 bg-white/5 rounded-xl mb-8"></div>
+                    <div class="space-y-4">
+                        <div class="h-6 w-1/3 bg-white/5 rounded mb-4"></div>
+                        <div class="h-4 w-full bg-white/5 rounded"></div>
+                        <div class="h-4 w-full bg-white/5 rounded"></div>
+                        <div class="h-4 w-2/3 bg-white/5 rounded"></div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="h-6 w-1/3 bg-white/5 rounded mb-4"></div>
+                        <div class="h-4 w-full bg-white/5 rounded"></div>
+                        <div class="h-4 w-full bg-white/5 rounded"></div>
+                    </div>
                 </div>
 
-                <div class="rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-xl p-8 md:p-10 space-y-10 text-slate-300 leading-relaxed print:bg-transparent print:border-none print:p-0 print:text-black">
+                <div x-show="loaded" style="display: none;" 
+                     x-transition:enter="transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 translate-y-4"
+                     x-transition:enter-end="opacity-100 translate-y-0">
                     
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
-                            <span class="text-cyan-400 print:text-black">1.</span> Coleta de Dados
-                        </h3>
-                        <p class="print:text-gray-800">Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço. A coleta é feita por meios justos e legais, com o seu conhecimento e consentimento. Os dados que coletamos incluem:</p>
-                        <ul class="list-disc pl-5 mt-3 space-y-1 text-slate-400 print:text-gray-800 marker:text-cyan-500">
-                            <li>Nome completo e E-mail para identificação;</li>
-                            <li>Dados de IP e navegador para segurança do sistema;</li>
-                            <li>Informações fornecidas na abertura de chamados.</li>
-                        </ul>
-                    </section>
+                    <div class="mb-8 border-b border-white/10 pb-8 print:border-black/10">
+                        <h1 class="text-4xl font-bold text-white mb-2 print:text-black">Política de Privacidade</h1>
+                        <p class="text-slate-400 print:text-gray-600">Última atualização: {{ date('d/m/Y') }}</p>
+                    </div>
 
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
-                            <span class="text-cyan-400 print:text-black">2.</span> Cookies e Rastreamento
-                        </h3>
-                        <p class="print:text-gray-800">Utilizamos cookies essenciais para manter a sua sessão segura e lembrar as suas preferências. Não utilizamos cookies de terceiros para fins publicitários sem o seu consentimento explícito.</p>
-                    </section>
+                    <div class="rounded-3xl border border-white/10 bg-slate-900/50 backdrop-blur-xl p-8 md:p-10 space-y-10 text-slate-300 leading-relaxed print:bg-transparent print:border-none print:p-0 print:text-black">
+                        
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
+                                <span class="text-cyan-400 print:text-black">1.</span> Coleta de Dados
+                            </h3>
+                            <p class="print:text-gray-800">Solicitamos informações pessoais apenas quando realmente precisamos delas para lhe fornecer um serviço. A coleta é feita por meios justos e legais, com o seu conhecimento e consentimento. Os dados que coletamos incluem:</p>
+                            <ul class="list-disc pl-5 mt-3 space-y-1 text-slate-400 print:text-gray-800 marker:text-cyan-500">
+                                <li>Nome completo e E-mail para identificação;</li>
+                                <li>Dados de IP e navegador para segurança do sistema;</li>
+                                <li>Informações fornecidas na abertura de chamados.</li>
+                            </ul>
+                        </section>
 
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
-                            <span class="text-cyan-400 print:text-black">3.</span> Seus Direitos (LGPD)
-                        </h3>
-                        <p class="mb-3 print:text-gray-800">Você tem total controle sobre os seus dados. De acordo com a Lei Geral de Proteção de Dados, você tem o direito de:</p>
-                        <div class="grid sm:grid-cols-2 gap-4 print:block print:space-y-4">
-                            <div class="p-4 rounded-xl bg-white/5 border border-white/5 print:border-gray-300 print:bg-gray-50">
-                                <div class="font-bold text-white mb-1 print:text-black">Acesso e Correção</div>
-                                <div class="text-xs text-slate-400 print:text-gray-600">Solicitar cópia ou corrigir dados incompletos.</div>
+                        {{-- ... demais seções ... --}}
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
+                                <span class="text-cyan-400 print:text-black">2.</span> Cookies e Rastreamento
+                            </h3>
+                            <p class="print:text-gray-800">Utilizamos cookies essenciais para manter a sua sessão segura e lembrar as suas preferências. Não utilizamos cookies de terceiros para fins publicitários sem o seu consentimento explícito.</p>
+                        </section>
+
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
+                                <span class="text-cyan-400 print:text-black">3.</span> Seus Direitos (LGPD)
+                            </h3>
+                            <p class="mb-3 print:text-gray-800">Você tem total controle sobre os seus dados. De acordo com a Lei Geral de Proteção de Dados, você tem o direito de:</p>
+                            <div class="grid sm:grid-cols-2 gap-4 print:block print:space-y-4">
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 print:border-gray-300 print:bg-gray-50">
+                                    <div class="font-bold text-white mb-1 print:text-black">Acesso e Correção</div>
+                                    <div class="text-xs text-slate-400 print:text-gray-600">Solicitar cópia ou corrigir dados incompletos.</div>
+                                </div>
+                                <div class="p-4 rounded-xl bg-white/5 border border-white/5 print:border-gray-300 print:bg-gray-50">
+                                    <div class="font-bold text-white mb-1 print:text-black">Exclusão</div>
+                                    <div class="text-xs text-slate-400 print:text-gray-600">Solicitar a remoção dos seus dados de nossos sistemas.</div>
+                                </div>
                             </div>
-                            <div class="p-4 rounded-xl bg-white/5 border border-white/5 print:border-gray-300 print:bg-gray-50">
-                                <div class="font-bold text-white mb-1 print:text-black">Exclusão</div>
-                                <div class="text-xs text-slate-400 print:text-gray-600">Solicitar a remoção dos seus dados de nossos sistemas.</div>
-                            </div>
-                        </div>
-                    </section>
+                        </section>
 
-                    <section>
-                        <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
-                            <span class="text-cyan-400 print:text-black">4.</span> Segurança
-                        </h3>
-                        <p class="print:text-gray-800">Armazenamos seus dados em servidores seguros com criptografia SSL e acesso restrito. Apenas colaboradores autorizados têm acesso às informações estritamente necessárias para o suporte.</p>
-                    </section>
+                        <section>
+                            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 print:text-black">
+                                <span class="text-cyan-400 print:text-black">4.</span> Segurança
+                            </h3>
+                            <p class="print:text-gray-800">Armazenamos seus dados em servidores seguros com criptografia SSL e acesso restrito. Apenas colaboradores autorizados têm acesso às informações estritamente necessárias para o suporte.</p>
+                        </section>
 
+                    </div>
                 </div>
             </div>
         </div>
