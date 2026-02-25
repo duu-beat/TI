@@ -55,6 +55,14 @@ class Ticket extends Model
         return $this->hasMany(TicketAttachment::class);
     }
 
+    /**
+     * Visitas técnicas vinculadas a este chamado.
+     */
+    public function technicalVisits(): HasMany
+    {
+        return $this->hasMany(TechnicalVisit::class);
+    }
+
     // Relacionamento com Tags (polimórfico)
     public function tags(): MorphToMany
     {

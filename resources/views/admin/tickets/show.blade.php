@@ -354,6 +354,14 @@
                             </form>
                         </div>
 
+                        {{-- Agendamento de Visita --}}
+                        <div class="mt-6 pt-6 border-t border-white/5">
+                            <a href="{{ route('admin.visits.create', $ticket) }}" 
+                               class="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl bg-cyan-600/10 hover:bg-cyan-600/20 text-cyan-400 hover:text-cyan-300 text-xs font-bold border border-cyan-500/20 transition shadow-lg shadow-cyan-900/10">
+                                <span>📅 Agendar Visita</span>
+                            </a>
+                        </div>
+
                         {{-- Merge & Escalar --}}
                         <div class="mt-6 pt-6 border-t border-white/5 grid grid-cols-2 gap-3">
                              {{-- Merge --}}

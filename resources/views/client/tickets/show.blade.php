@@ -66,6 +66,34 @@
                 {{-- 👈 COLUNA ESQUERDA (Chat e Detalhes) --}}
                 <div class="lg:col-span-8 space-y-6">
 
+                    {{-- VISITA TÉCNICA AGENDADA --}}
+                    @php $activeVisit = $ticket->technicalVisits()->whereIn('status', ['scheduled', 'in_transit', 'in_service'])->first(); @endphp
+                    @if($activeVisit)
+                        <div class="relative overflow-hidden rounded-2xl bg-cyan-600/10 border border-cyan-500/30 shadow-xl p-6 mb-6 animate-pulse-slow">
+                            <div class="flex items-start gap-4">
+                                <div class="h-12 w-12 rounded-xl bg-cyan-500/20 flex items-center justify-center text-2xl">
+                                    📅
+                                </div>
+                                <div class="flex-1">
+                                    <div class="flex items-center justify-between">
+                                        <h3 class="text-lg font-bold text-cyan-400">Visita Técnica Agendada</h3>
+                                        <span class="px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                                            {{ $activeVisit->getStatusLabel() }}
+                                        </span>
+                                    </div>
+                                    <p class="text-slate-300 text-sm mt-1">
+                                        Um técnico está programado para comparecer em: <br>
+                                        <strong class="text-white">{{ $activeVisit->scheduled_at->format('d/m/Y \à\s H:i') }}</strong>
+                                    </p>
+                                    <div class="mt-3 flex items-center gap-2 text-xs text-slate-400">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                                        {{ $activeVisit->address }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- CARD DO USUÁRIO & PROBLEMA --}}
                     <div class="relative overflow-hidden rounded-2xl bg-slate-900 border border-white/10 shadow-2xl">
                         {{-- Background Decorativo --}}

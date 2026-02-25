@@ -187,4 +187,12 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/relatorios', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::get('/relatorios/exportar-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportPdf'])->name('reports.export-pdf');
     Route::get('/relatorios/exportar-excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportExcel'])->name('reports.export-excel');
+
+    // 📅 Rotas de Visitas Técnicas
+    Route::controller(\App\Http\Controllers\Admin\TechnicalVisitController::class)->prefix('visitas')->name('visits.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/agendar/{ticket}', 'create')->name('create');
+        Route::post('/agendar', 'store')->name('store');
+        Route::patch('/{visit}/status', 'updateStatus')->name('update-status');
+    });
 });

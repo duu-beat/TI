@@ -52,6 +52,12 @@
        📊 Relatórios
     </a>
 
+    {{-- Agenda de Visitas --}}
+    <a href="{{ route('admin.visits.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm mb-1 {{ request()->routeIs('admin.visits.*') ? $activeClass : $inactiveClass }}">
+       📅 Agenda de Visitas
+    </a>
+
     {{-- Perfil --}}
     <a href="{{ route('master.profile') }}"
        class="block rounded-xl px-4 py-2.5 text-sm mb-1 {{ request()->routeIs('master.profile') ? $activeClass : $inactiveClass }}">
