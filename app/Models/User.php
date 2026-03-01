@@ -43,6 +43,14 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class, 'assigned_to');
     }
 
+    /**
+     * Equipamentos vinculados a este usuário.
+     */
+    public function assets()
+    {
+        return $this->hasMany(Asset::class);
+    }
+
     protected $hidden = [
         'password',
         'remember_token',

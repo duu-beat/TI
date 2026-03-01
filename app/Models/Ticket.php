@@ -14,6 +14,7 @@ class Ticket extends Model
 {
     protected $fillable = [
         'user_id', 
+        'asset_id', // ✅ ADICIONADO: Vínculo com equipamento
         'category',
         'subject', 
         'description', 
@@ -21,6 +22,7 @@ class Ticket extends Model
         'priority', 
         'rating', 
         'rating_comment',
+        'nps_score', // ✅ ADICIONADO: Score NPS
         'is_escalated',
         'assigned_to', // ✅ ADICIONADO: Necessário para a atribuição funcionar
     ];
@@ -61,6 +63,30 @@ class Ticket extends Model
     public function technicalVisits(): HasMany
     {
         return $this->hasMany(TechnicalVisit::class);
+    }
+
+    /**
+     * Equipamento vinculado a este chamado.
+     */
+    public function asset(): BelongsTo
+    {
+        return $this->belongsTo(Asset::class);
+    }
+
+    /**
+     * Itens de checklist deste chamado.
+     */
+    public function checklists(): HasMany
+    {
+        return $this->hasMany(TicketChecklist::class)->orderBy('order');
+    }
+
+    /**
+     * Pesquisa de satisfação vinculada a este chamado.
+     */
+    public function npsSurvey(): HasMany
+    {
+        return $this->hasMany(NpsSurvey::class);
     }
 
     // Relacionamento com Tags (polimórfico)
