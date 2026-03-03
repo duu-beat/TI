@@ -66,7 +66,27 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
-        $ticket->load(['user', 'messages.user', 'messages.attachments', 'assignee']);
+        $ticket->load(['user', 'messages.user', 'messages.attachments', 'assignee', 'checklists.completedBy']);
+
+        // 📋 Lógica de Checklist Automático
+        if ($ticket->checklists->isEmpty()) {
+            $template = \App\Models\ChecklistTemplate::where('category', $ticket->category)
+                ->where('is_active', true)
+                ->with('items')
+                ->first();
+
+            if ($template) {
+                foreach ($template->items as $item) {
+                    $ticket->checklists()->create([
+                        'task' => $item->content,
+                        'order' => $item->order,
+                        'is_completed' => false,
+                    ]);
+                }
+                // Recarrega para exibir os novos itens
+                $ticket->load('checklists');
+            }
+        }
 
         $clientHistory = [
             'total_tickets' => Ticket::where('user_id', $ticket->user_id)->count(),
@@ -80,6 +100,25 @@ class TicketController extends Controller
         $admins = User::whereIn('role', ['admin', 'master'])->get();
 
         return view('admin.tickets.show', compact('ticket', 'clientHistory', 'cannedResponses', 'admins'));
+    }
+
+    /**
+     * ✅ MÉTODO NOVO: Alternar status de item do checklist
+     */
+    public function toggleChecklistItem(Ticket $ticket, \App\Models\TicketChecklist $item)
+    {
+        $item->update([
+            'is_completed' => !$item->is_completed,
+            'completed_at' => !$item->is_completed ? now() : null,
+            'completed_by' => !$item->is_completed ? auth()->id() : null,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'is_completed' => $item->is_completed,
+            'completed_by' => $item->is_completed ? auth()->user()->name : null,
+            'completed_at' => $item->is_completed ? $item->completed_at->format('d/m/Y H:i') : null,
+        ]);
     }
 
     public function updateStatus(Request $request, Ticket $ticket)

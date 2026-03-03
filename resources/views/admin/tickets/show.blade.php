@@ -140,6 +140,54 @@
                         </div>
                     </div>
 
+                    {{-- 📋 CHECKLIST DE ATENDIMENTO (NOVO) --}}
+                    @if($ticket->checklists->isNotEmpty())
+                        <div class="bg-slate-900 border border-indigo-500/30 rounded-2xl overflow-hidden shadow-xl mb-6" x-data="{ 
+                            toggleItem(id) {
+                                fetch(`{{ route('admin.tickets.checklist.toggle', [$ticket, ':id']) }}`.replace(':id', id), {
+                                    method: 'POST',
+                                    headers: { 'X-CSRF-TOKEN': '{{ csrf_token() }}', 'Content-Type': 'application/json' }
+                                })
+                                .then(res => res.json())
+                                .then(data => {
+                                    if(data.success) {
+                                        // Opcional: feedback visual ou recarregar parte da página
+                                    }
+                                });
+                            }
+                        }">
+                            <div class="px-6 py-4 bg-indigo-500/10 border-b border-indigo-500/20 flex items-center justify-between">
+                                <h3 class="text-sm font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                                    Checklist de Atendimento
+                                </h3>
+                                <span class="text-[10px] text-slate-500 font-mono">OBRIGATÓRIO</span>
+                            </div>
+                            <div class="p-6 space-y-4">
+                                @foreach($ticket->checklists as $item)
+                                    <label class="flex items-start gap-3 group cursor-pointer">
+                                        <div class="relative flex items-center mt-0.5">
+                                            <input type="checkbox" 
+                                                   @change="toggleItem({{ $item->id }})"
+                                                   {{ $item->is_completed ? 'checked' : '' }}
+                                                   class="h-5 w-5 rounded border-slate-700 bg-slate-800 text-indigo-600 focus:ring-indigo-500 focus:ring-offset-slate-900 transition cursor-pointer">
+                                        </div>
+                                        <div class="flex-1">
+                                            <span class="text-sm font-medium transition {{ $item->is_completed ? 'text-slate-500 line-through' : 'text-slate-200 group-hover:text-white' }}">
+                                                {{ $item->task }}
+                                            </span>
+                                            @if($item->is_completed && $item->completedBy)
+                                                <div class="text-[10px] text-slate-600 mt-0.5">
+                                                    Marcado por {{ $item->completedBy->name }} em {{ $item->completed_at->format('d/m H:i') }}
+                                                </div>
+                                            @endif
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- 2. TIMELINE --}}
                     <div class="relative space-y-8 py-6">
                         <div class="absolute left-8 top-0 bottom-0 w-px bg-slate-800 -z-10 hidden md:block"></div>
@@ -303,6 +351,38 @@
 
                 {{-- 👉 COLUNA DIREITA (Sidebar de Controle) --}}
                 <div class="lg:col-span-4 space-y-6">
+
+                    {{-- 📦 EQUIPAMENTOS DO USUÁRIO (NOVO) --}}
+                    <div class="bg-slate-800/80 backdrop-blur border border-white/10 rounded-2xl p-5 shadow-xl">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-white/5 pb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                            Equipamentos do Usuário
+                        </h3>
+                        <div class="space-y-3">
+                            @forelse($ticket->user->assets as $asset)
+                                <div class="p-3 rounded-xl bg-slate-900/50 border border-white/5 hover:border-indigo-500/30 transition group">
+                                    <div class="flex items-center justify-between mb-1">
+                                        <span class="text-[10px] font-bold text-indigo-400 uppercase">{{ $asset->type }}</span>
+                                        <span class="text-[10px] px-1.5 py-0.5 rounded bg-{{ $asset->getStatusColor() }}-500/10 text-{{ $asset->getStatusColor() }}-400 border border-{{ $asset->getStatusColor() }}-500/20">
+                                            {{ $asset->getStatusLabel() }}
+                                        </span>
+                                    </div>
+                                    <div class="text-sm font-bold text-white group-hover:text-indigo-300 transition">{{ $asset->name }}</div>
+                                    <div class="text-[11px] text-slate-500 mt-1 flex flex-col gap-0.5">
+                                        <span>Patrimônio: <span class="text-slate-300">{{ $asset->tag }}</span></span>
+                                        @if($asset->serial_number)
+                                            <span>S/N: <span class="text-slate-300">{{ $asset->serial_number }}</span></span>
+                                        @endif
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-4">
+                                    <div class="text-slate-600 text-xs italic">Nenhum equipamento vinculado.</div>
+                                    <a href="{{ route('admin.assets.create', ['user_id' => $ticket->user_id]) }}" class="text-indigo-400 text-[10px] font-bold hover:underline mt-2 inline-block uppercase tracking-wider">+ Vincular Agora</a>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
                     
                     {{-- 1. Painel de Status --}}
                     <div class="bg-slate-800/80 backdrop-blur border border-white/10 rounded-2xl p-5 shadow-xl sticky top-6">

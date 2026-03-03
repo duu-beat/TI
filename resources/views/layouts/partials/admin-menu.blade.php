@@ -47,6 +47,18 @@
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.visits.*') ? $activeClass : $inactiveClass }}">
         📅 Agenda de Visitas
     </a>
+
+    {{-- Inventário --}}
+    <a href="{{ route('admin.assets.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.assets.*') ? $activeClass : $inactiveClass }}">
+        📦 Inventário de TI
+    </a>
+
+    {{-- Checklists --}}
+    <a href="{{ route('admin.checklists.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.checklists.*') ? $activeClass : $inactiveClass }}">
+        📋 Modelos de Checklist
+    </a>
     
     {{-- Perfil --}}
     <a href="{{ route('admin.profile') }}"

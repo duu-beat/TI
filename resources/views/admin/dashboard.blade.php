@@ -146,21 +146,55 @@
             {{-- 2. 📊 HUD DE ESTATÍSTICAS (Grid Pro) --}}
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
                 
-                {{-- Card: Total --}}
+                {{-- Card: NPS Score (NOVO) --}}
                 <div class="relative overflow-hidden rounded-2xl bg-slate-900/60 border border-white/5 p-5 group hover:border-indigo-500/30 transition-all duration-300">
                     <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition"></div>
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Geral</div>
-                            <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $stats->total ?? 0 }}</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">NPS Score</div>
+                            <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $npsStats['score'] ?? 0 }}</div>
                         </div>
                         <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.175 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.382-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                        Média: {{ $npsStats['avg'] ?? 0 }} • {{ $npsStats['total'] ?? 0 }} respostas
+                    </div>
+                </div>
+
+                {{-- Card: Inventário (NOVO) --}}
+                <div class="relative overflow-hidden rounded-2xl bg-slate-900/60 border border-white/5 p-5 group hover:border-cyan-500/30 transition-all duration-300">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Equipamentos</div>
+                            <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $assetStats->total_assets ?? 0 }}</div>
+                        </div>
+                        <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
+                        </div>
+                    </div>
+                    <div class="text-[10px] text-slate-500 font-bold uppercase tracking-wider">
+                        {{ $assetStats->active_assets ?? 0 }} Ativos • {{ $assetStats->maintenance_assets ?? 0 }} Manutenção
+                    </div>
+                </div>
+                
+                {{-- Card: Total --}}
+                <div class="relative overflow-hidden rounded-2xl bg-slate-900/60 border border-white/5 p-5 group hover:border-slate-500/30 transition-all duration-300">
+                    <div class="absolute right-0 top-0 w-24 h-24 bg-slate-500/10 rounded-full blur-2xl group-hover:bg-slate-500/20 transition"></div>
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Chamados</div>
+                            <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $stats->total ?? 0 }}</div>
+                        </div>
+                        <div class="p-2 rounded-lg bg-slate-500/10 text-slate-400">
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                         </div>
                     </div>
                     {{-- Barra de Progresso Decorativa --}}
                     <div class="w-full bg-slate-800 rounded-full h-1.5 overflow-hidden">
-                        <div class="bg-indigo-500 h-1.5 rounded-full" style="width: 100%"></div>
+                        <div class="bg-slate-500 h-1.5 rounded-full" style="width: 100%"></div>
                     </div>
                 </div>
 

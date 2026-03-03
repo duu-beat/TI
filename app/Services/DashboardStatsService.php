@@ -76,6 +76,26 @@ class DashboardStatsService
             TicketStatus::RESOLVED->value
         ])->first();
 
+        // 📧 Métricas de NPS
+        $npsStats = \App\Models\NpsSurvey::selectRaw("
+            avg(score) as avg_score,
+            count(*) as total_responses,
+            sum(case when score >= 9 then 1 else 0 end) as promoters,
+            sum(case when score <= 6 then 1 else 0 end) as detractors
+        ")->first();
+
+        $npsScore = 0;
+        if ($npsStats->total_responses > 0) {
+            $npsScore = (($npsStats->promoters - $npsStats->detractors) / $npsStats->total_responses) * 100;
+        }
+
+        // 📦 Métricas de Inventário
+        $assetStats = \App\Models\Asset::selectRaw("
+            count(*) as total_assets,
+            sum(case when status = 'active' then 1 else 0 end) as active_assets,
+            sum(case when status = 'maintenance' then 1 else 0 end) as maintenance_assets
+        ")->first();
+
         // Contagem de chamados críticos (Alta Prioridade e ainda abertos)
         $highPriority = Ticket::where('priority', TicketPriority::HIGH)
             ->whereIn('status', TicketStatus::openStatuses())
@@ -98,6 +118,12 @@ class DashboardStatsService
             'chartLabels'   => $dates->values(),
             'chartValues'   => $chartValues->values(),
             'slaStats'      => $this->slaService->getSlaStats(),
+            'npsStats'      => [
+                'score' => round($npsScore, 1),
+                'avg' => round($npsStats->avg_score, 1),
+                'total' => $npsStats->total_responses
+            ],
+            'assetStats'    => $assetStats,
         ];
     }
 

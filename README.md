@@ -48,6 +48,9 @@ O **Suporte TI** é uma plataforma centralizada onde a eficiência encontra a si
 * **Relatórios Avançados** : Exportação de dados em PDF e Excel com filtros personalizados.
 * **Sistema de Tags** : Organização flexível de chamados por etiquetas coloridas.
 * **Respostas Prontas** : Agilidade no atendimento com templates pré-configurados.
+* **📋 Checklists de Atendimento** : Modelos dinâmicos por categoria para padronização técnica.
+* **📦 Gestão de Inventário** : Controle de ativos de TI vinculados diretamente aos usuários.
+* **📧 Métricas NPS** : Dashboard com Score NPS e média de satisfação dos clientes.
 
 ---
 
@@ -59,10 +62,13 @@ O sistema possui uma separação rígida de permissões e interfaces personaliza
 | :--- | :---: | :---: | :---: |
 | Abrir/Ver Chamados | ✅ | ✅ | ✅ |
 | FAQ e Autoatendimento | ✅ | ✅ | ✅ |
+| Pesquisa de Satisfação (NPS) | ✅ | ✅ | ✅ |
 | Alterar Status/Responsável | ❌ | ✅ | ✅ |
 | Gerenciar Tags e Relatórios | ❌ | ✅ | ✅ |
 | Notas Internas | ❌ | ✅ | ✅ |
 | Ranking de Agentes | ❌ | ✅ | ✅ |
+| Gestão de Checklists | ❌ | ✅ | ✅ |
+| Gestão de Inventário | ❌ | ✅ | ✅ |
 | Gestão de Usuários | ❌ | ❌ | ✅ |
 | Logs de Auditoria | ❌ | ❌ | ✅ |
 

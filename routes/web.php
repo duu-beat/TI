@@ -86,6 +86,12 @@ Route::middleware(['auth', 'verified'])->prefix('cliente')->name('client.')->gro
         Route::post('/responder', 'reply')->name('reply');
         Route::post('/avaliar', 'rate')->name('rate');
     });
+
+    // 📧 Rotas de Pesquisa de Satisfação (NPS)
+    Route::controller(\App\Http\Controllers\Client\NpsController::class)->prefix('chamados/{ticket}/nps')->name('tickets.nps.')->group(function () {
+        Route::get('/', 'show')->name('show');
+        Route::post('/', 'store')->name('store');
+    });
 });
 
 /*
@@ -136,6 +142,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
                     Route::post('/escalar', 'escalate')->name('escalate');
                     Route::patch('/atribuir', 'assign')->name('assign');
                     Route::post('/fundir', 'merge')->name('merge');
+                    Route::post('/checklist/{item}/toggle', 'toggleChecklistItem')->name('checklist.toggle');
                 });
             });
     });
@@ -195,4 +202,10 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
         Route::post('/agendar', 'store')->name('store');
         Route::patch('/{visit}/status', 'updateStatus')->name('update-status');
     });
+
+    // 📦 Rotas de Inventário (Assets)
+    Route::resource('assets', \App\Http\Controllers\Admin\AssetController::class);
+
+    // 📋 Rotas de Checklist
+    Route::resource('checklists', \App\Http\Controllers\Admin\ChecklistController::class);
 });

@@ -66,6 +66,31 @@
                 {{-- 👈 COLUNA ESQUERDA (Chat e Detalhes) --}}
                 <div class="lg:col-span-8 space-y-6">
 
+                    {{-- 📧 BANNER DE PESQUISA DE SATISFAÇÃO (NPS) --}}
+                    @if($ticket->status === \App\Enums\TicketStatus::CLOSED && !$ticket->npsSurvey()->exists())
+                        <div class="relative overflow-hidden rounded-2xl bg-gradient-to-r from-indigo-600 to-violet-600 shadow-2xl p-6 mb-8 animate-fade-in-up">
+                            <div class="absolute top-0 right-0 -mt-8 -mr-8 w-48 h-48 bg-white/10 rounded-full blur-3xl pointer-events-none"></div>
+                            <div class="flex flex-col md:flex-row items-center gap-6 relative z-10 text-center md:text-left">
+                                <div class="h-16 w-16 rounded-2xl bg-white/20 flex items-center justify-center text-3xl shadow-inner border border-white/30">
+                                    ⭐
+                                </div>
+                                <div class="flex-1">
+                                    <h3 class="text-xl font-bold text-white">Sua opinião é muito importante!</h3>
+                                    <p class="text-indigo-100 text-sm mt-1">
+                                        Este chamado foi concluído. Poderia dedicar 30 segundos para nos contar como foi sua experiência?
+                                    </p>
+                                </div>
+                                <div class="shrink-0">
+                                    <a href="{{ route('client.tickets.nps.show', $ticket) }}" 
+                                       class="inline-flex items-center px-6 py-3 bg-white text-indigo-600 rounded-xl font-bold shadow-lg hover:bg-indigo-50 transition transform hover:scale-105 active:scale-95">
+                                        Avaliar Atendimento
+                                        <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+
                     {{-- VISITA TÉCNICA AGENDADA --}}
                     @php $activeVisit = $ticket->technicalVisits()->whereIn('status', ['scheduled', 'in_transit', 'in_service'])->first(); @endphp
                     @if($activeVisit)
