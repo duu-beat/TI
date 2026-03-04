@@ -1,124 +1,137 @@
 <x-app-layout>
     <x-slot name="header">
-        <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Editar Equipamento') }}: {{ $asset->name }}
-            </h2>
-            <a href="{{ route('admin.assets.index') }}" class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">
-                Voltar
+        <div class="flex items-center gap-4">
+            <a href="{{ route('admin.assets.index') }}" 
+               class="group flex h-10 w-10 items-center justify-center rounded-xl bg-slate-800 border border-white/10 text-slate-400 transition hover:bg-indigo-600 hover:text-white hover:border-indigo-500 hover:shadow-lg hover:shadow-indigo-500/30">
+                <svg class="w-5 h-5 transition-transform group-hover:-translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             </a>
+            <div>
+                <h2 class="font-bold text-xl text-white leading-tight">
+                    📦 Editar: {{ $asset->name }}
+                </h2>
+                <p class="text-xs text-slate-500 uppercase tracking-widest mt-0.5">Atualizar informações do ativo #{{ $asset->tag }}</p>
+            </div>
         </div>
     </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg p-6">
-                <form action="{{ route('admin.assets.update', $asset) }}" method="POST">
+    <div class="py-8">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-white/10 shadow-2xl">
+                {{-- Background Decorativo --}}
+                <div class="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+                
+                <form action="{{ route('admin.assets.update', $asset) }}" method="POST" class="relative z-10 p-8 sm:p-10 space-y-8">
                     @csrf
                     @method('PUT')
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Nome -->
-                        <div>
-                            <x-label for="name" value="Nome do Equipamento" />
-                            <x-input id="name" name="name" type="text" class="mt-1 block w-full" value="{{ old('name', $asset->name) }}" required />
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {{-- Nome --}}
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nome do Equipamento</label>
+                            <input type="text" name="name" value="{{ old('name', $asset->name) }}" required 
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
                             <x-input-error for="name" class="mt-2" />
                         </div>
 
-                        <!-- Patrimônio / Tag -->
+                        {{-- Patrimônio --}}
                         <div>
-                            <x-label for="tag" value="Nº de Patrimônio (Tag)" />
-                            <x-input id="tag" name="tag" type="text" class="mt-1 block w-full" value="{{ old('tag', $asset->tag) }}" required />
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nº Patrimônio (Tag)</label>
+                            <input type="text" name="tag" value="{{ old('tag', $asset->tag) }}" required 
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
                             <x-input-error for="tag" class="mt-2" />
                         </div>
 
-                        <!-- Tipo -->
+                        {{-- Tipo --}}
                         <div>
-                            <x-label for="type" value="Tipo de Equipamento" />
-                            <select id="type" name="type" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
-                                <option value="notebook" {{ old('type', $asset->type) == 'notebook' ? 'selected' : '' }}>Notebook</option>
-                                <option value="desktop" {{ old('type', $asset->type) == 'desktop' ? 'selected' : '' }}>Desktop</option>
-                                <option value="monitor" {{ old('type', $asset->type) == 'monitor' ? 'selected' : '' }}>Monitor</option>
-                                <option value="printer" {{ old('type', $asset->type) == 'printer' ? 'selected' : '' }}>Impressora</option>
-                                <option value="smartphone" {{ old('type', $asset->type) == 'smartphone' ? 'selected' : '' }}>Smartphone</option>
-                                <option value="other" {{ old('type', $asset->type) == 'other' ? 'selected' : '' }}>Outro</option>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Tipo de Ativo</label>
+                            <select name="type" required 
+                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                <option value="Laptop" class="bg-slate-900" {{ old('type', $asset->type) == 'Laptop' ? 'selected' : '' }}>Laptop</option>
+                                <option value="Desktop" class="bg-slate-900" {{ old('type', $asset->type) == 'Desktop' ? 'selected' : '' }}>Desktop</option>
+                                <option value="Monitor" class="bg-slate-900" {{ old('type', $asset->type) == 'Monitor' ? 'selected' : '' }}>Monitor</option>
+                                <option value="Impressora" class="bg-slate-900" {{ old('type', $asset->type) == 'Impressora' ? 'selected' : '' }}>Impressora</option>
+                                <option value="Celular" class="bg-slate-900" {{ old('type', $asset->type) == 'Celular' ? 'selected' : '' }}>Celular</option>
+                                <option value="Outros" class="bg-slate-900" {{ old('type', $asset->type) == 'Outros' ? 'selected' : '' }}>Outros</option>
                             </select>
-                            <x-input-error for="type" class="mt-2" />
                         </div>
 
-                        <!-- Usuário Responsável -->
+                        {{-- Marca --}}
                         <div>
-                            <x-label for="user_id" value="Usuário Responsável" />
-                            <select id="user_id" name="user_id" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
-                                <option value="">Sem vínculo (Estoque)</option>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Marca</label>
+                            <input type="text" name="brand" value="{{ old('brand', $asset->brand) }}"
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                        </div>
+
+                        {{-- Modelo --}}
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Modelo</label>
+                            <input type="text" name="model" value="{{ old('model', $asset->model) }}"
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                        </div>
+
+                        {{-- Serial --}}
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Número de Série</label>
+                            <input type="text" name="serial_number" value="{{ old('serial_number', $asset->serial_number) }}"
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                        </div>
+
+                        {{-- Usuário Responsável --}}
+                        <div>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Usuário Responsável</label>
+                            <select name="user_id" 
+                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                <option value="" class="bg-slate-900">-- Sem Vínculo (Em Estoque) --</option>
                                 @foreach($users as $user)
-                                    <option value="{{ $user->id }}" {{ old('user_id', $asset->user_id) == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }}
+                                    <option value="{{ $user->id }}" class="bg-slate-900" {{ old('user_id', $asset->user_id) == $user->id ? 'selected' : '' }}>
+                                        {{ $user->name }} ({{ $user->email }})
                                     </option>
                                 @endforeach
                             </select>
-                            <x-input-error for="user_id" class="mt-2" />
                         </div>
 
-                        <!-- Marca -->
+                        {{-- Status --}}
                         <div>
-                            <x-label for="brand" value="Marca" />
-                            <x-input id="brand" name="brand" type="text" class="mt-1 block w-full" value="{{ old('brand', $asset->brand) }}" />
-                            <x-input-error for="brand" class="mt-2" />
-                        </div>
-
-                        <!-- Modelo -->
-                        <div>
-                            <x-label for="model" value="Modelo" />
-                            <x-input id="model" name="model" type="text" class="mt-1 block w-full" value="{{ old('model', $asset->model) }}" />
-                            <x-input-error for="model" class="mt-2" />
-                        </div>
-
-                        <!-- Número de Série -->
-                        <div>
-                            <x-label for="serial_number" value="Número de Série" />
-                            <x-input id="serial_number" name="serial_number" type="text" class="mt-1 block w-full" value="{{ old('serial_number', $asset->serial_number) }}" />
-                            <x-input-error for="serial_number" class="mt-2" />
-                        </div>
-
-                        <!-- Status -->
-                        <div>
-                            <x-label for="status" value="Status" />
-                            <select id="status" name="status" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">
-                                <option value="active" {{ old('status', $asset->status) == 'active' ? 'selected' : '' }}>Ativo</option>
-                                <option value="maintenance" {{ old('status', $asset->status) == 'maintenance' ? 'selected' : '' }}>Em Manutenção</option>
-                                <option value="retired" {{ old('status', $asset->status) == 'retired' ? 'selected' : '' }}>Aposentado</option>
-                                <option value="lost" {{ old('status', $asset->status) == 'lost' ? 'selected' : '' }}>Extraviado</option>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Status Atual</label>
+                            <select name="status" required 
+                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                <option value="active" class="bg-slate-900" {{ old('status', $asset->status) == 'active' ? 'selected' : '' }}>Ativo</option>
+                                <option value="maintenance" class="bg-slate-900" {{ old('status', $asset->status) == 'maintenance' ? 'selected' : '' }}>Em Manutenção</option>
+                                <option value="retired" class="bg-slate-900" {{ old('status', $asset->status) == 'retired' ? 'selected' : '' }}>Aposentado</option>
+                                <option value="lost" class="bg-slate-900" {{ old('status', $asset->status) == 'lost' ? 'selected' : '' }}>Extraviado</option>
                             </select>
-                            <x-input-error for="status" class="mt-2" />
                         </div>
 
-                        <!-- Data de Compra -->
+                        {{-- Datas --}}
                         <div>
-                            <x-label for="purchase_date" value="Data de Compra" />
-                            <x-input id="purchase_date" name="purchase_date" type="date" class="mt-1 block w-full" value="{{ old('purchase_date', $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : '') }}" />
-                            <x-input-error for="purchase_date" class="mt-2" />
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Data de Compra</label>
+                            <input type="date" name="purchase_date" value="{{ old('purchase_date', $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : '') }}"
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
                         </div>
 
-                        <!-- Expiração da Garantia -->
                         <div>
-                            <x-label for="warranty_expiration" value="Expiração da Garantia" />
-                            <x-input id="warranty_expiration" name="warranty_expiration" type="date" class="mt-1 block w-full" value="{{ old('warranty_expiration', $asset->warranty_expiration ? $asset->warranty_expiration->format('Y-m-d') : '') }}" />
-                            <x-input-error for="warranty_expiration" class="mt-2" />
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Expiração da Garantia</label>
+                            <input type="date" name="warranty_expiration" value="{{ old('warranty_expiration', $asset->warranty_expiration ? $asset->warranty_expiration->format('Y-m-d') : '') }}"
+                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                        </div>
+
+                        {{-- Notas --}}
+                        <div class="md:col-span-2">
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Observações Técnicas</label>
+                            <textarea name="notes" rows="4" 
+                                      class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">{{ old('notes', $asset->notes) }}</textarea>
                         </div>
                     </div>
 
-                    <!-- Notas -->
-                    <div class="mt-6">
-                        <x-label for="notes" value="Observações" />
-                        <textarea id="notes" name="notes" rows="4" class="border-gray-300 focus:border-indigo-500 focus:ring-indigo-500 rounded-md shadow-sm mt-1 block w-full">{{ old('notes', $asset->notes) }}</textarea>
-                        <x-input-error for="notes" class="mt-2" />
-                    </div>
-
-                    <div class="flex items-center justify-end mt-6">
-                        <x-button class="ml-4">
-                            {{ __('Atualizar Equipamento') }}
-                        </x-button>
+                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
+                        <a href="{{ route('admin.assets.index') }}" 
+                           class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-2xl transition text-center">
+                            Cancelar
+                        </a>
+                        <button type="submit" 
+                                class="px-10 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-2xl transition shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 active:translate-y-0">
+                            Atualizar Equipamento
+                        </button>
                     </div>
                 </form>
             </div>
