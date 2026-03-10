@@ -8,23 +8,17 @@ use App\Models\NpsSurvey;
 use Illuminate\Http\Request;
 use App\Enums\TicketStatus;
 
-/**
- * Gerencia as pesquisas de satisfação (NPS) dos clientes
- */
 class NpsController extends Controller
 {
-    /**
-     * Exibe o formulário de pesquisa de satisfação para um chamado fechado
-     */
     public function show(Ticket $ticket)
     {
-        // Verifica se o chamado pertence ao usuário e está fechado
-        if ($ticket->user_id !== auth()->id() || $ticket->status !== TicketStatus::CLOSED) {
-            abort(403, 'Acesso negado ou chamado não está fechado.');
+        // Permite que o cliente avalie se o chamado estiver Fechado OU Resolvido
+        if ($ticket->user_id != auth()->id() || !in_array($ticket->status, [TicketStatus::CLOSED, TicketStatus::RESOLVED])) {
+            abort(403, 'Acesso negado ou o chamado ainda não foi finalizado.');
         }
 
-        // Verifica se já respondeu
-        if ($ticket->npsSurvey) {
+        // Verifica se já respondeu usando exists() para não carregar a relation toda à toa
+        if ($ticket->npsSurvey()->exists()) {
             return redirect()->route('client.tickets.show', $ticket)
                 ->with('info', 'Você já respondeu a esta pesquisa de satisfação. Obrigado!');
         }
@@ -32,9 +26,6 @@ class NpsController extends Controller
         return view('client.tickets.nps', compact('ticket'));
     }
 
-    /**
-     * Salva a resposta da pesquisa de satisfação
-     */
     public function store(Request $request, Ticket $ticket)
     {
         $validated = $request->validate([
@@ -42,23 +33,24 @@ class NpsController extends Controller
             'comment' => 'nullable|string|max:1000',
         ]);
 
-        // Verifica se o chamado pertence ao usuário e está fechado
-        if ($ticket->user_id !== auth()->id() || $ticket->status !== TicketStatus::CLOSED) {
+        if ($ticket->user_id != auth()->id() || !in_array($ticket->status, [TicketStatus::CLOSED, TicketStatus::RESOLVED])) {
             abort(403);
         }
 
-        // Verifica se já respondeu
-        if ($ticket->npsSurvey) {
-            return redirect()->route('client.tickets.show', $ticket);
-        }
+        if (!$ticket->npsSurvey()->exists()) {
+            NpsSurvey::create([
+                'ticket_id' => $ticket->id,
+                'user_id' => auth()->id(),
+                'score' => $validated['score'],
+                'comment' => $validated['comment'],
+                'responded_at' => now(),
+            ]);
 
-        NpsSurvey::create([
-            'ticket_id' => $ticket->id,
-            'user_id' => auth()->id(),
-            'score' => $validated['score'],
-            'comment' => $validated['comment'],
-            'responded_at' => now(),
-        ]);
+            // Se o chamado estava apenas resolvido, a avaliação o encerra definitivamente
+            if ($ticket->status === TicketStatus::RESOLVED) {
+                $ticket->update(['status' => TicketStatus::CLOSED]);
+            }
+        }
 
         return redirect()->route('client.tickets.show', $ticket)
             ->with('success', 'Obrigado pelo seu feedback! Sua avaliação nos ajuda a melhorar.');

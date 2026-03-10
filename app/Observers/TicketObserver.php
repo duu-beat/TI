@@ -8,6 +8,30 @@ use Illuminate\Support\Facades\Cache;
 class TicketObserver
 {
     /**
+     * Manipula o evento "created" (executado apenas ao criar um novo chamado).
+     */
+    public function created(Ticket $ticket): void
+    {
+        // Lógica de Checklist Automático movida do TicketController
+        $template = \App\Models\ChecklistTemplate::where('category', $ticket->category)
+            ->where('is_active', true)
+            ->with('items')
+            ->first();
+
+        if ($template) {
+            $checklists = $template->items->map(function ($item) {
+                return [
+                    'task' => $item->content,
+                    'order' => $item->order,
+                    'is_completed' => false,
+                ];
+            });
+            
+            $ticket->checklists()->createMany($checklists->toArray());
+        }
+    }
+
+    /**
      * Manipula o evento "saved" (executado ao criar ou atualizar).
      */
     public function saved(Ticket $ticket): void

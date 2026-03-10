@@ -7,7 +7,7 @@
             </a>
             <div>
                 <h2 class="font-bold text-xl text-white leading-tight">
-                    ⭐ Pesquisa de Satisfação
+                     Pesquisa de Satisfação
                 </h2>
                 <p class="text-xs text-slate-500 uppercase tracking-widest mt-0.5">Chamado #{{ $ticket->id }}</p>
             </div>

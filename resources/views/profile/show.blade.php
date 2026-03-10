@@ -6,19 +6,25 @@
         $isMaster = method_exists($user, 'isMaster') ? $user->isMaster() : ($user->role === 'master');
         $isAdmin  = method_exists($user, 'isAdmin') ? $user->isAdmin() : ($user->role === 'admin');
         
-        // Define Cor e Rótulo
+        // Define Classes Completas para o Tailwind não remover em produção (Purge)
         if ($isMaster) {
-            $accent = 'red';
-            $roleLabel = 'Segurança (Master)';
+            $roleLabel  = 'Segurança (Master)';
             $badgeClass = 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(220,38,38,0.2)]';
+            $glowClass  = 'from-red-500/10 group-hover:from-red-500/20';
+            $ringClass  = 'ring-red-500/30';
+            $stripeClass = 'via-red-500';
         } elseif ($isAdmin) {
-            $accent = 'cyan';
-            $roleLabel = 'Administrador';
-            $badgeClass = 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400';
+            $roleLabel  = 'Administrador';
+            $badgeClass = 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]';
+            $glowClass  = 'from-cyan-500/10 group-hover:from-cyan-500/20';
+            $ringClass  = 'ring-cyan-500/30';
+            $stripeClass = 'via-cyan-500';
         } else {
-            $accent = 'indigo';
-            $roleLabel = 'Cliente';
+            $roleLabel  = 'Cliente';
             $badgeClass = 'bg-slate-800 border-white/10 text-slate-300';
+            $glowClass  = 'from-indigo-500/10 group-hover:from-indigo-500/20';
+            $ringClass  = 'ring-indigo-500/30';
+            $stripeClass = 'via-indigo-500';
         }
     @endphp
 
@@ -55,16 +61,16 @@
                 {{-- HEADER BANNER DINÂMICO --}}
                 <div class="relative bg-slate-900/80 border border-white/10 rounded-[2rem] p-6 mb-8 flex flex-col md:flex-row items-center gap-6 overflow-hidden shadow-2xl group">
                     {{-- Glow de fundo baseado no cargo --}}
-                    <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-l from-{{ $accent }}-500/10 to-transparent pointer-events-none group-hover:from-{{ $accent }}-500/20 transition duration-700"></div>
+                    <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-l {{ $glowClass }} pointer-events-none transition duration-700"></div>
 
-                    <img class="relative h-24 w-24 rounded-full object-cover border-4 border-slate-950 shadow-lg ring-2 ring-{{ $accent }}-500/30" 
+                    <img class="relative h-24 w-24 rounded-full object-cover border-4 border-slate-950 shadow-lg ring-2 {{ $ringClass }}" 
                          src="{{ $user->profile_photo_url }}" 
                          alt="{{ $user->name }}">
 
                     <div class="relative text-center md:text-left z-10 flex-1">
                         <h1 class="text-3xl font-black text-white tracking-tight flex items-center justify-center md:justify-start gap-3">
                             {{ $user->name }}
-                            @if($isMaster) <span title="Acesso Root">🛡️</span> @endif
+                            @if($isMaster) <span title="Acesso Root" class="text-2xl drop-shadow-md">🛡️</span> @endif
                         </h1>
                         
                         <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2">
@@ -118,15 +124,15 @@
                                 {{-- Admin/Master protegidos --}}
                                 <div class="flex flex-col justify-center items-center bg-slate-900/50 border border-white/10 rounded-[2rem] p-8 text-center opacity-75 hover:opacity-100 transition relative overflow-hidden">
                                     {{-- Listra de Atenção --}}
-                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-{{ $accent }}-500 to-transparent opacity-50"></div>
+                                    <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent {{ $stripeClass }} to-transparent opacity-50"></div>
                                     
                                     <div class="text-4xl mb-4 grayscale opacity-50">🛡️</div>
                                     <h3 class="text-white font-bold text-lg mb-2">Conta Protegida</h3>
                                     <p class="text-sm text-slate-400 max-w-md mx-auto">
-                                        Esta conta possui privilégios de <strong>{{ $roleLabel }}</strong> e não pode ser excluída por este painel para garantir a integridade do sistema.
+                                        Esta conta possui privilégios de <strong class="text-white">{{ $roleLabel }}</strong> e não pode ser excluída por este painel para garantir a integridade do sistema.
                                     </p>
                                     @if($isMaster)
-                                        <p class="text-xs text-red-400/60 mt-4 font-mono">ROOT ACCESS LOCK: ENABLED</p>
+                                        <p class="text-xs text-red-400/60 mt-4 font-mono uppercase tracking-widest border border-red-500/20 bg-red-500/10 px-3 py-1 rounded-md">Root Access Lock: Enabled</p>
                                     @endif
                                 </div>
                             @endif

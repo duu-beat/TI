@@ -66,27 +66,8 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
+        // Carrega os relacionamentos necessários
         $ticket->load(['user', 'messages.user', 'messages.attachments', 'assignee', 'checklists.completedBy']);
-
-        // 📋 Lógica de Checklist Automático
-        if ($ticket->checklists->isEmpty()) {
-            $template = \App\Models\ChecklistTemplate::where('category', $ticket->category)
-                ->where('is_active', true)
-                ->with('items')
-                ->first();
-
-            if ($template) {
-                foreach ($template->items as $item) {
-                    $ticket->checklists()->create([
-                        'task' => $item->content,
-                        'order' => $item->order,
-                        'is_completed' => false,
-                    ]);
-                }
-                // Recarrega para exibir os novos itens
-                $ticket->load('checklists');
-            }
-        }
 
         $clientHistory = [
             'total_tickets' => Ticket::where('user_id', $ticket->user_id)->count(),
