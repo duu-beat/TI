@@ -13,9 +13,23 @@ use Illuminate\Support\Facades\DB;
  */
 class ChecklistController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $templates = ChecklistTemplate::withCount('items')->get();
+        $query = ChecklistTemplate::withCount('items');
+
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('category', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('category')) {
+            $query->where('category', $request->category);
+        }
+
+        $templates = $query->latest()->get();
         return view('admin.checklists.index', compact('templates'));
     }
 

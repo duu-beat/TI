@@ -78,15 +78,20 @@
 
         {{-- SKELETON LOADER --}}
         <div x-show="!loaded" class="space-y-4 animate-pulse">
-            @foreach(range(1, 4) as $i)
-                <div class="rounded-2xl border border-white/5 bg-slate-900/50 p-6 h-36 flex flex-col justify-between">
-                    <div class="flex justify-between">
-                        <div class="h-6 bg-slate-800 rounded w-1/3"></div>
-                        <div class="h-6 bg-slate-800 rounded w-20"></div>
+            @foreach(range(1, 5) as $i)
+                <div class="rounded-2xl border border-white/5 bg-slate-900/40 p-6 flex items-center gap-6">
+                    <div class="h-12 w-12 rounded-xl bg-white/5 shrink-0"></div>
+                    <div class="flex-1 space-y-3">
+                        <div class="flex items-center gap-2">
+                            <div class="h-4 w-12 bg-white/5 rounded"></div>
+                            <div class="h-4 w-20 bg-white/5 rounded"></div>
+                        </div>
+                        <div class="h-6 w-1/2 bg-white/5 rounded"></div>
+                        <div class="h-4 w-3/4 bg-white/5 rounded opacity-50"></div>
                     </div>
-                    <div class="space-y-2">
-                        <div class="h-4 bg-slate-800 rounded w-full"></div>
-                        <div class="h-4 bg-slate-800 rounded w-2/3"></div>
+                    <div class="flex flex-col items-end gap-2 shrink-0">
+                        <div class="h-6 w-24 bg-white/5 rounded-full"></div>
+                        <div class="h-4 w-16 bg-white/5 rounded"></div>
                     </div>
                 </div>
             @endforeach

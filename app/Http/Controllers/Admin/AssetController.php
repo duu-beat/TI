@@ -5,13 +5,56 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Asset;
 use App\Models\User;
+use App\Models\AssetHistory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 /**
  * Gerencia o inventário de equipamentos (Assets)
  */
 class AssetController extends Controller
 {
+    public function export(Request $request)
+    {
+        $assets = Asset::with('user')->latest()->get();
+        
+        $filename = "inventario_ti_" . date('Y-m-d_H-i') . ".csv";
+        $handle = fopen('php://output', 'w');
+        
+        // Header
+        fputcsv($handle, [
+            'ID', 'Tag/Patrimonio', 'Nome', 'Tipo', 'Marca', 'Modelo', 
+            'Serial', 'Status', 'Responsavel', 'Data Compra', 'Garantia'
+        ]);
+
+        foreach ($assets as $asset) {
+            fputcsv($handle, [
+                $asset->id,
+                $asset->tag,
+                $asset->name,
+                $asset->type,
+                $asset->brand,
+                $asset->model,
+                $asset->serial_number,
+                $asset->getStatusLabel(),
+                $asset->user->name ?? 'Em Estoque',
+                $asset->purchase_date ? $asset->purchase_date->format('d/m/Y') : '-',
+                $asset->warranty_expiration ? $asset->warranty_expiration->format('d/m/Y') : '-',
+            ]);
+        }
+
+        return response()->stream(
+            function () use ($handle) {
+                fclose($handle);
+            },
+            200,
+            [
+                'Content-Type' => 'text/csv',
+                'Content-Disposition' => "attachment; filename=\"{$filename}\"",
+            ]
+        );
+    }
+
     public function index(Request $request)
     {
         $query = Asset::with('user');
@@ -61,7 +104,17 @@ class AssetController extends Controller
             'notes' => 'nullable|string',
         ]);
 
-        Asset::create($validated);
+        $asset = Asset::create($validated);
+
+        // Registrar criação no histórico
+        AssetHistory::create([
+            'asset_id' => $asset->id,
+            'user_id' => Auth::id(),
+            'action' => 'create',
+            'description' => 'Equipamento cadastrado no sistema.',
+            'new_status' => $asset->status,
+            'new_user_id' => $asset->user_id,
+        ]);
 
         return redirect()->route('admin.assets.index')
             ->with('success', 'Equipamento cadastrado com sucesso!');
@@ -89,7 +142,32 @@ class AssetController extends Controller
             'notes' => 'nullable|string',
         ]);
 
+        $oldStatus = $asset->status;
+        $oldUserId = $asset->user_id;
+
         $asset->update($validated);
+
+        // Verificar se houve mudança de status ou dono para registrar no histórico
+        if ($oldStatus !== $asset->status || $oldUserId !== $asset->user_id) {
+            $description = [];
+            if ($oldStatus !== $asset->status) $description[] = "Status alterado de {$oldStatus} para {$asset->status}";
+            if ($oldUserId !== $asset->user_id) {
+                $oldUserName = $oldUserId ? User::find($oldUserId)?->name : 'Ninguém';
+                $newUserName = $asset->user_id ? User::find($asset->user_id)?->name : 'Ninguém';
+                $description[] = "Responsável alterado de {$oldUserName} para {$newUserName}";
+            }
+
+            AssetHistory::create([
+                'asset_id' => $asset->id,
+                'user_id' => Auth::id(),
+                'action' => 'update',
+                'description' => implode('. ', $description),
+                'old_status' => $oldStatus,
+                'new_status' => $asset->status,
+                'old_user_id' => $oldUserId,
+                'new_user_id' => $asset->user_id,
+            ]);
+        }
 
         return redirect()->route('admin.assets.index')
             ->with('success', 'Equipamento atualizado com sucesso!');

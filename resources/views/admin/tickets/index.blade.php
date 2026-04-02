@@ -19,13 +19,30 @@
         </div>
     </x-slot>
 
-    <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 300)" class="py-8">
+    <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)" class="py-8">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             {{-- SKELETON LOADER --}}
-            <div x-show="!loaded" class="space-y-4 animate-pulse">
-                <div class="h-16 bg-white/5 rounded-2xl w-full border border-white/5"></div>
-                <div class="h-96 bg-white/5 rounded-2xl w-full border border-white/5"></div>
+            <div x-show="!loaded" class="space-y-6 animate-pulse">
+                {{-- Filtros Skeleton --}}
+                <div class="h-16 bg-slate-900/50 rounded-2xl w-full border border-white/5"></div>
+                
+                {{-- Tabela Skeleton --}}
+                <div class="rounded-2xl border border-white/5 bg-slate-900/40 overflow-hidden">
+                    <div class="h-12 bg-white/5 border-b border-white/5"></div>
+                    @foreach(range(1, 8) as $i)
+                        <div class="flex items-center gap-4 px-6 py-4 border-b border-white/5">
+                            <div class="h-4 w-12 bg-white/5 rounded"></div>
+                            <div class="h-10 w-10 rounded-full bg-white/5"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="h-4 w-1/3 bg-white/5 rounded"></div>
+                                <div class="h-3 w-1/4 bg-white/5 rounded opacity-50"></div>
+                            </div>
+                            <div class="h-6 w-20 bg-white/5 rounded-full"></div>
+                            <div class="h-8 w-24 bg-white/5 rounded-lg"></div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             {{-- CONTEÚDO REAL --}}

@@ -204,6 +204,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     });
 
     // 📦 Rotas de Inventário (Assets)
+    Route::get('assets/export', [\App\Http\Controllers\Admin\AssetController::class, 'export'])->name('assets.export');
     Route::resource('assets', \App\Http\Controllers\Admin\AssetController::class);
 
     // 📋 Rotas de Checklist

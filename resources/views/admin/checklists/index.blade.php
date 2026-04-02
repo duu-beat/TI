@@ -22,8 +22,9 @@
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             {{-- SKELETON LOADER --}}
-            <div x-show="!loaded" class="space-y-4 animate-pulse">
-                <div class="h-96 bg-white/5 rounded-2xl w-full border border-white/5"></div>
+            <div x-show="!loaded" class="space-y-6 animate-pulse">
+                <div class="h-16 bg-slate-900/50 rounded-2xl w-full border border-white/5"></div>
+                <div class="h-96 bg-slate-900/50 rounded-2xl w-full border border-white/5"></div>
             </div>
 
             {{-- CONTEÚDO REAL --}}
@@ -32,6 +33,38 @@
                  x-transition:enter="transition ease-out duration-500"
                  x-transition:enter-start="opacity-0 translate-y-4"
                  x-transition:enter-end="opacity-100 translate-y-0">
+
+                {{-- FILTROS --}}
+                <div class="sticky top-0 z-20 rounded-2xl bg-slate-900/90 backdrop-blur-xl border border-white/10 shadow-2xl p-2">
+                    <form method="GET" action="{{ route('admin.checklists.index') }}" class="flex flex-col md:flex-row gap-2">
+                        <div class="relative flex-1 group">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500 group-focus-within:text-indigo-400 transition">
+                                <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+                            </div>
+                            <input type="text" name="search" value="{{ request('search') }}" 
+                                   placeholder="Buscar por Título ou Categoria..." 
+                                   class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950/50 border border-white/5 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition placeholder-slate-600 text-sm">
+                        </div>
+                        
+                        <div class="relative w-full md:w-48 group">
+                            <select name="category" onchange="this.form.submit()" 
+                                    class="w-full px-4 py-2.5 rounded-xl bg-slate-950/50 border border-white/5 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition cursor-pointer appearance-none text-sm">
+                                <option value="" class="bg-slate-900">Todas Categorias</option>
+                                <option value="hardware" class="bg-slate-900" {{ request('category') == 'hardware' ? 'selected' : '' }}>Hardware</option>
+                                <option value="software" class="bg-slate-900" {{ request('category') == 'software' ? 'selected' : '' }}>Software</option>
+                                <option value="network" class="bg-slate-900" {{ request('category') == 'network' ? 'selected' : '' }}>Rede</option>
+                                <option value="access" class="bg-slate-900" {{ request('category') == 'access' ? 'selected' : '' }}>Acesso</option>
+                                <option value="printer" class="bg-slate-900" {{ request('category') == 'printer' ? 'selected' : '' }}>Impressora</option>
+                            </select>
+                        </div>
+
+                        @if(request()->hasAny(['search', 'category']))
+                            <a href="{{ route('admin.checklists.index') }}" class="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition flex items-center justify-center">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </a>
+                        @endif
+                    </form>
+                </div>
 
                 <div class="rounded-2xl border border-white/10 bg-slate-900/60 overflow-hidden shadow-xl backdrop-blur-sm">
                     <div class="overflow-x-auto">

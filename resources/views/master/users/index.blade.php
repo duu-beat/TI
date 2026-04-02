@@ -13,10 +13,24 @@
             {{-- 💀 SKELETON --}}
             <div x-show="!loaded" class="space-y-6 animate-pulse">
                 <div class="flex justify-between gap-4">
-                    <div class="h-10 w-full max-w-md bg-white/5 rounded-xl"></div>
-                    <div class="h-10 w-40 bg-white/5 rounded-xl"></div>
+                    <div class="h-10 w-full max-w-md bg-slate-800/50 rounded-xl border border-white/5"></div>
+                    <div class="h-10 w-40 bg-slate-800/50 rounded-xl border border-white/5"></div>
                 </div>
-                <div class="h-96 bg-white/5 rounded-2xl border border-white/5"></div>
+                <div class="bg-slate-800/40 rounded-2xl border border-white/5 overflow-hidden">
+                    <div class="h-12 bg-white/5 border-b border-white/5"></div>
+                    @foreach(range(1, 10) as $i)
+                        <div class="flex items-center gap-4 px-6 py-4 border-b border-white/5">
+                            <div class="h-8 w-8 rounded-full bg-white/5"></div>
+                            <div class="flex-1 space-y-2">
+                                <div class="h-4 w-1/4 bg-white/5 rounded"></div>
+                                <div class="h-3 w-1/3 bg-white/5 rounded opacity-50"></div>
+                            </div>
+                            <div class="h-6 w-20 bg-white/5 rounded"></div>
+                            <div class="h-4 w-32 bg-white/5 rounded"></div>
+                            <div class="h-4 w-12 bg-white/5 rounded ml-auto"></div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
 
             {{-- ✅ CONTEÚDO REAL --}}

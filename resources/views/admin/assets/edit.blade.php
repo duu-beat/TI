@@ -14,126 +14,206 @@
         </div>
     </x-slot>
 
-    <div class="py-8">
+    <div x-data="{ loaded: false, tab: 'details' }" x-init="setTimeout(() => loaded = true, 300)" class="py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-white/10 shadow-2xl">
-                {{-- Background Decorativo --}}
-                <div class="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
-                
-                <form action="{{ route('admin.assets.update', $asset) }}" method="POST" class="relative z-10 p-8 sm:p-10 space-y-8">
-                    @csrf
-                    @method('PUT')
+            
+            {{-- SKELETON --}}
+            <div x-show="!loaded" class="space-y-6 animate-pulse">
+                <div class="h-12 w-full max-w-md bg-slate-800/50 rounded-xl border border-white/5"></div>
+                <div class="h-80 bg-slate-900/50 rounded-3xl border border-white/5"></div>
+            </div>
+
+            {{-- CONTEÚDO REAL --}}
+            <div x-show="loaded" style="display: none;"
+                 x-transition:enter="transition ease-out duration-500"
+                 x-transition:enter-start="opacity-0 translate-y-4"
+                 x-transition:enter-end="opacity-100 translate-y-0">
+
+                {{-- TABS --}}
+                <div class="flex items-center gap-2 mb-6">
+                    <button @click="tab = 'details'" 
+                            :class="tab === 'details' ? 'bg-indigo-600 text-white shadow-indigo-500/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
+                            class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg">
+                        Detalhes do Equipamento
+                    </button>
+                    <button @click="tab = 'history'" 
+                            :class="tab === 'history' ? 'bg-indigo-600 text-white shadow-indigo-500/20' : 'bg-slate-800 text-slate-400 hover:bg-slate-700'"
+                            class="px-6 py-2.5 rounded-xl font-bold text-sm transition-all shadow-lg flex items-center gap-2">
+                        Histórico de Movimentação
+                        <span class="px-2 py-0.5 rounded-full bg-black/20 text-[10px]">{{ $asset->history->count() }}</span>
+                    </button>
+                </div>
+
+                <div class="relative overflow-hidden rounded-3xl bg-slate-900 border border-white/10 shadow-2xl">
+                    {{-- Background Decorativo --}}
+                    <div class="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
                     
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {{-- Nome --}}
-                        <div class="md:col-span-2">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nome do Equipamento</label>
-                            <input type="text" name="name" value="{{ old('name', $asset->name) }}" required 
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                            <x-input-error for="name" class="mt-2" />
+                    {{-- ABA: DETALHES --}}
+                    <form x-show="tab === 'details'" action="{{ route('admin.assets.update', $asset) }}" method="POST" class="relative z-10 p-8 sm:p-10 space-y-8">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                            {{-- Nome --}}
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nome do Equipamento</label>
+                                <input type="text" name="name" value="{{ old('name', $asset->name) }}" required 
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                                <x-input-error for="name" class="mt-2" />
+                            </div>
+
+                            {{-- Patrimônio --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nº Patrimônio (Tag)</label>
+                                <input type="text" name="tag" value="{{ old('tag', $asset->tag) }}" required 
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                                <x-input-error for="tag" class="mt-2" />
+                            </div>
+
+                            {{-- Tipo --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Tipo de Ativo</label>
+                                <select name="type" required 
+                                        class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                    <option value="Laptop" class="bg-slate-900" {{ old('type', $asset->type) == 'Laptop' ? 'selected' : '' }}>Laptop</option>
+                                    <option value="Desktop" class="bg-slate-900" {{ old('type', $asset->type) == 'Desktop' ? 'selected' : '' }}>Desktop</option>
+                                    <option value="Monitor" class="bg-slate-900" {{ old('type', $asset->type) == 'Monitor' ? 'selected' : '' }}>Monitor</option>
+                                    <option value="Impressora" class="bg-slate-900" {{ old('type', $asset->type) == 'Impressora' ? 'selected' : '' }}>Impressora</option>
+                                    <option value="Celular" class="bg-slate-900" {{ old('type', $asset->type) == 'Celular' ? 'selected' : '' }}>Celular</option>
+                                    <option value="Outros" class="bg-slate-900" {{ old('type', $asset->type) == 'Outros' ? 'selected' : '' }}>Outros</option>
+                                </select>
+                            </div>
+
+                            {{-- Marca --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Marca</label>
+                                <input type="text" name="brand" value="{{ old('brand', $asset->brand) }}"
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                            </div>
+
+                            {{-- Modelo --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Modelo</label>
+                                <input type="text" name="model" value="{{ old('model', $asset->model) }}"
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                            </div>
+
+                            {{-- Serial --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Número de Série</label>
+                                <input type="text" name="serial_number" value="{{ old('serial_number', $asset->serial_number) }}"
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                            </div>
+
+                            {{-- Usuário Responsável --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Usuário Responsável</label>
+                                <select name="user_id" 
+                                        class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                    <option value="" class="bg-slate-900">-- Sem Vínculo (Em Estoque) --</option>
+                                    @foreach($users as $user)
+                                        <option value="{{ $user->id }}" class="bg-slate-900" {{ old('user_id', $asset->user_id) == $user->id ? 'selected' : '' }}>
+                                            {{ $user->name }} ({{ $user->email }})
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            {{-- Status --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Status Atual</label>
+                                <select name="status" required 
+                                        class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                    <option value="active" class="bg-slate-900" {{ old('status', $asset->status) == 'active' ? 'selected' : '' }}>Ativo</option>
+                                    <option value="maintenance" class="bg-slate-900" {{ old('status', $asset->status) == 'maintenance' ? 'selected' : '' }}>Em Manutenção</option>
+                                    <option value="retired" class="bg-slate-900" {{ old('status', $asset->status) == 'retired' ? 'selected' : '' }}>Aposentado</option>
+                                    <option value="lost" class="bg-slate-900" {{ old('status', $asset->status) == 'lost' ? 'selected' : '' }}>Extraviado</option>
+                                </select>
+                            </div>
+
+                            {{-- Datas --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Data de Compra</label>
+                                <input type="date" name="purchase_date" value="{{ old('purchase_date', $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : '') }}"
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                            </div>
+
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Expiração da Garantia</label>
+                                <input type="date" name="warranty_expiration" value="{{ old('warranty_expiration', $asset->warranty_expiration ? $asset->warranty_expiration->format('Y-m-d') : '') }}"
+                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
+                            </div>
+
+                            {{-- Notas --}}
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Observações Técnicas</label>
+                                <textarea name="notes" rows="4" 
+                                          class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">{{ old('notes', $asset->notes) }}</textarea>
+                            </div>
                         </div>
 
-                        {{-- Patrimônio --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nº Patrimônio (Tag)</label>
-                            <input type="text" name="tag" value="{{ old('tag', $asset->tag) }}" required 
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                            <x-input-error for="tag" class="mt-2" />
+                        <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
+                            <a href="{{ route('admin.assets.index') }}" 
+                               class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-2xl transition text-center">
+                                Cancelar
+                            </a>
+                            <button type="submit" 
+                                    class="px-10 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-2xl transition shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 active:translate-y-0">
+                                Atualizar Equipamento
+                            </button>
+                        </div>
+                    </form>
+
+                    {{-- ABA: HISTÓRICO --}}
+                    <div x-show="tab === 'history'" class="p-8 sm:p-10 space-y-8 relative z-10">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="text-lg font-bold text-white">Linha do Tempo</h3>
+                            <span class="text-xs text-slate-500 italic">Registros automáticos de auditoria</span>
                         </div>
 
-                        {{-- Tipo --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Tipo de Ativo</label>
-                            <select name="type" required 
-                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
-                                <option value="Laptop" class="bg-slate-900" {{ old('type', $asset->type) == 'Laptop' ? 'selected' : '' }}>Laptop</option>
-                                <option value="Desktop" class="bg-slate-900" {{ old('type', $asset->type) == 'Desktop' ? 'selected' : '' }}>Desktop</option>
-                                <option value="Monitor" class="bg-slate-900" {{ old('type', $asset->type) == 'Monitor' ? 'selected' : '' }}>Monitor</option>
-                                <option value="Impressora" class="bg-slate-900" {{ old('type', $asset->type) == 'Impressora' ? 'selected' : '' }}>Impressora</option>
-                                <option value="Celular" class="bg-slate-900" {{ old('type', $asset->type) == 'Celular' ? 'selected' : '' }}>Celular</option>
-                                <option value="Outros" class="bg-slate-900" {{ old('type', $asset->type) == 'Outros' ? 'selected' : '' }}>Outros</option>
-                            </select>
-                        </div>
+                        <div class="relative space-y-8 before:absolute before:inset-0 before:ml-5 before:-translate-x-px before:h-full before:w-0.5 before:bg-gradient-to-b before:from-indigo-500 before:via-slate-700 before:to-transparent">
+                            @forelse($asset->history as $log)
+                                <div class="relative flex items-start gap-6 group">
+                                    {{-- Ícone do Evento --}}
+                                    <div class="absolute left-0 flex items-center justify-center w-10 h-10 rounded-full bg-slate-900 border-2 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.3)] z-10 transition-transform group-hover:scale-110">
+                                        @if($log->action === 'create')
+                                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                        @else
+                                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                        @endif
+                                    </div>
 
-                        {{-- Marca --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Marca</label>
-                            <input type="text" name="brand" value="{{ old('brand', $asset->brand) }}"
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                        </div>
+                                    <div class="flex-1 ml-12 bg-white/5 rounded-2xl p-5 border border-white/5 hover:border-white/10 transition shadow-sm">
+                                        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
+                                            <div class="text-sm font-bold text-white">
+                                                {{ $log->action === 'create' ? 'Cadastro Inicial' : 'Atualização de Registro' }}
+                                            </div>
+                                            <div class="text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                                                {{ $log->created_at->format('d/m/Y H:i:s') }}
+                                            </div>
+                                        </div>
+                                        
+                                        <p class="text-sm text-slate-400 leading-relaxed">
+                                            {{ $log->description }}
+                                        </p>
 
-                        {{-- Modelo --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Modelo</label>
-                            <input type="text" name="model" value="{{ old('model', $asset->model) }}"
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                        </div>
-
-                        {{-- Serial --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Número de Série</label>
-                            <input type="text" name="serial_number" value="{{ old('serial_number', $asset->serial_number) }}"
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                        </div>
-
-                        {{-- Usuário Responsável --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Usuário Responsável</label>
-                            <select name="user_id" 
-                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
-                                <option value="" class="bg-slate-900">-- Sem Vínculo (Em Estoque) --</option>
-                                @foreach($users as $user)
-                                    <option value="{{ $user->id }}" class="bg-slate-900" {{ old('user_id', $asset->user_id) == $user->id ? 'selected' : '' }}>
-                                        {{ $user->name }} ({{ $user->email }})
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
-
-                        {{-- Status --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Status Atual</label>
-                            <select name="status" required 
-                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
-                                <option value="active" class="bg-slate-900" {{ old('status', $asset->status) == 'active' ? 'selected' : '' }}>Ativo</option>
-                                <option value="maintenance" class="bg-slate-900" {{ old('status', $asset->status) == 'maintenance' ? 'selected' : '' }}>Em Manutenção</option>
-                                <option value="retired" class="bg-slate-900" {{ old('status', $asset->status) == 'retired' ? 'selected' : '' }}>Aposentado</option>
-                                <option value="lost" class="bg-slate-900" {{ old('status', $asset->status) == 'lost' ? 'selected' : '' }}>Extraviado</option>
-                            </select>
-                        </div>
-
-                        {{-- Datas --}}
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Data de Compra</label>
-                            <input type="date" name="purchase_date" value="{{ old('purchase_date', $asset->purchase_date ? $asset->purchase_date->format('Y-m-d') : '') }}"
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                        </div>
-
-                        <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Expiração da Garantia</label>
-                            <input type="date" name="warranty_expiration" value="{{ old('warranty_expiration', $asset->warranty_expiration ? $asset->warranty_expiration->format('Y-m-d') : '') }}"
-                                   class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
-                        </div>
-
-                        {{-- Notas --}}
-                        <div class="md:col-span-2">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Observações Técnicas</label>
-                            <textarea name="notes" rows="4" 
-                                      class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">{{ old('notes', $asset->notes) }}</textarea>
+                                        <div class="mt-4 pt-4 border-t border-white/5 flex items-center gap-3">
+                                            <div class="h-6 w-6 rounded-full bg-indigo-500/20 flex items-center justify-center text-[10px] font-bold text-indigo-400 border border-indigo-500/20">
+                                                {{ substr($log->user->name ?? 'S', 0, 1) }}
+                                            </div>
+                                            <span class="text-xs text-slate-500">Realizado por <strong class="text-slate-300">{{ $log->user->name ?? 'Sistema' }}</strong></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="text-center py-12">
+                                    <div class="text-4xl mb-4 opacity-20">📜</div>
+                                    <p class="text-slate-500 text-sm">Nenhum histórico registrado para este equipamento.</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
-
-                    <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
-                        <a href="{{ route('admin.assets.index') }}" 
-                           class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-2xl transition text-center">
-                            Cancelar
-                        </a>
-                        <button type="submit" 
-                                class="px-10 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-2xl transition shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 active:translate-y-0">
-                            Atualizar Equipamento
-                        </button>
-                    </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

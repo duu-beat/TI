@@ -47,6 +47,14 @@ class Asset extends Model
     }
 
     /**
+     * Histórico de movimentações deste equipamento
+     */
+    public function history(): HasMany
+    {
+        return $this->hasMany(AssetHistory::class)->orderBy('created_at', 'desc');
+    }
+
+    /**
      * Retorna a cor do status para exibição na interface
      */
     public function getStatusColor(): string
