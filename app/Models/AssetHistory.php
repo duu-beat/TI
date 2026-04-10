@@ -16,6 +16,7 @@ class AssetHistory extends Model
         'new_status',
         'old_user_id',
         'new_user_id',
+        'signature', // Base64 da assinatura digital
     ];
 
     public function asset(): BelongsTo

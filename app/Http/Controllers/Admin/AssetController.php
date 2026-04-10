@@ -140,6 +140,7 @@ class AssetController extends Controller
             'purchase_date' => 'nullable|date',
             'warranty_expiration' => 'nullable|date',
             'notes' => 'nullable|string',
+            'signature' => 'nullable|string', // Base64 da assinatura
         ]);
 
         $oldStatus = $asset->status;
@@ -161,11 +162,12 @@ class AssetController extends Controller
                 'asset_id' => $asset->id,
                 'user_id' => Auth::id(),
                 'action' => 'update',
-                'description' => implode('. ', $description),
+                'description' => implode('. ', $description) . ($request->filled('signature') ? ' (Com assinatura digital)' : ''),
                 'old_status' => $oldStatus,
                 'new_status' => $asset->status,
                 'old_user_id' => $oldUserId,
                 'new_user_id' => $asset->user_id,
+                'signature' => $request->signature,
             ]);
         }
 

@@ -208,5 +208,17 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('assets', \App\Http\Controllers\Admin\AssetController::class);
 
     // 📋 Rotas de Checklist
-    Route::resource('checklists', \App\Http\Controllers\Admin\ChecklistController::class);
+    Route::resource('checklists', \App\Http\Controllers\Admin\ChecklistController.class);
+
+    // 📚 Rotas da Wiki (Base de Conhecimento)
+    Route::resource('wiki', \App\Http\Controllers\Admin\KnowledgeBaseController::class)
+        ->parameters(['wiki' => 'article']);
+});
+
+// 🔔 Rotas de Notificações (Compartilhadas)
+Route::middleware(['auth', 'verified'])->prefix('notificacoes')->name('notifications.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\NotificationController::class, 'index'])->name('index');
+    Route::get('/unread-count', [\App\Http\Controllers\NotificationController::class, 'unreadCount'])->name('unread-count');
+    Route::post('/{notification}/read', [\App\Http\Controllers\NotificationController::class, 'markAsRead'])->name('read');
+    Route::post('/read-all', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead'])->name('read-all');
 });

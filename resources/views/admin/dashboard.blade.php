@@ -93,9 +93,15 @@
                 </div>
             @endif
 
-            {{-- 5. GRID: GRÁFICO + LISTA --}}
+            {{-- 5. GRID: GRÁFICOS + LISTA --}}
             <div class="grid lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 h-96 bg-white/5 rounded-3xl border border-white/5"></div>
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="h-80 bg-white/5 rounded-3xl border border-white/5"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="h-64 bg-white/5 rounded-3xl border border-white/5"></div>
+                        <div class="h-64 bg-white/5 rounded-3xl border border-white/5"></div>
+                    </div>
+                </div>
                 <div class="space-y-4">
                     <div class="h-8 w-1/2 bg-white/5 rounded"></div>
                     <div class="h-24 bg-white/5 rounded-2xl border border-white/5"></div>
@@ -259,27 +265,58 @@
                 </div>
             </div>
 
-            {{-- 3. ÁREA PRINCIPAL (Gráfico e Lista) --}}
+            {{-- 3. ÁREA PRINCIPAL (Gráficos e Lista) --}}
             <div class="grid lg:grid-cols-3 gap-8">
                 
-                {{-- GRÁFICO (Painel de Vidro) --}}
-                <div class="lg:col-span-2 flex flex-col gap-4">
-                    <div class="flex items-center justify-between px-1">
-                        <h3 class="text-lg font-bold text-white flex items-center gap-2">
-                            <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
-                            Volume Semanal
-                        </h3>
-                        @if(isset($todayCount))
-                            <span class="text-xs font-bold bg-indigo-500/20 text-indigo-300 px-3 py-1 rounded-full border border-indigo-500/20">
-                                Hoje: {{ $todayCount }} novos
-                            </span>
-                        @endif
+                <div class="lg:col-span-2 space-y-8">
+                    {{-- GRÁFICO PRINCIPAL: VOLUME SEMANAL --}}
+                    <div class="flex flex-col gap-4">
+                        <div class="flex items-center justify-between px-1">
+                            <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                                Volume Semanal
+                            </h3>
+                        </div>
+                        
+                        <div class="relative w-full p-4 sm:p-6 rounded-3xl bg-slate-900/80 border border-white/10 shadow-xl">
+                            <div class="h-80 w-full relative z-10">
+                                <canvas id="weeklyChart"></canvas>
+                            </div>
+                        </div>
                     </div>
-                    
-                    <div class="relative w-full p-4 sm:p-6 rounded-3xl bg-slate-900/80 border border-white/5 shadow-xl">
-                        <div class="absolute inset-0 bg-gradient-to-b from-white/5 to-transparent rounded-3xl pointer-events-none"></div>
-                        <div class="h-80 w-full relative z-10">
-                            <canvas id="weeklyChart"></canvas>
+
+                    {{-- GRID DE GRÁFICOS SECUNDÁRIOS --}}
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {{-- VOLUME POR CATEGORIA --}}
+                        <div class="flex flex-col gap-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">Volume por Categoria</h3>
+                            <div class="p-6 rounded-3xl bg-slate-900/80 border border-white/10 shadow-xl h-64">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                        </div>
+
+                        {{-- MÉTRICA DE SLA --}}
+                        <div class="flex flex-col gap-4">
+                            <h3 class="text-sm font-bold text-slate-400 uppercase tracking-widest px-1">Performance de SLA</h3>
+                            <div class="p-6 rounded-3xl bg-slate-900/80 border border-white/10 shadow-xl h-64 flex flex-col items-center justify-center text-center">
+                                <div class="relative mb-4">
+                                    <svg class="w-32 h-32 transform -rotate-90">
+                                        <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" class="text-slate-800" />
+                                        <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
+                                                class="text-indigo-500" 
+                                                stroke-dasharray="{{ 2 * pi() * 58 }}" 
+                                                stroke-dashoffset="{{ (2 * pi() * 58) * (1 - ($slaStats['within_sla_percent'] / 100)) }}" 
+                                                stroke-linecap="round" />
+                                    </svg>
+                                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                        <span class="text-2xl font-black text-white">{{ $slaStats['within_sla_percent'] }}%</span>
+                                        <span class="text-[10px] text-slate-500 uppercase font-bold">No Prazo</span>
+                                    </div>
+                                </div>
+                                <div class="text-xs text-slate-400">
+                                    Tempo Médio de Resolução: <strong class="text-white">{{ $avgResolution }}h</strong>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -342,27 +379,25 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const ctx = document.getElementById('weeklyChart');
-            const labels = @json($chartLabels ?? []);
-            const values = @json($chartValues ?? []);
-
-            if (ctx) {
-                // Gradiente para o gráfico
-                const gradient = ctx.getContext('2d').createLinearGradient(0, 0, 0, 300);
-                gradient.addColorStop(0, 'rgba(99, 102, 241, 0.5)'); // Indigo 500
-                gradient.addColorStop(1, 'rgba(99, 102, 241, 0)');
-
-                new Chart(ctx, {
-                    type: 'bar', // ou 'line' se preferir
+            // 1. Gráfico de Volume Semanal
+            const ctxWeekly = document.getElementById('weeklyChart');
+            if (ctxWeekly) {
+                new Chart(ctxWeekly, {
+                    type: 'line',
                     data: {
-                        labels: labels,
+                        labels: @json($chartLabels ?? []),
                         datasets: [{
                             label: 'Chamados',
-                            data: values,
-                            backgroundColor: '#6366f1',
-                            hoverBackgroundColor: '#818cf8',
-                            borderRadius: 6,
-                            barThickness: 20, // Barras mais finas e elegantes
+                            data: @json($chartValues ?? []),
+                            borderColor: '#6366f1',
+                            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                            fill: true,
+                            tension: 0.4,
+                            pointBackgroundColor: '#6366f1',
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
                         }]
                     },
                     options: {
@@ -372,22 +407,41 @@
                             legend: { display: false },
                             tooltip: {
                                 backgroundColor: 'rgba(15, 23, 42, 0.9)',
-                                titleColor: '#fff',
-                                bodyColor: '#cbd5e1',
-                                padding: 10,
-                                cornerRadius: 8,
-                                displayColors: false,
+                                padding: 12,
+                                cornerRadius: 12,
+                                displayColors: false
                             }
                         },
                         scales: {
-                            y: { 
-                                beginAtZero: true, 
-                                grid: { color: 'rgba(255, 255, 255, 0.05)' },
-                                ticks: { color: '#64748b' }
-                            },
-                            x: { 
-                                grid: { display: false },
-                                ticks: { color: '#64748b' }
+                            y: { beginAtZero: true, grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#64748b' } },
+                            x: { grid: { display: false }, ticks: { color: '#64748b' } }
+                        }
+                    }
+                });
+            }
+
+            // 2. Gráfico de Volume por Categoria
+            const ctxCategory = document.getElementById('categoryChart');
+            if (ctxCategory) {
+                new Chart(ctxCategory, {
+                    type: 'doughnut',
+                    data: {
+                        labels: @json($categoryLabels ?? []),
+                        datasets: [{
+                            data: @json($categoryValues ?? []),
+                            backgroundColor: ['#6366f1', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'],
+                            borderWidth: 0,
+                            hoverOffset: 10
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        cutout: '70%',
+                        plugins: {
+                            legend: {
+                                position: 'right',
+                                labels: { color: '#94a3b8', font: { size: 10 }, usePointStyle: true, padding: 15 }
                             }
                         }
                     }

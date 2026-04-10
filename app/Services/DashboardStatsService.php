@@ -40,7 +40,7 @@ class DashboardStatsService
     {
         // 1. Dados Pesados (Cacheados por 5 minutos)
         // Inclui contagens globais, dados do gráfico e métricas de SLA.
-        $cachedData = Cache::remember('admin_dashboard_stats_v5', 300, function () {
+        $cachedData = Cache::remember('admin_dashboard_stats_v6', 900, function () {
             return $this->calculateCachedStats();
         });
 
@@ -112,11 +112,27 @@ class DashboardStatsService
 
         $chartValues = $dates->map(fn($date) => $ticketsPerDay->get($date, 0));
 
+        // 📊 Volume por Categoria (Top 5)
+        $categoryStats = Ticket::selectRaw('category, count(*) as total')
+            ->groupBy('category')
+            ->orderByDesc('total')
+            ->take(5)
+            ->get();
+
+        // ⏱️ Tempo Médio de Resolução (SLA Real)
+        $avgResolutionTime = Ticket::where('status', TicketStatus::RESOLVED)
+            ->whereNotNull('resolved_at')
+            ->selectRaw('avg(timestampdiff(HOUR, created_at, resolved_at)) as avg_hours')
+            ->first()->avg_hours ?? 0;
+
         return [
             'stats'         => $stats,
             'priorityStats' => ['high' => $highPriority],
             'chartLabels'   => $dates->values(),
             'chartValues'   => $chartValues->values(),
+            'categoryLabels' => $categoryStats->pluck('category'),
+            'categoryValues' => $categoryStats->pluck('total'),
+            'avgResolution' => round($avgResolutionTime, 1),
             'slaStats'      => $this->slaService->getSlaStats(),
             'npsStats'      => [
                 'score' => round($npsScore, 1),

@@ -59,6 +59,12 @@
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.checklists.*') ? $activeClass : $inactiveClass }}">
         📋 Modelos de Checklist
     </a>
+
+    {{-- Wiki --}}
+    <a href="{{ route('admin.wiki.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.wiki.*') ? $activeClass : $inactiveClass }}">
+        📚 Base de Conhecimento
+    </a>
     
     {{-- Perfil --}}
     <a href="{{ route('admin.profile') }}"

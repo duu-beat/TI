@@ -150,6 +150,22 @@
                                 <textarea name="notes" rows="4" 
                                           class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">{{ old('notes', $asset->notes) }}</textarea>
                             </div>
+
+                            {{-- Painel de Assinatura Digital --}}
+                            <div class="md:col-span-2 mt-4" x-data="signaturePad()">
+                                <label class="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">Assinatura Digital de Recebimento (Opcional)</label>
+                                <div class="relative bg-white rounded-2xl overflow-hidden border-2 border-white/10 shadow-inner">
+                                    <canvas x-ref="canvas" class="w-full h-40 cursor-crosshair"></canvas>
+                                    <button type="button" @click="clear()" class="absolute top-3 right-3 p-2 bg-slate-900/80 text-white rounded-xl hover:bg-red-500 transition-all shadow-lg">
+                                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                                    </button>
+                                </div>
+                                <input type="hidden" name="signature" x-model="signatureData">
+                                <p class="text-[10px] text-slate-500 mt-3 italic flex items-center gap-2">
+                                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Assine acima para confirmar a entrega do equipamento ao novo responsável.
+                                </p>
+                            </div>
                         </div>
 
                         <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
@@ -203,6 +219,14 @@
                                             </div>
                                             <span class="text-xs text-slate-500">Realizado por <strong class="text-slate-300">{{ $log->user->name ?? 'Sistema' }}</strong></span>
                                         </div>
+
+                                        {{-- Exibição da Assinatura --}}
+                                        @if($log->signature)
+                                            <div class="mt-4 p-3 bg-white rounded-xl border border-white/10 inline-block">
+                                                <p class="text-[10px] text-slate-400 uppercase font-bold mb-2">Assinatura Digital:</p>
+                                                <img src="{{ $log->signature }}" alt="Assinatura" class="h-16 w-auto grayscale contrast-125">
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                             @empty
@@ -217,4 +241,74 @@
             </div>
         </div>
     </div>
+    <script>
+        function signaturePad() {
+            return {
+                signatureData: '',
+                isDrawing: false,
+                ctx: null,
+                init() {
+                    const canvas = this.$refs.canvas;
+                    this.ctx = canvas.getContext('2d');
+                    
+                    const resize = () => {
+                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                        canvas.width = canvas.offsetWidth * ratio;
+                        canvas.height = canvas.offsetHeight * ratio;
+                        this.ctx.scale(ratio, ratio);
+                        
+                        this.ctx.strokeStyle = '#0f172a';
+                        this.ctx.lineWidth = 2.5;
+                        this.ctx.lineJoin = 'round';
+                        this.ctx.lineCap = 'round';
+                    };
+
+                    window.addEventListener('resize', resize);
+                    setTimeout(resize, 100);
+                    
+                    const getPos = (e) => {
+                        const rect = canvas.getBoundingClientRect();
+                        return {
+                            x: (e.clientX || (e.touches && e.touches[0].clientX)) - rect.left,
+                            y: (e.clientY || (e.touches && e.touches[0].clientY)) - rect.top
+                        };
+                    };
+
+                    const start = (e) => {
+                        this.isDrawing = true;
+                        const pos = getPos(e);
+                        this.ctx.beginPath();
+                        this.ctx.moveTo(pos.x, pos.y);
+                    };
+
+                    const move = (e) => {
+                        if (!this.isDrawing) return;
+                        if (e.cancelable) e.preventDefault();
+                        const pos = getPos(e);
+                        this.ctx.lineTo(pos.x, pos.y);
+                        this.ctx.stroke();
+                    };
+
+                    const stop = () => {
+                        if (this.isDrawing) {
+                            this.isDrawing = false;
+                            this.signatureData = canvas.toDataURL('image/png');
+                        }
+                    };
+
+                    canvas.addEventListener('mousedown', start);
+                    canvas.addEventListener('mousemove', move);
+                    window.addEventListener('mouseup', stop);
+                    
+                    canvas.addEventListener('touchstart', start, { passive: false });
+                    canvas.addEventListener('touchmove', move, { passive: false });
+                    canvas.addEventListener('touchend', stop);
+                },
+                clear() {
+                    this.ctx.clearRect(0, 0, this.$refs.canvas.width, this.$refs.canvas.height);
+                    this.signatureData = '';
+                }
+            }
+        }
+    </script>
 </x-app-layout>
