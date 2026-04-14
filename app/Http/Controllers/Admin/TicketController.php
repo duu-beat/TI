@@ -129,17 +129,23 @@ class TicketController extends Controller
         ]);
 
         if ($request->boolean('is_internal')) {
-            $ticket->messages()->create([
+            $message = $ticket->messages()->create([
                 'user_id' => auth()->id(),
                 'message' => $validated['message'],
                 'is_internal' => true,
                 'time_spent' => $request->input('time_spent', 0),
             ]);
             
+            // Disparar evento para tempo real (apenas se não for interna ou se quiser que técnicos vejam)
+            event(new \App\Events\TicketMessageSent($message));
+
             return back()->with('success', 'Nota interna adicionada.');
         }
 
-        $replier->execute($request->user(), $ticket, $validated, $request);
+        $message = $replier->execute($request->user(), $ticket, $validated, $request);
+        
+        // Disparar evento para tempo real
+        event(new \App\Events\TicketMessageSent($message));
 
         if ($ticket->status !== TicketStatus::RESOLVED && $ticket->status !== TicketStatus::CLOSED) {
             $ticket->update(['status' => TicketStatus::WAITING_CLIENT]);

@@ -36,7 +36,45 @@
         </div>
     </x-slot>
 
-    <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 300)" class="py-8 pb-24 min-h-screen">
+    <div x-data="{ 
+            loaded: false,
+            messages: @js($ticket->messages),
+            typingUser: null,
+            typingTimeout: null,
+            initEcho() {
+                if (window.Echo) {
+                    window.Echo.private(`ticket.{{ $ticket->id }}`)
+                        .listen('.message.sent', (e) => {
+                            console.log('Nova mensagem recebida via Echo:', e.message);
+                            if (!this.messages.find(m => m.id === e.message.id)) {
+                                if (!e.message.is_internal) {
+                                    this.messages.push(e.message);
+                                    this.$nextTick(() => {
+                                        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                    });
+                                }
+                            }
+                        })
+                        .listenForWhisper('typing', (e) => {
+                            this.typingUser = e.name;
+                            if (this.typingTimeout) clearTimeout(this.typingTimeout);
+                            this.typingTimeout = setTimeout(() => {
+                                this.typingUser = null;
+                            }, 3000);
+                        });
+                }
+            },
+            broadcastTyping() {
+                if (window.Echo) {
+                    window.Echo.private(`ticket.{{ $ticket->id }}`)
+                        .whisper('typing', {
+                            name: '{{ auth()->user()->name }}'
+                        });
+                }
+            }
+         }" 
+         x-init="setTimeout(() => { loaded = true; initEcho(); }, 300)" 
+         class="py-8 pb-24 min-h-screen">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             
@@ -148,58 +186,52 @@
                         </div>
                     </div>
 
-                    {{-- TIMELINE (Mensagens de resposta) --}}
+                    {{-- TIMELINE (Renderizado via Alpine para Tempo Real) --}}
                     <div class="relative space-y-6 py-6">
                         <div class="absolute left-8 top-0 bottom-0 w-px bg-white/10 -z-10 hidden md:block"></div>
 
-                        @foreach($ticket->messages->skip(1) as $message)
-                            @php 
-                                $isMe = $message->user_id === auth()->id();
-                                $isAdmin = $message->user->role === 'admin' || $message->user->role === 'master';
-                                // O Cliente não deve ver mensagens internas nunca, mas caso chegue algo, a gente filtra na view por segurança
-                                if($message->is_internal) continue; 
-                            @endphp
-
-                            <div class="flex gap-4 {{ $isMe ? 'flex-row-reverse' : '' }} group">
+                        <template x-for="(message, index) in messages" :key="message.id">
+                            <div x-show="index > 0 && !message.is_internal" 
+                                 class="flex gap-4 group animate-fade-in-up"
+                                 :class="message.user_id == {{ auth()->id() }} ? 'flex-row-reverse' : ''">
+                                
                                 {{-- Avatar --}}
-                                <div class="h-10 w-10 rounded-xl flex items-center justify-center text-xs font-bold border shrink-0 shadow-lg relative z-10 
-                                    {{ $isMe ? 'bg-indigo-600 border-indigo-500 text-white ring-4 ring-slate-900' : 'bg-slate-800 border-white/10 text-indigo-300 ring-4 ring-slate-900' }}">
-                                    {{ substr($message->user->name, 0, 1) }}
+                                <div class="h-10 w-10 rounded-xl flex items-center justify-center text-xs font-bold border shrink-0 shadow-lg relative z-10"
+                                    :class="message.user_id == {{ auth()->id() }} ? 'bg-indigo-600 border-indigo-500 text-white ring-4 ring-slate-900' : 'bg-slate-800 border-white/10 text-indigo-300 ring-4 ring-slate-900'">
+                                    <span x-text="message.user.name.substring(0, 1)"></span>
                                 </div>
 
                                 <div class="flex-1 max-w-3xl">
                                     {{-- Bolha --}}
-                                    <div class="rounded-2xl p-5 shadow-xl relative border transition-all duration-200 
-                                        {{ $isMe ? 'bg-indigo-500/10 border-indigo-500/20 rounded-tr-sm backdrop-blur-sm' : 'bg-slate-800/80 border-white/10 rounded-tl-sm backdrop-blur-sm' }}">
+                                    <div class="rounded-2xl p-5 shadow-xl relative border transition-all duration-200"
+                                        :class="message.user_id == {{ auth()->id() }} ? 'bg-indigo-500/10 border-indigo-500/20 rounded-tr-sm backdrop-blur-sm' : 'bg-slate-800/80 border-white/10 rounded-tl-sm backdrop-blur-sm'">
                                         
                                         <div class="flex items-center justify-between mb-3">
                                             <div class="flex items-center gap-2">
-                                                <span class="text-xs font-bold {{ $isAdmin ? 'text-indigo-400' : 'text-white' }}">{{ $message->user->name }}</span>
-                                                @if($isAdmin && !$isMe)
+                                                <span class="text-xs font-bold" :class="message.user.role === 'admin' || message.user.role === 'master' ? 'text-indigo-400' : 'text-white'" x-text="message.user.name"></span>
+                                                <template x-if="(message.user.role === 'admin' || message.user.role === 'master') && message.user_id != {{ auth()->id() }}">
                                                     <span class="px-1.5 py-0.5 rounded bg-indigo-500/10 text-[9px] font-bold text-indigo-400 border border-indigo-500/20 uppercase">Suporte Técnico</span>
-                                                @endif
+                                                </template>
                                             </div>
-                                            <span class="text-[10px] text-slate-500">{{ $message->created_at->format('d/m H:i') }}</span>
+                                            <span class="text-[10px] text-slate-500" x-text="new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
                                         </div>
 
-                                        <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed font-mono">
-                                            {!! nl2br(e($message->message)) !!}
-                                        </div>
+                                        <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed font-mono" x-html="message.message.replace(/\n/g, '<br>')"></div>
 
-                                        @if($message->attachments->count() > 0)
+                                        <template x-if="message.attachments && message.attachments.length > 0">
                                             <div class="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-2">
-                                                @foreach($message->attachments as $attachment)
-                                                    <a href="{{ Storage::url($attachment->path) }}" target="_blank" 
+                                                <template x-for="attachment in message.attachments" :key="attachment.id">
+                                                    <a :href="'/storage/' + attachment.path" target="_blank" 
                                                        class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/30 hover:bg-black/50 border border-white/10 transition text-xs font-medium text-cyan-400 hover:text-cyan-300">
-                                                        <span>📎</span> {{ $attachment->name }}
+                                                        <span>📎</span> <span x-text="attachment.name"></span>
                                                     </a>
-                                                @endforeach
+                                                </template>
                                             </div>
-                                        @endif
+                                        </template>
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        </template>
                     </div>
 
                     {{-- Feedback do Cliente (Se já foi avaliado) --}}
@@ -296,11 +328,26 @@
                                     </label>
                                 </div>
 
-                                <textarea name="message" rows="1" 
-                                          class="w-full bg-slate-950/50 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 resize-none px-4 py-3 max-h-40 overflow-y-auto custom-scrollbar transition shadow-inner"
-                                          placeholder="Digite sua resposta aqui..." 
-                                          required
-                                          oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 160) + 'px'"></textarea>
+                                <div class="relative w-full">
+                                    <textarea name="message" rows="1" 
+                                              @input="broadcastTyping()"
+                                              class="w-full bg-slate-950/50 border border-white/10 rounded-xl text-white placeholder:text-slate-500 focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500/50 resize-none px-4 py-3 max-h-40 overflow-y-auto custom-scrollbar transition shadow-inner"
+                                              placeholder="Digite sua resposta aqui..." 
+                                              required
+                                              oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 160) + 'px'"></textarea>
+                                    
+                                    {{-- Indicador de Digitação --}}
+                                    <div x-show="typingUser" 
+                                         style="display: none;"
+                                         class="absolute -top-10 left-0 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-indigo-500/30 text-[10px] text-indigo-400 font-bold animate-pulse backdrop-blur-sm shadow-lg">
+                                        <div class="flex gap-1">
+                                            <span class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce"></span>
+                                            <span class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                                            <span class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                                        </div>
+                                        <span x-text="typingUser + ' está digitando...'"></span>
+                                    </div>
+                                </div>
 
                                 <button type="submit" class="shrink-0 h-12 px-6 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95">
                                     <span class="hidden sm:block text-sm">Enviar</span>

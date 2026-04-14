@@ -386,8 +386,23 @@
                 list: [],
                 init() {
                     this.fetchData();
-                    // Polling a cada 60 segundos para novas notificações
-                    setInterval(() => this.fetchData(), 60000);
+                    
+                    // ✅ ESCUTAR NOTIFICAÇÕES EM TEMPO REAL (Websockets)
+                    if (window.Echo) {
+                        window.Echo.private(`App.Models.User.{{ auth()->id() }}`)
+                            .listen('.notification.received', (e) => {
+                                console.log('Nova notificação recebida:', e.notification);
+                                this.addNotification(e.notification);
+                            });
+                    }
+                },
+                addNotification(notification) {
+                    this.list.unshift(notification);
+                    if (this.list.length > 20) this.list.pop();
+                    this.unreadCount++;
+                    
+                    // Mostrar Toast de Alerta (opcional, já que o sistema já tem toasts de sessão)
+                    // Mas para tempo real é bom ter um feedback visual imediato
                 },
                 fetchData() {
                     fetch('{{ route('notifications.unread-count') }}')

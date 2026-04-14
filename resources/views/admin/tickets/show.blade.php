@@ -44,18 +44,48 @@
             loaded: false, 
             replyMode: 'public',
             replyMessage: '', 
+            messages: @js($ticket->messages),
+            typingUser: null,
+            typingTimeout: null,
             toggleMode() { this.replyMode = this.replyMode === 'public' ? 'internal' : 'public' },
             useAiResponse(text) {
                 this.replyMessage = text; 
                 this.replyMode = 'public'; 
-                // Foca no textarea
                 setTimeout(() => {
                     document.querySelector('textarea[name=message]').focus();
                     window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
                 }, 100);
+            },
+            initEcho() {
+                if (window.Echo) {
+                    window.Echo.private(`ticket.{{ $ticket->id }}`)
+                        .listen('.message.sent', (e) => {
+                            if (!this.messages.find(m => m.id === e.message.id)) {
+                                this.messages.push(e.message);
+                                this.$nextTick(() => {
+                                    window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+                                });
+                            }
+                        })
+                        .listenForWhisper('typing', (e) => {
+                            this.typingUser = e.name;
+                            if (this.typingTimeout) clearTimeout(this.typingTimeout);
+                            this.typingTimeout = setTimeout(() => {
+                                this.typingUser = null;
+                            }, 3000);
+                        });
+                }
+            },
+            broadcastTyping() {
+                if (window.Echo) {
+                    window.Echo.private(`ticket.{{ $ticket->id }}`)
+                        .whisper('typing', {
+                            name: '{{ auth()->user()->name }}'
+                        });
+                }
             }
          }" 
-         x-init="setTimeout(() => loaded = true, 300)" 
+         x-init="setTimeout(() => { loaded = true; initEcho(); }, 300)" 
          class="py-8 pb-24 min-h-screen">
 
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -188,11 +218,71 @@
                         </div>
                     @endif
 
-                    {{-- 2. TIMELINE --}}
+                    {{-- 2. TIMELINE (Renderizado via Alpine para Tempo Real) --}}
                     <div class="relative space-y-8 py-6">
                         <div class="absolute left-8 top-0 bottom-0 w-px bg-slate-800 -z-10 hidden md:block"></div>
 
-                        @foreach($ticket->messages->skip(1) as $message)
+                        <template x-for="(message, index) in messages" :key="message.id">
+                            <div x-show="index > 0">
+                                @php 
+                                    // Variáveis para o template (usando dados do Alpine)
+                                @endphp
+                                
+                                {{-- ESTILO: Mensagem Normal / Nota Interna --}}
+                                <div class="flex gap-4 group animate-fade-in-up"
+                                     :class="message.user_id == {{ auth()->id() }} ? 'flex-row-reverse' : ''">
+                                    
+                                    {{-- Avatar --}}
+                                    <div class="h-10 w-10 rounded-xl flex items-center justify-center text-xs font-bold border shrink-0 shadow-lg relative z-10"
+                                        :class="message.is_internal 
+                                            ? 'bg-amber-500/10 border-amber-500/50 text-amber-500 ring-4 ring-slate-900' 
+                                            : (message.user.role === 'admin' || message.user.role === 'master'
+                                                ? (message.user_id == {{ auth()->id() }} ? 'bg-indigo-600 border-indigo-500 text-white ring-4 ring-slate-900' : 'bg-slate-700 border-slate-600 text-indigo-300 ring-4 ring-slate-900') 
+                                                : 'bg-slate-800 border-slate-700 text-slate-400 ring-4 ring-slate-900')">
+                                        <span x-text="message.is_internal ? '🔒' : message.user.name.substring(0, 1)"></span>
+                                    </div>
+
+                                    <div class="flex-1 max-w-3xl">
+                                        {{-- Bolha --}}
+                                        <div class="rounded-2xl p-5 shadow-sm relative border transition-all duration-200 hover:shadow-md"
+                                            :class="message.is_internal
+                                                ? 'bg-amber-950/30 border-amber-500/20 rounded-tl-sm'
+                                                : (message.user_id == {{ auth()->id() }} 
+                                                    ? 'bg-indigo-500/10 border-indigo-500/20 rounded-tr-sm'
+                                                    : (message.user.role === 'admin' || message.user.role === 'master' ? 'bg-slate-800 border-white/10 rounded-tl-sm' : 'bg-slate-900 border-white/5 rounded-tl-sm')
+                                                )">
+                                            
+                                            <div class="flex items-center justify-between mb-2">
+                                                <div class="flex items-center gap-2">
+                                                    <span class="text-xs font-bold" :class="message.is_internal ? 'text-amber-500' : (message.user.role === 'admin' || message.user.role === 'master' ? 'text-indigo-400' : 'text-white')" x-text="message.user.name"></span>
+                                                    <template x-if="message.is_internal">
+                                                        <span class="px-1.5 py-0.5 rounded bg-amber-500/10 text-[9px] font-bold text-amber-500 border border-amber-500/20 uppercase">Nota Interna</span>
+                                                    </template>
+                                                </div>
+                                                <span class="text-[10px] text-slate-500" x-text="new Date(message.created_at).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})"></span>
+                                            </div>
+
+                                            <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed" x-html="message.message.replace(/\n/g, '<br>')"></div>
+
+                                            <template x-if="message.attachments && message.attachments.length > 0">
+                                                <div class="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-2">
+                                                    <template x-for="attachment in message.attachments" :key="attachment.id">
+                                                        <a :href="'/storage/' + attachment.path" target="_blank" 
+                                                           class="flex items-center gap-2 px-3 py-1.5 rounded bg-black/20 hover:bg-black/40 border border-white/5 transition text-xs font-medium text-cyan-400 hover:underline">
+                                                            <span>📎</span> <span x-text="attachment.name"></span>
+                                                        </a>
+                                                    </template>
+                                                </div>
+                                            </template>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+
+                        {{-- Loop original oculto para SEO e fallback (opcional, mas vamos remover para limpar a view) --}}
+                        <div style="display:none">
+                            @foreach($ticket->messages->skip(1) as $message)
                             @php 
                                 $isMe = $message->user_id === auth()->id();
                                 $user = $message->user; // Usa o withDefault do Model
@@ -645,11 +735,26 @@
                                 </div>
 
                                 {{-- Textarea (Vinculado ao Alpine x-model global) --}}
-                                <textarea name="message" rows="1" x-model="replyMessage"
-                                          class="w-full bg-transparent border-0 text-white placeholder:text-slate-500 focus:ring-0 resize-none py-3 max-h-60 overflow-y-auto custom-scrollbar"
-                                          :placeholder="replyMode === 'internal' ? 'Escreva uma nota visível apenas para a equipe...' : 'Escreva uma resposta técnica para o cliente...'" 
-                                          required
-                                          oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 240) + 'px'"></textarea>
+                                <div class="relative w-full">
+                                    <textarea name="message" rows="1" x-model="replyMessage"
+                                              @input="broadcastTyping()"
+                                              class="w-full bg-transparent border-0 text-white placeholder:text-slate-500 focus:ring-0 resize-none py-3 max-h-60 overflow-y-auto custom-scrollbar"
+                                              :placeholder="replyMode === 'internal' ? 'Escreva uma nota visível apenas para a equipe...' : 'Escreva uma resposta técnica para o cliente...'" 
+                                              required
+                                              oninput="this.style.height = ''; this.style.height = Math.min(this.scrollHeight, 240) + 'px'"></textarea>
+                                    
+                                    {{-- Indicador de Digitação --}}
+                                    <div x-show="typingUser" 
+                                         style="display: none;"
+                                         class="absolute -top-10 left-0 flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800/90 border border-indigo-500/30 text-[10px] text-indigo-400 font-bold animate-pulse backdrop-blur-sm shadow-lg">
+                                        <div class="flex gap-1">
+                                            <span class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce"></span>
+                                            <span class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"></span>
+                                            <span class="w-1 h-1 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]"></span>
+                                        </div>
+                                        <span x-text="typingUser + ' está digitando...'"></span>
+                                    </div>
+                                </div>
 
                                 {{-- Botão Enviar --}}
                                 <button type="submit" 

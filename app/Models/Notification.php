@@ -20,6 +20,14 @@ class Notification extends Model
         'read_at' => 'datetime',
     ];
 
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function ($notification) {
+            event(new \App\Events\NotificationReceived($notification));
+        });
+    }
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);

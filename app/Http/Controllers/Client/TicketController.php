@@ -73,7 +73,10 @@ class TicketController extends Controller
 
     public function reply(ReplyTicketRequest $request, Ticket $ticket, ReplyToTicket $replier)
     {
-        $replier->execute($request->user(), $ticket, $request->validated(), $request);
+        $message = $replier->execute($request->user(), $ticket, $request->validated(), $request);
+
+        // Disparar evento para tempo real
+        event(new \App\Events\TicketMessageSent($message));
 
         return back()->with('success', 'Mensagem enviada!');
     }
