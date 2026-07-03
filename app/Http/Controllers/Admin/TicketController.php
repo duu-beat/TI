@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
+use App\Http\Requests\Admin\UpdateTicketStatusRequest;
 use App\Enums\TicketStatus;
 use App\Http\Requests\ReplyTicketRequest;
 use App\Notifications\TicketUpdated;
@@ -102,12 +103,12 @@ class TicketController extends Controller
         ]);
     }
 
-    public function updateStatus(Request $request, Ticket $ticket)
+    public function updateStatus(UpdateTicketStatusRequest $request, Ticket $ticket)
     {
-        $request->validate(['status' => ['required', Rule::enum(TicketStatus::class)]]);
+        $validated = $request->validated();
 
         $oldStatus = $ticket->status->label();
-        $ticket->update(['status' => $request->status]);
+        $ticket->update(['status' => $validated['status']]);
         $newStatus = $ticket->status->label();
 
         $ticket->messages()->create([

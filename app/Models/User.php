@@ -19,7 +19,7 @@ class User extends Authenticatable
     use HasProfilePhoto;
     use Notifiable;
     use TwoFactorAuthenticatable;
-    // use SoftDeletes; // Descomente se criou a migration de soft deletes
+    use SoftDeletes;
 
     // 👑 CONSTANTES DE NÍVEL
     const ROLE_CLIENT = 'client';

@@ -38,7 +38,8 @@ class TicketController extends Controller
 
     public function index(Request $request)
     {
-        $tickets = Ticket::where('user_id', $request->user()->id)
+        // ✅ SÊNIOR: Sempre use o relacionamento do usuário logado para garantir isolamento total
+        $tickets = $request->user()->tickets()
             ->filter($request->only(['search', 'status']))
             ->latest()
             ->paginate(10)
@@ -63,6 +64,7 @@ class TicketController extends Controller
 
     public function show(Ticket $ticket)
     {
+        // ✅ SÊNIOR: A Policy garante que o cliente só veja o que é dele
         $this->authorize('view', $ticket);
         
         // Carrega relações para evitar N+1
