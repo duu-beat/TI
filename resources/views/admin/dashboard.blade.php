@@ -119,7 +119,7 @@
              x-transition:enter-end="opacity-100 translate-y-0">
 
             {{-- 1. 🚨 ALERTA DE PRIORIDADE (Efeito de Crise) --}}
-            @if(isset($priorityStats) && $priorityStats['high'] > 0)
+            @if(isset($priorityStats['high']) && $priorityStats['high'] > 0)
                 <div class="relative overflow-hidden rounded-2xl bg-red-500/10 border border-red-500/30 p-1 shadow-[0_0_30px_rgba(239,68,68,0.2)] animate-pulse-slow">
                     <div class="absolute inset-0 bg-gradient-to-r from-red-600/10 to-transparent pointer-events-none"></div>
                     
@@ -135,7 +135,7 @@
                             <div>
                                 <h3 class="text-lg font-bold text-white tracking-wide">Ação Imediata Necessária</h3>
                                 <p class="text-red-200/80 text-sm mt-1">
-                                    Existem <strong class="text-red-400 text-lg border-b border-red-500/50">{{ $priorityStats['high'] }}</strong> chamados marcados como <strong>Alta Prioridade</strong> na fila.
+                                    Existem <strong class="text-red-400 text-lg border-b border-red-500/50">{{ $priorityStats['high'] ?? 0 }}</strong> chamados marcados como <strong>Alta Prioridade</strong> na fila.
                                 </p>
                             </div>
                         </div>
@@ -305,11 +305,11 @@
                                         <circle cx="64" cy="64" r="58" stroke="currentColor" stroke-width="8" fill="transparent" 
                                                 class="text-indigo-500" 
                                                 stroke-dasharray="{{ 2 * pi() * 58 }}" 
-                                                stroke-dashoffset="{{ (2 * pi() * 58) * (1 - ($slaStats['within_sla_percent'] / 100)) }}" 
+                                                stroke-dashoffset="{{ (2 * pi() * 58) * (1 - (($slaStats['within_sla_percent'] ?? 0) / 100)) }}" 
                                                 stroke-linecap="round" />
                                     </svg>
                                     <div class="absolute inset-0 flex flex-col items-center justify-center">
-                                        <span class="text-2xl font-black text-white">{{ $slaStats['within_sla_percent'] }}%</span>
+                                        <span class="text-2xl font-black text-white">{{ $slaStats['within_sla_percent'] ?? 0 }}%</span>
                                         <span class="text-[10px] text-slate-500 uppercase font-bold">No Prazo</span>
                                     </div>
                                 </div>

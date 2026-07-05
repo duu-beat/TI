@@ -169,11 +169,22 @@ class SlaService
         $avgResolutionTime = Ticket::whereNotNull('resolution_time_minutes')
             ->avg('resolution_time_minutes');
 
+        // ✅ SÊNIOR: Cálculo da porcentagem de chamados dentro do SLA
+        $totalResolved = Ticket::whereIn('status', [TicketStatus::RESOLVED, TicketStatus::CLOSED])->count();
+        $withinSla = Ticket::whereIn('status', [TicketStatus::RESOLVED, TicketStatus::CLOSED])
+            ->where(function($query) {
+                $query->whereNull('resolved_at')
+                      ->orWhereColumn('resolved_at', '<=', 'sla_due_at');
+            })->count();
+
+        $withinSlaPercent = $totalResolved > 0 ? ($withinSla / $totalResolved) * 100 : 100;
+
         return [
             'overdue' => $overdue,
             'due_today' => $dueToday,
             'avg_response_time' => round($avgResponseTime ?? 0, 2),
             'avg_resolution_time' => round($avgResolutionTime ?? 0, 2),
+            'within_sla_percent' => round($withinSlaPercent, 1), // 👈 CHAVE QUE ESTAVA FALTANDO
         ];
     }
 }
