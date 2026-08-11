@@ -208,7 +208,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('assets', \App\Http\Controllers\Admin\AssetController::class);
 
     // 📋 Rotas de Checklist
-    Route::resource('checklists', \App\Http\Controllers\Admin\ChecklistController.class);
+    Route::resource('checklists', \App\Http\Controllers\Admin\ChecklistController::class);
 
     // 📚 Rotas da Wiki (Base de Conhecimento)
     Route::resource('wiki', \App\Http\Controllers\Admin\KnowledgeBaseController::class)
