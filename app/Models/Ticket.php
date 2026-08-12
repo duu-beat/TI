@@ -9,11 +9,14 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Traits\Searchable;
+use App\Traits\Auditable;
 
 class Ticket extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes, Searchable, Auditable;
     protected $fillable = [
         'user_id', 
         'asset_id', // ✅ ADICIONADO: Vínculo com equipamento
@@ -106,21 +109,15 @@ class Ticket extends Model
 
     public function scopeFilter(Builder $query, array $filters): void
     {
-        // Busca avançada: ID, subject, description, mensagens
+        // Busca avançada usando a Trait Searchable
         $query->when($filters['search'] ?? null, function ($q, $search) {
-            $q->where(function ($subQ) use ($search) {
-                $subQ->where('subject', 'like', "%{$search}%")
-                     ->orWhere('description', 'like', "%{$search}%");
-                
-                if (is_numeric($search)) {
-                    $subQ->orWhere('id', $search);
-                }
-                
-                // Busca em mensagens
-                $subQ->orWhereHas('messages', function($msgQ) use ($search) {
-                    $msgQ->where('message', 'like', "%{$search}%");
-                });
-            });
+            $columns = ['subject', 'description', 'messages.message'];
+            
+            if (is_numeric($search)) {
+                $q->where('id', $search)->orSearch($search, $columns);
+            } else {
+                $q->search($search, $columns);
+            }
         });
 
         // Filtro por status

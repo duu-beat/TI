@@ -6,6 +6,7 @@ use App\Models\Ticket;
 use App\Enums\TicketStatus;
 use App\Notifications\TicketUpdated;
 use App\Services\SlaService;
+use Illuminate\Support\Facades\DB;
 
 class UpdateTicketStatus
 {
@@ -17,20 +18,22 @@ class UpdateTicketStatus
 
         $slaService = app(SlaService::class);
 
-        // Se está sendo marcado como resolvido, registrar o timestamp
-        if ($newStatus === TicketStatus::RESOLVED && !$ticket->resolved_at) {
-            $ticket->update([
-                'status' => $newStatus,
-                'resolved_at' => now(),
-            ]);
-            
-            // Calcular tempo de resolução
-            $slaService->calculateResolutionTime($ticket);
-        } else {
-            $ticket->update(['status' => $newStatus]);
-        }
+        DB::transaction(function () use ($ticket, $newStatus, $slaService) {
+            // Se está sendo marcado como resolvido, registrar o timestamp
+            if ($newStatus === TicketStatus::RESOLVED && !$ticket->resolved_at) {
+                $ticket->update([
+                    'status' => $newStatus,
+                    'resolved_at' => now(),
+                ]);
+                
+                // Calcular tempo de resolução
+                $slaService->calculateResolutionTime($ticket);
+            } else {
+                $ticket->update(['status' => $newStatus]);
+            }
 
-        // Notificar o cliente sobre a mudança
-        $ticket->user->notify(new TicketUpdated($ticket, 'status_updated'));
+            // Notificar o cliente sobre a mudança
+            $ticket->user->notify(new \App\Notifications\TicketUpdated($ticket, 'status_updated'));
+        });
     }
 }

@@ -110,15 +110,17 @@ class TicketController extends Controller
     {
         $validated = $request->validated();
 
-        $oldStatus = $ticket->status->label();
-        $updater->execute($ticket, TicketStatus::from($validated['status']));
-        $newStatus = $ticket->status->label();
+        \Illuminate\Support\Facades\DB::transaction(function () use ($ticket, $validated, $updater) {
+            $oldStatus = $ticket->status->label();
+            $updater->execute($ticket, TicketStatus::from($validated['status']));
+            $newStatus = $ticket->status->label();
 
-        $ticket->messages()->create([
-            'user_id' => auth()->id(),
-            'is_internal' => true,
-            'message' => "⚡ alterou o status de **{$oldStatus}** para **{$newStatus}**."
-        ]);
+            $ticket->messages()->create([
+                'user_id' => auth()->id(),
+                'is_internal' => true,
+                'message' => "⚡ alterou o status de **{$oldStatus}** para **{$newStatus}**."
+            ]);
+        });
 
         return back()->with('success', 'Status atualizado.');
     }
@@ -133,27 +135,31 @@ class TicketController extends Controller
         ]);
 
         if ($request->boolean('is_internal')) {
-            $message = $ticket->messages()->create([
-                'user_id' => auth()->id(),
-                'message' => $validated['message'],
-                'is_internal' => true,
-                'time_spent' => $request->input('time_spent', 0),
-            ]);
-            
-            // Disparar evento para tempo real (apenas se não for interna ou se quiser que técnicos vejam)
-            event(new \App\Events\TicketMessageSent($message));
+            \Illuminate\Support\Facades\DB::transaction(function () use ($ticket, $validated, $request) {
+                $message = $ticket->messages()->create([
+                    'user_id' => auth()->id(),
+                    'message' => $validated['message'],
+                    'is_internal' => true,
+                    'time_spent' => $request->input('time_spent', 0),
+                ]);
+                
+                // Disparar evento para tempo real
+                event(new \App\Events\TicketMessageSent($message));
+            });
 
             return back()->with('success', 'Nota interna adicionada.');
         }
 
-        $message = $replier->execute($request->user(), $ticket, $validated, $request);
-        
-        // Disparar evento para tempo real
-        event(new \App\Events\TicketMessageSent($message));
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $ticket, $validated, $replier) {
+            $message = $replier->execute($request->user(), $ticket, $validated, $request);
+            
+            // Disparar evento para tempo real
+            event(new \App\Events\TicketMessageSent($message));
 
-        if ($ticket->status !== TicketStatus::RESOLVED && $ticket->status !== TicketStatus::CLOSED) {
-            $ticket->update(['status' => TicketStatus::WAITING_CLIENT]);
-        }
+            if ($ticket->status !== TicketStatus::RESOLVED && $ticket->status !== TicketStatus::CLOSED) {
+                $ticket->update(['status' => TicketStatus::WAITING_CLIENT]);
+            }
+        });
 
         return back()->with('success', 'Resposta enviada!');
     }
@@ -166,13 +172,15 @@ class TicketController extends Controller
 
     public function escalate(Ticket $ticket)
     {
-        $ticket->update(['is_escalated' => true]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($ticket) {
+            $ticket->update(['is_escalated' => true]);
 
-        $ticket->messages()->create([
-            'user_id' => auth()->id(),
-            'is_internal' => true,
-            'message' => "🚨 **ESCALONOU** este chamado para a equipe de Segurança."
-        ]);
+            $ticket->messages()->create([
+                'user_id' => auth()->id(),
+                'is_internal' => true,
+                'message' => "🚨 **ESCALONOU** este chamado para a equipe de Segurança."
+            ]);
+        });
 
         return back()->with('success', 'Escalonado com sucesso.');
     }
@@ -186,14 +194,16 @@ class TicketController extends Controller
             ],
         ]);
 
-        $user = User::findOrFail($request->assigned_to);
-        $ticket->update(['assigned_to' => $request->assigned_to]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $ticket) {
+            $user = User::findOrFail($request->assigned_to);
+            $ticket->update(['assigned_to' => $request->assigned_to]);
 
-        $ticket->messages()->create([
-            'user_id' => auth()->id(),
-            'is_internal' => true,
-            'message' => "👤 atribuiu este chamado para **{$user->name}**."
-        ]);
+            $ticket->messages()->create([
+                'user_id' => auth()->id(),
+                'is_internal' => true,
+                'message' => "👤 atribuiu este chamado para **{$user->name}**."
+            ]);
+        });
 
         return back()->with('success', 'Chamado atribuído.');
     }
@@ -202,21 +212,23 @@ class TicketController extends Controller
     {
         $request->validate(['target_ticket_id' => 'required|exists:tickets,id']);
 
-        $targetTicket = Ticket::find($request->target_ticket_id);
+        $targetTicket = Ticket::findOrFail($request->target_ticket_id);
 
         if ($targetTicket->id === $ticket->id) {
             return back()->with('error', 'Não pode fundir o chamado com ele mesmo.');
         }
 
-        $ticket->messages()->update(['ticket_id' => $targetTicket->id]);
-        
-        $targetTicket->messages()->create([
-            'user_id' => auth()->id(),
-            'message' => "Sistema: As mensagens do chamado #{$ticket->id} foram movidas para cá.",
-            'is_internal' => true,
-        ]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($ticket, $targetTicket) {
+            $ticket->messages()->update(['ticket_id' => $targetTicket->id]);
+            
+            $targetTicket->messages()->create([
+                'user_id' => auth()->id(),
+                'message' => "Sistema: As mensagens do chamado #{$ticket->id} foram movidas para cá.",
+                'is_internal' => true,
+            ]);
 
-        $ticket->update(['status' => TicketStatus::CLOSED]);
+            $ticket->update(['status' => TicketStatus::CLOSED]);
+        });
 
         return redirect()->route('admin.tickets.show', $targetTicket)
             ->with('success', "Chamados fundidos.");
