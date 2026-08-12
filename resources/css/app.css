@@ -1,11 +1,11 @@
 
 
+/* Acessibilidade */
+@import './accessibility.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
-
-/* Acessibilidade */
-@import './accessibility.css';
 
 [x-cloak] {
     display: none;

@@ -17,6 +17,7 @@ use App\Models\CannedResponse;
 use App\Models\User;
 use App\Services\SlaService;
 use App\Services\DashboardStatsService;
+use App\Actions\Ticket\UpdateTicketStatus;
 
 class TicketController extends Controller
 {
@@ -89,6 +90,8 @@ class TicketController extends Controller
      */
     public function toggleChecklistItem(Ticket $ticket, \App\Models\TicketChecklist $item)
     {
+        $item = $ticket->checklists()->findOrFail($item->id);
+
         $item->update([
             'is_completed' => !$item->is_completed,
             'completed_at' => !$item->is_completed ? now() : null,
@@ -103,12 +106,12 @@ class TicketController extends Controller
         ]);
     }
 
-    public function updateStatus(UpdateTicketStatusRequest $request, Ticket $ticket)
+    public function updateStatus(UpdateTicketStatusRequest $request, Ticket $ticket, UpdateTicketStatus $updater)
     {
         $validated = $request->validated();
 
         $oldStatus = $ticket->status->label();
-        $ticket->update(['status' => $validated['status']]);
+        $updater->execute($ticket, TicketStatus::from($validated['status']));
         $newStatus = $ticket->status->label();
 
         $ticket->messages()->create([
@@ -176,9 +179,14 @@ class TicketController extends Controller
 
     public function assign(Request $request, Ticket $ticket)
     {
-        $request->validate(['assigned_to' => 'required|exists:users,id']);
+        $request->validate([
+            'assigned_to' => [
+                'required',
+                Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['admin', 'master'])),
+            ],
+        ]);
 
-        $user = User::find($request->assigned_to);
+        $user = User::findOrFail($request->assigned_to);
         $ticket->update(['assigned_to' => $request->assigned_to]);
 
         $ticket->messages()->create([
@@ -238,21 +246,25 @@ class TicketController extends Controller
                 ];
             });
 
-        // Busca Usuários
-        $users = User::where('name', 'like', "%{$query}%")
-            ->orWhere('email', 'like', "%{$query}%")
-            ->take(3)
-            ->get()
-            ->map(function($user) {
-                return [
-                    'type' => 'user',
-                    'id' => $user->id,
-                    'title' => $user->name,
-                    'subtitle' => $user->email,
-                    'url' => route('master.users.edit', $user), // Ajuste se a rota for diferente
-                    'icon' => 'user'
-                ];
-            });
+        // Dados de usuários são reservados à área master; o recurso edit não existe nesta rota.
+        $users = $request->user()->isMaster()
+            ? User::where(function ($userQuery) use ($query) {
+                $userQuery->where('name', 'like', "%{$query}%")
+                    ->orWhere('email', 'like', "%{$query}%");
+            })
+                ->take(3)
+                ->get()
+                ->map(function ($user) {
+                    return [
+                        'type' => 'user',
+                        'id' => $user->id,
+                        'title' => $user->name,
+                        'subtitle' => $user->email,
+                        'url' => route('master.users.index'),
+                        'icon' => 'user',
+                    ];
+                })
+            : collect();
 
         return response()->json($tickets->merge($users));
     }

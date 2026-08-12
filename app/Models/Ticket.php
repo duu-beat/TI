@@ -27,6 +27,11 @@ class Ticket extends Model
         'nps_score', // ✅ ADICIONADO: Score NPS
         'is_escalated',
         'assigned_to', // ✅ ADICIONADO: Necessário para a atribuição funcionar
+        'sla_due_at',
+        'first_response_at',
+        'resolved_at',
+        'response_time_minutes',
+        'resolution_time_minutes',
     ];
 
     protected $casts = [
