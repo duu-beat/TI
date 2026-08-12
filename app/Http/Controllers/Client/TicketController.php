@@ -75,8 +75,6 @@ class TicketController extends Controller
 
     public function reply(ReplyTicketRequest $request, Ticket $ticket, ReplyToTicket $replier)
     {
-        $this->authorize('update', $ticket);
-
         $message = $replier->execute($request->user(), $ticket, $request->validated(), $request);
 
         // Disparar evento para tempo real

@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Ticket;
 use App\Models\User;
-use App\Enums\TicketStatus;
 
 class TicketPolicy
 {
@@ -53,7 +52,7 @@ class TicketPolicy
             return true;
         }
         // Cliente só atualiza o seu próprio se não estiver fechado
-        return $user->id === $ticket->user_id && $ticket->status !== TicketStatus::CLOSED;
+        return $user->id === $ticket->user_id && $ticket->status !== 'closed';
     }
 
     /**

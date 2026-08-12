@@ -2,11 +2,7 @@
 
 namespace App\Providers;
 
-use App\Models\Asset;
-use App\Models\NpsSurvey;
 use App\Models\Ticket;
-use App\Observers\AssetObserver;
-use App\Observers\NpsSurveyObserver;
 use App\Observers\TicketObserver;
 use App\Policies\TicketPolicy;
 use Illuminate\Support\Carbon;
@@ -37,8 +33,6 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Ticket::class, TicketPolicy::class);
 
         Ticket::observe(TicketObserver::class);
-        Asset::observe(AssetObserver::class);
-        NpsSurvey::observe(NpsSurveyObserver::class);
 
         View::composer('layouts.app', function ($view) {
             $bannerData = Cache::remember('ui:global_banner:v1', 60, function () {

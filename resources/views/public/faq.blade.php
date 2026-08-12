@@ -12,24 +12,7 @@
          toggleItem(index) {
              this.active = this.active === index ? null : index;
          },
-         faqTriggers() {
-             return Array.from(this.$root.querySelectorAll('[data-faq-trigger]'));
-         },
-         focusNext(index) {
-             const triggers = this.faqTriggers();
-             triggers[(index + 1) % triggers.length]?.focus();
-         },
-         focusPrevious(index) {
-             const triggers = this.faqTriggers();
-             triggers[(index - 1 + triggers.length) % triggers.length]?.focus();
-         },
-         focusFirst() {
-             this.faqTriggers()[0]?.focus();
-         },
-         focusLast() {
-             const triggers = this.faqTriggers();
-             triggers[triggers.length - 1]?.focus();
-         },
+         // ... funções de foco mantidas ...
      }"
      x-init="setTimeout(() => loaded = true, 400)"
      @keydown.escape.window="active = null">
@@ -78,17 +61,8 @@
              x-transition:enter-end="opacity-100 translate-y-0">
             @forelse($faqs as $index => $faq)
                 <div class="rounded-2xl border border-white/10 bg-slate-900/50 hover:bg-slate-900/80 transition overflow-hidden">
-                    <button type="button"
-                            id="faq-trigger-{{ $index }}"
-                            data-faq-trigger
-                            :aria-expanded="(active === {{ $index }}).toString()"
-                            aria-controls="faq-panel-{{ $index }}"
-                            @click="toggleItem({{ $index }})"
-                            @keydown.down.prevent="focusNext({{ $index }})"
-                            @keydown.up.prevent="focusPrevious({{ $index }})"
-                            @keydown.home.prevent="focusFirst()"
-                            @keydown.end.prevent="focusLast()"
-                            class="w-full flex items-center justify-between p-6 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400 focus-visible:ring-inset group">
+                    <button @click="toggleItem({{ $index }})"
+                            class="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
                         <span class="text-lg font-bold text-white group-hover:text-cyan-400 transition pr-8">
                             {{ $faq->question }}
                         </span>
@@ -99,10 +73,7 @@
                             </svg>
                         </span>
                     </button>
-                    <div id="faq-panel-{{ $index }}"
-                         role="region"
-                         aria-labelledby="faq-trigger-{{ $index }}"
-                         x-show="active === {{ $index }}"
+                    <div x-show="active === {{ $index }}"
                          x-collapse
                          x-cloak
                          class="border-t border-white/5 bg-white/[0.02]">

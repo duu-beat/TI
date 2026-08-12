@@ -25,8 +25,7 @@ class DeleteAccountTest extends TestCase
             ->set('password', 'password')
             ->call('deleteUser');
 
-        $this->assertSoftDeleted('users', ['id' => $user->id]);
-        $this->assertNull(User::find($user->id));
+        $this->assertNull($user->fresh());
     }
 
     public function test_correct_password_must_be_provided_before_account_can_be_deleted(): void

@@ -3,7 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Ticket;
-use App\Support\DashboardCache;
+use Illuminate\Support\Facades\Cache;
 
 class TicketObserver
 {
@@ -52,7 +52,10 @@ class TicketObserver
      */
     protected function clearDashboardCache($userId): void
     {
-        DashboardCache::forgetTicketDataForUser((int) $userId);
-        DashboardCache::forgetAdminData();
+        Cache::forget("dashboard_stats_{$userId}");
+        Cache::forget("home:client:{$userId}:stats:v1");
+        Cache::forget('home:admin:stats:v1');
+        Cache::forget('home:master:stats:v1');
+        Cache::forget('admin_dashboard_stats_v5');
     }
 }
