@@ -7,6 +7,8 @@ use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use App\Support\DashboardCache;
 
 /**
  * Serviço de Estatísticas do Dashboard
@@ -40,7 +42,7 @@ class DashboardStatsService
     {
         // 1. Dados Pesados (Cacheados por 5 minutos)
         // Inclui contagens globais, dados do gráfico e métricas de SLA.
-        $cachedData = Cache::remember('admin_dashboard_stats_v6', 900, function () {
+        $cachedData = Cache::remember(DashboardCache::ADMIN_STATS, 900, function () {
             return $this->calculateCachedStats();
         });
 
@@ -104,11 +106,16 @@ class DashboardStatsService
         // Preparação dos dados para o gráfico de volume dos últimos 7 dias
         $dates = collect(range(6, 0))->map(fn($daysAgo) => now()->subDays($daysAgo)->format('d/m'));
 
-        // Agrupamento via PHP para garantir compatibilidade entre MySQL e SQLite
-        $ticketsPerDay = Ticket::where('created_at', '>=', now()->subDays(6)->startOfDay())
-            ->get()
-            ->groupBy(fn($ticket) => $ticket->created_at->format('d/m'))
-            ->map->count();
+        // Agregação no banco para não carregar todos os tickets da semana em memória.
+        $dateExpression = DB::connection()->getDriverName() === 'sqlite'
+            ? "strftime('%d/%m', created_at)"
+            : "DATE_FORMAT(created_at, '%d/%m')";
+
+        $ticketsPerDay = Ticket::query()
+            ->where('created_at', '>=', now()->subDays(6)->startOfDay())
+            ->selectRaw("{$dateExpression} as day, count(*) as total")
+            ->groupBy('day')
+            ->pluck('total', 'day');
 
         $chartValues = $dates->map(fn($date) => $ticketsPerDay->get($date, 0));
 
@@ -120,10 +127,8 @@ class DashboardStatsService
             ->get();
 
         // ⏱️ Tempo Médio de Resolução (SLA Real)
-        $avgResolutionTime = Ticket::where('status', TicketStatus::RESOLVED)
-            ->whereNotNull('resolved_at')
-            ->selectRaw('avg(timestampdiff(HOUR, created_at, resolved_at)) as avg_hours')
-            ->first()->avg_hours ?? 0;
+        $avgResolutionTime = (Ticket::whereNotNull('resolution_time_minutes')
+            ->avg('resolution_time_minutes') ?? 0) / 60;
 
         return [
             'stats'         => $stats,
@@ -160,7 +165,7 @@ class DashboardStatsService
                 },
             ])
             ->withAvg('assignedTickets as avg_rating', 'rating')
-            ->having('assigned_tickets_count', '>', 0)
+            ->has('assignedTickets')
             ->orderByDesc('resolved_count')
             ->take(5)
             ->get();
