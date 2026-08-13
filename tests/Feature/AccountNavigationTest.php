@@ -18,7 +18,8 @@ class AccountNavigationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('account-menu', false);
-        $response->assertSee(route('client.profile'), false);
+        $response->assertSee(route('client.profile') . '#identidade-da-conta', false);
+        $response->assertSee(route('client.profile') . '#seguranca-da-conta', false);
         $response->assertSee('Segurança da Conta');
         $response->assertDontSee('👤 Meu Perfil', false);
     }
@@ -31,7 +32,8 @@ class AccountNavigationTest extends TestCase
 
         $response->assertOk();
         $response->assertSee('account-menu', false);
-        $response->assertSee(route('admin.profile'), false);
+        $response->assertSee(route('admin.profile') . '#identidade-da-conta', false);
+        $response->assertSee(route('admin.profile') . '#seguranca-da-conta', false);
         $response->assertDontSee('👤 Meu Perfil', false);
     }
 
@@ -45,5 +47,7 @@ class AccountNavigationTest extends TestCase
         $response->assertSee('Central da Conta');
         $response->assertSee('id="identidade-da-conta"', false);
         $response->assertSee('id="seguranca-da-conta"', false);
+        $response->assertSee('openSectionFromHash()', false);
+        $response->assertSee('@hashchange.window="openSectionFromHash()"', false);
     }
 }

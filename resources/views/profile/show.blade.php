@@ -40,7 +40,32 @@
     </x-slot>
 
     {{-- ⚡ ALPINE.JS CONTROLLER --}}
-    <div x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 500)" class="py-10">
+    <div x-data="{
+            loaded: false,
+            highlightedSection: null,
+            highlightTimer: null,
+            openSectionFromHash() {
+                const sectionId = decodeURIComponent(window.location.hash.replace('#', ''));
+
+                if (!['identidade-da-conta', 'seguranca-da-conta'].includes(sectionId)) {
+                    return;
+                }
+
+                this.$nextTick(() => {
+                    const section = document.getElementById(sectionId);
+                    if (!section) return;
+
+                    section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    section.focus({ preventScroll: true });
+                    this.highlightedSection = sectionId;
+                    window.clearTimeout(this.highlightTimer);
+                    this.highlightTimer = window.setTimeout(() => this.highlightedSection = null, 2200);
+                });
+            }
+        }"
+        x-init="setTimeout(() => { loaded = true; openSectionFromHash(); }, 500)"
+        @hashchange.window="openSectionFromHash()"
+        class="py-10">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
             
             {{-- 💀 SKELETON LOADING --}}
@@ -123,12 +148,18 @@
                 <div class="grid lg:grid-cols-2 gap-8">
                     
                     {{-- 1. Informações --}}
-                    <div id="identidade-da-conta" class="scroll-mt-24 bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
+                    <div id="identidade-da-conta"
+                         tabindex="-1"
+                         :class="highlightedSection === 'identidade-da-conta' ? 'ring-2 ring-cyan-400/70 border-cyan-400/40 shadow-[0_0_32px_rgba(34,211,238,0.18)]' : ''"
+                         class="scroll-mt-24 bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
                         @livewire('profile.update-profile-information-form')
                     </div>
 
                     {{-- 2. Senha --}}
-                    <div id="seguranca-da-conta" class="scroll-mt-24 bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
+                    <div id="seguranca-da-conta"
+                         tabindex="-1"
+                         :class="highlightedSection === 'seguranca-da-conta' ? 'ring-2 ring-emerald-400/70 border-emerald-400/40 shadow-[0_0_32px_rgba(52,211,153,0.16)]' : ''"
+                         class="scroll-mt-24 bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
                         @livewire('profile.update-password-form')
                     </div>
 

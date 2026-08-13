@@ -101,7 +101,7 @@
                  class="absolute bottom-full left-0 right-0 z-[60] mb-3 rounded-2xl border border-white/10 bg-slate-900/95 p-2 shadow-2xl backdrop-blur-xl"
                  role="menu"
                  aria-label="{{ __('Opções da conta') }}">
-                <a href="{{ $profileRoute }}"
+                <a href="{{ $profileRoute }}#identidade-da-conta"
                    role="menuitem"
                    @click="accountMenuOpen = false"
                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 hover:text-white transition">
