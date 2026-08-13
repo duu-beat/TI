@@ -65,10 +65,4 @@
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.wiki.*') ? $activeClass : $inactiveClass }}">
         📚 Base de Conhecimento
     </a>
-    
-    {{-- Perfil --}}
-    <a href="{{ route('admin.profile') }}"
-        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.profile') ? $activeClass : $inactiveClass }}">
-        👤 Meu Perfil
-    </a>
 </div>

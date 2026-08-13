@@ -67,27 +67,74 @@
         @endif
     </nav>
 
-    {{-- Rodapé do Menu: Informações do Usuário e Botão de Logout --}}
-    <div class="p-4 border-t border-white/10 bg-white/5">
-        <div class="flex items-center justify-between gap-3">
-            
-            {{-- Link para o perfil do usuário --}}
-            <a href="{{ $profileRoute }}" class="overflow-hidden group cursor-pointer block flex-1">
-                <div class="text-sm text-slate-200 font-semibold truncate group-hover:text-white transition">{{ $user->name }}</div>
-                <div class="text-xs text-slate-500 truncate group-hover:text-slate-400 transition">{{ $user->email }}</div>
-            </a>
-            
-            {{-- Botão de Logout com acionamento de modal Alpine.js --}}
+    {{-- Conta: o avatar é o acesso principal ao perfil e à segurança. --}}
+    <div class="p-4 border-t border-white/10 bg-white/5" x-data="{ accountMenuOpen: false }" @keydown.escape.window="accountMenuOpen = false">
+        <div class="relative">
             <button type="button"
-                    @click="openLogoutModal($event.currentTarget)"
-                    :aria-expanded="logoutModalOpen.toString()"
-                    aria-controls="logout-modal"
-                    class="rounded-xl bg-white/10 p-2 text-slate-200 hover:bg-white/20 hover:text-red-400 transition" 
-                    title="Sair">
-                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                    @click="accountMenuOpen = !accountMenuOpen"
+                    :aria-expanded="accountMenuOpen.toString()"
+                    aria-haspopup="menu"
+                    aria-controls="account-menu"
+                    class="w-full flex items-center gap-3 rounded-2xl p-2 text-left hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-cyan-400/60 transition group">
+                <img src="{{ $user->profile_photo_url }}"
+                     alt="{{ __('Abrir opções da conta de :name', ['name' => $user->name]) }}"
+                     class="h-11 w-11 rounded-xl object-cover border border-white/10 bg-slate-800 group-hover:border-cyan-400/50 transition" />
+                <span class="min-w-0 flex-1">
+                    <span class="block text-sm text-slate-200 font-semibold truncate group-hover:text-white transition">{{ $user->name }}</span>
+                    <span class="block text-xs text-slate-500 truncate">{{ $badge }}</span>
+                </span>
+                <svg class="h-4 w-4 shrink-0 text-slate-500 transition-transform" :class="accountMenuOpen ? 'rotate-180 text-cyan-300' : ''" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" />
                 </svg>
             </button>
+
+            <div id="account-menu"
+                 x-cloak
+                 x-show="accountMenuOpen"
+                 x-transition:enter="transition ease-out duration-150"
+                 x-transition:enter-start="opacity-0 translate-y-2"
+                 x-transition:enter-end="opacity-100 translate-y-0"
+                 x-transition:leave="transition ease-in duration-100"
+                 x-transition:leave-start="opacity-100 translate-y-0"
+                 x-transition:leave-end="opacity-0 translate-y-2"
+                 @click.outside="accountMenuOpen = false"
+                 class="absolute bottom-full left-0 right-0 z-[60] mb-3 rounded-2xl border border-white/10 bg-slate-900/95 p-2 shadow-2xl backdrop-blur-xl"
+                 role="menu"
+                 aria-label="{{ __('Opções da conta') }}">
+                <a href="{{ $profileRoute }}"
+                   role="menuitem"
+                   @click="accountMenuOpen = false"
+                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 hover:text-white transition">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-300">👤</span>
+                    <span>
+                        <span class="block font-semibold">{{ __('Meu Perfil') }}</span>
+                        <span class="block text-xs text-slate-500">{{ __('Dados e foto da conta') }}</span>
+                    </span>
+                </a>
+
+                <a href="{{ $profileRoute }}#seguranca-da-conta"
+                   role="menuitem"
+                   @click="accountMenuOpen = false"
+                   class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 hover:text-white transition">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-300">🛡️</span>
+                    <span>
+                        <span class="block font-semibold">{{ __('Segurança da Conta') }}</span>
+                        <span class="block text-xs text-slate-500">{{ __('Senha, 2FA e sessões') }}</span>
+                    </span>
+                </a>
+
+                <div class="my-2 h-px bg-white/10"></div>
+
+                <button type="button"
+                        role="menuitem"
+                        aria-controls="logout-modal"
+                        :aria-expanded="logoutModalOpen.toString()"
+                        @click="accountMenuOpen = false; openLogoutModal($event.currentTarget)"
+                        class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition">
+                    <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">↪</span>
+                    <span class="font-semibold">{{ __('Sair da conta') }}</span>
+                </button>
+            </div>
         </div>
     </div>
 </aside>

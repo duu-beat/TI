@@ -11,18 +11,21 @@
         // Define Classes Completas para o Tailwind não remover em produção (Purge)
         if ($isMaster) {
             $roleLabel  = 'Segurança (Master)';
-            $badgeClass = 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(220,38,38,0.2)]';
+            $accountIntro = 'Gerencie a identidade e os controles de acesso do Núcleo de Segurança.';
+            $badgeClass = 'bg-red-500/10 border-red-500/20 text-red-400 shadow-[0_0_15px_rgba(220,38,68,0.2)]';
             $glowClass  = 'from-red-500/10 group-hover:from-red-500/20';
             $ringClass  = 'ring-red-500/30';
             $stripeClass = 'via-red-500';
         } elseif ($isAdmin) {
             $roleLabel  = 'Administrador';
+            $accountIntro = 'Mantenha sua identidade e os controles de acesso do suporte protegidos.';
             $badgeClass = 'bg-cyan-500/10 border-cyan-500/20 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.2)]';
             $glowClass  = 'from-cyan-500/10 group-hover:from-cyan-500/20';
             $ringClass  = 'ring-cyan-500/30';
             $stripeClass = 'via-cyan-500';
         } else {
             $roleLabel  = 'Cliente';
+            $accountIntro = 'Atualize seus dados e mantenha sua conta protegida para acompanhar seus chamados.';
             $badgeClass = 'bg-slate-800 border-white/10 text-slate-300';
             $glowClass  = 'from-indigo-500/10 group-hover:from-indigo-500/20';
             $ringClass  = 'ring-indigo-500/30';
@@ -32,7 +35,7 @@
 
     <x-slot name="header">
         <h2 class="font-bold text-xl text-white leading-tight">
-            {{ __('Minha Conta') }}
+            {{ __('Central da Conta') }}
         </h2>
     </x-slot>
 
@@ -65,9 +68,11 @@
                     {{-- Glow de fundo baseado no cargo --}}
                     <div class="absolute top-0 right-0 w-full h-full bg-gradient-to-l {{ $glowClass }} pointer-events-none transition duration-700"></div>
 
-                    <img class="relative h-24 w-24 rounded-full object-cover border-4 border-slate-950 shadow-lg ring-2 {{ $ringClass }}" 
-                         src="{{ $user->profile_photo_url }}" 
-                         alt="{{ $user->name }}">
+                    <a href="#identidade-da-conta" class="relative shrink-0 rounded-full focus:outline-none focus:ring-2 focus:ring-cyan-400/70" aria-label="{{ __('Alterar foto e dados do perfil') }}">
+                        <img class="h-24 w-24 rounded-full object-cover border-4 border-slate-950 shadow-lg ring-2 {{ $ringClass }}"
+                             src="{{ $user->profile_photo_url }}"
+                             alt="{{ $user->name }}">
+                    </a>
 
                     <div class="relative text-center md:text-left z-10 flex-1">
                         <h1 class="text-3xl font-black text-white tracking-tight flex items-center justify-center md:justify-start gap-3">
@@ -75,7 +80,9 @@
                             @if($isMaster) <span title="Acesso Root" class="text-2xl drop-shadow-md">🛡️</span> @endif
                         </h1>
                         
-                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-2">
+                        <p class="mt-2 text-sm text-slate-400 max-w-xl">{{ $accountIntro }}</p>
+
+                        <div class="flex flex-wrap items-center justify-center md:justify-start gap-4 mt-3">
                             <span class="text-slate-400 text-sm font-medium flex items-center gap-1">
                                 <svg class="w-4 h-4 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
                                 {{ $user->email }}
@@ -104,16 +111,24 @@
                     </div>
                 </div>
 
+                <div class="mt-10 mb-5 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
+                    <div>
+                        <p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">{{ __('Configurações da conta') }}</p>
+                        <h3 class="mt-1 text-2xl font-black text-white">{{ __('Identidade e proteção em um só lugar') }}</h3>
+                    </div>
+                    <p class="text-sm text-slate-400">{{ __('Use o avatar na barra lateral para voltar rapidamente a esta central.') }}</p>
+                </div>
+
                 {{-- GRID DE CONFIGURAÇÕES --}}
                 <div class="grid lg:grid-cols-2 gap-8">
                     
                     {{-- 1. Informações --}}
-                    <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
+                    <div id="identidade-da-conta" class="scroll-mt-24 bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
                         @livewire('profile.update-profile-information-form')
                     </div>
 
                     {{-- 2. Senha --}}
-                    <div class="bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
+                    <div id="seguranca-da-conta" class="scroll-mt-24 bg-slate-900/50 rounded-[2rem] border border-white/5 p-2 shadow-xl hover:border-white/10 transition">
                         @livewire('profile.update-password-form')
                     </div>
 
