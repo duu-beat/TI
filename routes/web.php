@@ -181,7 +181,8 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::cl
         Route::post('/chamados/{ticket}/resolver-master', [MasterDashboardController::class, 'resolveEscalated'])->name('tickets.resolve');
         Route::get('/logs-sistema', [MasterDashboardController::class, 'systemLogs'])->name('system-logs');
         Route::post('/logs-sistema/limpar', [MasterDashboardController::class, 'clearSystemLogs'])->name('system-logs.clear');
-});
+        Route::get('/saude', [\App\Http\Controllers\Master\HealthCheckController::class, 'index'])->name('health');
+    });
 
 // Rotas Extras (Admin)
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {

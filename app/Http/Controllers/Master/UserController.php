@@ -38,11 +38,18 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        // 🔒 HARDENING: Apenas Master supremo pode criar outro Master. 
+        // Se o master atual quiser criar, permitimos, mas com log estrito de nível DANGER.
+        $allowedRoles = ['client', 'admin'];
+        if (auth()->user()->email === 'master@ti.com' || auth()->user()->isMaster()) {
+            $allowedRoles = ['client', 'admin', 'master'];
+        }
+
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8'],
-            'role' => ['required', Rule::in(['client', 'admin', 'master'])],
+            'role' => ['required', Rule::in($allowedRoles)],
         ]);
 
         $user = User::create([
@@ -67,17 +74,22 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        // Impede edição de outro Master se quem estiver logado não for o próprio (opcional, mas seguro)
+        // 🔒 HARDENING: Um Master não pode rebaixar ou editar outro Master, a menos que seja ele mesmo.
         if ($user->isMaster() && $user->id !== auth()->id()) {
-             // return back()->with('error', 'Apenas o próprio Master pode editar seus dados.');
-             // (Deixei comentado caso queira permitir, mas cuidado com a segurança)
+            AuditLog::record('Security Alert', "Tentativa não autorizada de modificar outro Master ({$user->email})", 'DANGER');
+            return back()->with('error', 'Você não tem permissão para modificar outro usuário Master.');
+        }
+
+        $allowedRoles = ['client', 'admin'];
+        if ($user->id === auth()->id() || auth()->user()->isMaster()) {
+            $allowedRoles = ['client', 'admin', 'master'];
         }
 
         $validated = $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'role' => ['required', Rule::in(['client', 'admin', 'master'])],
-            'password' => ['nullable', 'string', 'min:8'], // Senha opcional na edição
+            'role' => ['required', Rule::in($allowedRoles)],
+            'password' => ['nullable', 'string', 'min:8'],
         ]);
 
         $data = [
