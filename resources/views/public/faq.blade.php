@@ -9,12 +9,29 @@
      x-data="{
          loaded: false,
          active: null,
+         faqTriggers: [],
          toggleItem(index) {
              this.active = this.active === index ? null : index;
          },
-         // ... funções de foco mantidas ...
+         registerFaqTriggers() {
+             this.faqTriggers = Array.from(this.$root.querySelectorAll('[data-faq-trigger]'));
+         },
+         focusNext(index) {
+             if (!this.faqTriggers.length) return;
+             this.faqTriggers[(index + 1) % this.faqTriggers.length].focus();
+         },
+         focusPrevious(index) {
+             if (!this.faqTriggers.length) return;
+             this.faqTriggers[(index - 1 + this.faqTriggers.length) % this.faqTriggers.length].focus();
+         },
+         focusFirst() {
+             this.faqTriggers[0]?.focus();
+         },
+         focusLast() {
+             this.faqTriggers.at(-1)?.focus();
+         }
      }"
-     x-init="setTimeout(() => loaded = true, 400)"
+     x-init="setTimeout(() => loaded = true, 400); $nextTick(() => registerFaqTriggers())"
      @keydown.escape.window="active = null">
     
     {{-- Background Glow --}}
@@ -61,7 +78,15 @@
              x-transition:enter-end="opacity-100 translate-y-0">
             @forelse($faqs as $index => $faq)
                 <div class="rounded-2xl border border-white/10 bg-slate-900/50 hover:bg-slate-900/80 transition overflow-hidden">
-                    <button @click="toggleItem({{ $index }})"
+                    <button type="button"
+                            data-faq-trigger
+                            @click="toggleItem({{ $index }})"
+                            @keydown.down.prevent="focusNext({{ $loop->index }})"
+                            @keydown.up.prevent="focusPrevious({{ $loop->index }})"
+                            @keydown.home.prevent="focusFirst()"
+                            @keydown.end.prevent="focusLast()"
+                            :aria-expanded="(active === {{ $index }}).toString()"
+                            aria-controls="faq-answer-{{ $faq->id }}"
                             class="w-full flex items-center justify-between p-6 text-left focus:outline-none group">
                         <span class="text-lg font-bold text-white group-hover:text-cyan-400 transition pr-8">
                             {{ $faq->question }}
@@ -73,7 +98,8 @@
                             </svg>
                         </span>
                     </button>
-                    <div x-show="active === {{ $index }}"
+                    <div id="faq-answer-{{ $faq->id }}"
+                         x-show="active === {{ $index }}"
                          x-collapse
                          x-cloak
                          class="border-t border-white/5 bg-white/[0.02]">
