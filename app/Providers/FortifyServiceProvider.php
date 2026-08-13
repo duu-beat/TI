@@ -16,9 +16,11 @@ use Laravel\Fortify\Fortify;
 // Interfaces do Fortify
 use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
+use Laravel\Fortify\Contracts\TwoFactorLoginResponse;
 // Tuas Classes Personalizadas
 use App\Http\Responses\LoginResponse as CustomLoginResponse;
 use App\Http\Responses\RegisterResponse as CustomRegisterResponse;
+use App\Http\Responses\TwoFactorLoginResponse as CustomTwoFactorLoginResponse;
 
 class FortifyServiceProvider extends ServiceProvider
 {
@@ -32,6 +34,9 @@ class FortifyServiceProvider extends ServiceProvider
 
         // Diz ao Laravel para usar a tua classe de resposta de Registo (se existir)
         $this->app->singleton(RegisterResponse::class, CustomRegisterResponse::class);
+
+        // Mantém o redirecionamento por hierarquia depois da confirmação de 2FA.
+        $this->app->singleton(TwoFactorLoginResponse::class, CustomTwoFactorLoginResponse::class);
     }
 
     /**

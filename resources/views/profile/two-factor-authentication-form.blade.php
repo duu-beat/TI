@@ -1,4 +1,9 @@
 <x-action-section>
+    @php
+        $isMaster = $this->user->isMaster();
+        $isAdmin = $this->user->isAdmin();
+    @endphp
+
     <x-slot name="title">{{ __('Autenticação de Dois Fatores') }}</x-slot>
     <x-slot name="description">{{ __('Adicione uma camada extra de segurança à sua conta.') }}</x-slot>
 
@@ -25,6 +30,20 @@
                 @endif
             </div>
         </div>
+
+        @if ($isMaster)
+            <div role="status" class="mb-6 rounded-xl border {{ $this->enabled ? 'border-red-500/20 bg-red-500/5 text-red-200' : 'border-amber-500/20 bg-amber-500/5 text-amber-100' }} px-4 py-3 text-sm">
+                @if ($this->enabled)
+                    {{ __('Proteção de acesso Master ativa: o código será solicitado em cada novo login na área de Segurança.') }}
+                @else
+                    {{ __('Atenção: contas Master devem ativar 2FA antes de operar recursos sensíveis de segurança.') }}
+                @endif
+            </div>
+        @elseif ($isAdmin && ! $this->enabled)
+            <div role="status" class="mb-6 rounded-xl border border-cyan-500/20 bg-cyan-500/5 px-4 py-3 text-sm text-cyan-100">
+                {{ __('Recomendado para Admin: ative 2FA para reforçar o acesso às operações de suporte e inventário.') }}
+            </div>
+        @endif
 
         @if ($this->enabled)
             <div class="grid md:grid-cols-2 gap-8">

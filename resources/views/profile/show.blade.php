@@ -5,6 +5,8 @@
         // --- LÓGICA DE NÍVEIS ---
         $isMaster = method_exists($user, 'isMaster') ? $user->isMaster() : ($user->role === 'master');
         $isAdmin  = method_exists($user, 'isAdmin') ? $user->isAdmin() : ($user->role === 'admin');
+        $twoFactorEnabled = filled($user->two_factor_secret) && filled($user->two_factor_confirmed_at);
+        $hasProfilePhoto = filled($user->profile_photo_path);
         
         // Define Classes Completas para o Tailwind não remover em produção (Purge)
         if ($isMaster) {
@@ -83,6 +85,21 @@
                             <span class="px-3 py-1 rounded-full border text-[10px] font-bold uppercase tracking-wider {{ $badgeClass }}">
                                 {{ $roleLabel }}
                             </span>
+                        </div>
+                    </div>
+
+                    <div class="relative z-10 shrink-0 grid grid-cols-2 gap-2 text-center">
+                        <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-2">
+                            <span class="block text-[10px] font-bold uppercase tracking-wider {{ $twoFactorEnabled ? 'text-emerald-400' : 'text-amber-400' }}">
+                                {{ $twoFactorEnabled ? '2FA ativo' : '2FA pendente' }}
+                            </span>
+                            <span class="mt-1 block text-xs text-slate-400">{{ $twoFactorEnabled ? 'Conta protegida' : 'Ative na seção abaixo' }}</span>
+                        </div>
+                        <div class="rounded-xl border border-white/10 bg-slate-950/40 px-3 py-2">
+                            <span class="block text-[10px] font-bold uppercase tracking-wider {{ $hasProfilePhoto ? 'text-cyan-400' : 'text-slate-400' }}">
+                                {{ $hasProfilePhoto ? 'Foto definida' : 'Foto pendente' }}
+                            </span>
+                            <span class="mt-1 block text-xs text-slate-400">Identidade visual</span>
                         </div>
                     </div>
                 </div>

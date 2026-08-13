@@ -56,15 +56,18 @@ class AuthController extends Controller
             ]);
         }
 
+        $user = Auth::user();
+
         // Verifica se é MASTER
-        if (!Auth::user()->isMaster()) {
+        if (!$user->isMaster()) {
+            $attemptedUserId = $user->id;
             Auth::logout();
             RateLimiter::hit($throttleKey);
             
             // Log de tentativa de acesso não autorizado
             AuditLog::record(
                 'Acesso Negado (Master)', 
-                "Usuário sem privilégios tentou acessar o Master. ID: " . ($request->user()->id ?? 'N/A'), 
+                "Usuário sem privilégios tentou acessar o Master. ID: {$attemptedUserId}",
                 'WARNING'
             );
             
@@ -74,6 +77,22 @@ class AuthController extends Controller
         }
 
         RateLimiter::clear($throttleKey);
+
+        // Um Master que ativou 2FA só recebe uma sessão autenticada após confirmar o código.
+        if ($user->two_factor_secret && $user->two_factor_confirmed_at) {
+            AuditLog::record(
+                'Desafio 2FA Master',
+                'Credenciais primárias validadas; aguardando confirmação de autenticação em dois fatores.',
+                'INFO'
+            );
+
+            Auth::logout();
+            $request->session()->put('login.id', $user->id);
+            $request->session()->put('login.remember', $request->boolean('remember'));
+
+            return redirect()->route('two-factor.login');
+        }
+
         $request->session()->regenerate();
 
         AuditLog::record(
