@@ -22,8 +22,8 @@ class StoreTicketRequest extends FormRequest
             'priority' => ['nullable', Rule::enum(TicketPriority::class)],
             
             // ✨ ATUALIZADO PARA MÚLTIPLOS ARQUIVOS
-            'attachments' => ['nullable', 'array', 'max:5'], // Máx 5 arquivos (opcional)
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'], // 5MB cada
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240'],
         ];
     }
 }

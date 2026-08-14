@@ -18,9 +18,12 @@ use App\Models\User;
 use App\Services\SlaService;
 use App\Services\DashboardStatsService;
 use App\Actions\Ticket\UpdateTicketStatus;
+use App\Traits\HandleAttachmentsEnhanced;
 
 class TicketController extends Controller
 {
+    use HandleAttachmentsEnhanced;
+
     public function dashboard(DashboardStatsService $statsService)
     {
         // Uma única linha para buscar tudo!
@@ -129,7 +132,8 @@ class TicketController extends Controller
     {
         $validated = $request->validate([
             'message' => ['required', 'string'],
-            'attachments.*' => ['nullable', 'file', 'max:10240'],
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240'],
             'is_internal' => ['boolean'],
             'time_spent' => ['nullable', 'integer', 'min:0'],
         ]);
@@ -142,6 +146,8 @@ class TicketController extends Controller
                     'is_internal' => true,
                     'time_spent' => $request->input('time_spent', 0),
                 ]);
+
+                $this->processAttachmentsEnhanced($request, $message);
                 
                 // Disparar evento para tempo real
                 event(new \App\Events\TicketMessageSent($message));

@@ -7,7 +7,7 @@ use App\Models\TicketMessage;
 use App\Models\User;
 use App\Enums\TicketStatus;
 use App\Notifications\TicketUpdated;
-use App\Traits\HandleAttachments;
+use App\Traits\HandleAttachmentsEnhanced;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Services\SlaService;
@@ -15,7 +15,7 @@ use App\Services\SlaService;
 
 class CreateTicket
 {
-    use HandleAttachments;
+    use HandleAttachmentsEnhanced;
 
     public function execute(User $user, array $data, $request): Ticket
     {
@@ -40,7 +40,7 @@ class CreateTicket
             ]);
 
             // 3. Processar Anexos
-            $this->processAttachments($request, $message);
+            $this->processAttachmentsEnhanced($request, $message);
 
             // 4. Calcular e definir SLA
             $slaService->setSlaForTicket($ticket);

@@ -8,12 +8,17 @@ use Illuminate\Support\Facades\Storage;
 
 class TicketAttachment extends Model
 {
+    protected $appends = [
+        'url',
+        'name',
+        'formatted_size',
+        'icon',
+    ];
+
     protected $fillable = [
         'ticket_message_id',
         'file_name',
         'file_path',
-        'path',
-        'filename',
         'mime_type',
         'size',
         'disk',
@@ -52,7 +57,7 @@ class TicketAttachment extends Model
         }
 
         // Fallback: verifica pela extensão
-        $extension = strtolower(pathinfo($this->filename ?? $this->file_name, PATHINFO_EXTENSION));
+        $extension = strtolower(pathinfo($this->file_name, PATHINFO_EXTENSION));
         return in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg']);
     }
 
@@ -61,8 +66,8 @@ class TicketAttachment extends Model
      */
     public function isPdf(): bool
     {
-        return $this->mime_type === 'application/pdf' || 
-               str_ends_with(strtolower($this->filename ?? $this->file_name), '.pdf');
+        return $this->mime_type === 'application/pdf' ||
+               str_ends_with(strtolower($this->file_name), '.pdf');
     }
 
     /**
@@ -86,7 +91,7 @@ class TicketAttachment extends Model
      */
     public function getUrlAttribute(): string
     {
-        $path = $this->path ?? $this->file_path;
+        $path = $this->file_path;
         $disk = $this->disk ?? 'public';
 
         return Storage::disk($disk)->url($path);
@@ -97,7 +102,7 @@ class TicketAttachment extends Model
      */
     public function getNameAttribute(): string
     {
-        return $this->filename ?? $this->file_name;
+        return $this->file_name;
     }
 
     /**

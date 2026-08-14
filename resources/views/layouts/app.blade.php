@@ -186,23 +186,7 @@
         </div>
     </div>
 
-    {{-- Toast Notification --}}
-    @if (session('success') || session('error') || session('status'))
-        <div x-data="{ show: true }" x-init="setTimeout(() => show = false, 4000)" x-show="show" x-transition.move
-             class="fixed bottom-6 right-6 z-[100] max-w-sm w-full bg-slate-900 border border-white/10 shadow-2xl rounded-2xl p-4 flex items-start gap-3">
-            <div class="shrink-0 text-2xl">
-                {{ session('error') ? '⚠️' : '✅' }}
-            </div>
-            <div>
-                <div class="font-bold text-white">
-                    {{ session('error') ? 'Atenção' : 'Sucesso' }}
-                </div>
-                <div class="text-sm text-slate-400">
-                    {{ session('success') ?? session('error') ?? session('status') }}
-                </div>
-            </div>
-        </div>
-    @endif
+    <x-flash-notifications />
 
     @stack('modals')
     @livewireScripts

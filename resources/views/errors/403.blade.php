@@ -16,7 +16,7 @@
         <div class="mt-8">
             <a href="{{ route('home') }}" 
                class="px-8 py-3 rounded-2xl bg-gradient-to-r from-yellow-500 to-orange-400 font-bold text-slate-950 hover:shadow-[0_0_20px_rgba(234,179,8,0.4)] transition-all">
-                Voltar para Segurança
+                Voltar ao início
             </a>
         </div>
     </div>

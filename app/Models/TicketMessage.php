@@ -9,10 +9,16 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class TicketMessage extends Model
 {
     protected $fillable = [
-        'ticket_id', 
-        'user_id', 
-        'message', 
-        'is_internal'
+        'ticket_id',
+        'user_id',
+        'message',
+        'is_internal',
+        'time_spent',
+    ];
+
+    protected $casts = [
+        'is_internal' => 'boolean',
+        'time_spent' => 'integer',
     ];
 
     public function ticket(): BelongsTo

@@ -24,8 +24,8 @@ class ReplyTicketRequest extends FormRequest
         return [
             'message' => ['required', 'string'],
             // Regras de anexo idênticas ao StoreTicketRequest
-            'attachments' => ['nullable', 'array', 'max:5'], 
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,pdf', 'max:5120'], // 5MB
+            'attachments' => ['nullable', 'array', 'max:5'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240'],
         ];
     }
 }

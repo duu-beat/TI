@@ -64,6 +64,18 @@
                         });
                 }
             },
+            attachmentUrl(attachment) {
+                return attachment.url || ('/storage/' + (attachment.path || attachment.file_path));
+            },
+            attachmentName(attachment) {
+                return attachment.name || attachment.filename || attachment.file_name || 'Anexo';
+            },
+            isImageAttachment(attachment) {
+                return (attachment.mime_type || '').startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(this.attachmentName(attachment));
+            },
+            isPdfAttachment(attachment) {
+                return attachment.mime_type === 'application/pdf' || /\.pdf$/i.test(this.attachmentName(attachment));
+            },
             broadcastTyping() {
                 if (window.Echo) {
                     window.Echo.private(`ticket.{{ $ticket->id }}`)
@@ -173,12 +185,7 @@
                                     </h4>
                                     <div class="flex flex-wrap gap-3">
                                         @foreach($ticket->messages->first()->attachments as $attachment)
-                                            <a href="{{ Storage::url($attachment->path) }}" target="_blank" 
-                                               class="flex items-center gap-3 px-3 py-2 rounded-lg bg-slate-800/80 border border-white/10 hover:border-indigo-500/50 hover:bg-slate-700 transition group shadow-md">
-                                                <span class="text-xs text-indigo-400 font-bold group-hover:text-white transition">BAIXAR</span>
-                                                <span class="w-px h-4 bg-white/10"></span>
-                                                <span class="text-xs text-slate-300 truncate max-w-[150px]">{{ $attachment->name }}</span>
-                                            </a>
+                                            <x-ticket-attachment-card :attachment="$attachment" />
                                         @endforeach
                                     </div>
                                 </div>
@@ -219,11 +226,13 @@
                                         <div class="prose prose-invert prose-sm max-w-none text-slate-300 leading-relaxed font-mono" x-html="message.message.replace(/\n/g, '<br>')"></div>
 
                                         <template x-if="message.attachments && message.attachments.length > 0">
-                                            <div class="mt-4 pt-3 border-t border-white/5 flex flex-wrap gap-2">
+                                            <div class="mt-4 grid grid-cols-2 gap-2 border-t border-white/5 pt-3 sm:grid-cols-3">
                                                 <template x-for="attachment in message.attachments" :key="attachment.id">
-                                                    <a :href="'/storage/' + attachment.path" target="_blank" 
-                                                       class="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-black/30 hover:bg-black/50 border border-white/10 transition text-xs font-medium text-cyan-400 hover:text-cyan-300">
-                                                        <span>📎</span> <span x-text="attachment.name"></span>
+                                                    <a :href="attachmentUrl(attachment)" target="_blank" rel="noopener" class="overflow-hidden rounded-xl border border-white/10 bg-slate-950/50 hover:border-cyan-400/40 transition">
+                                                        <template x-if="isImageAttachment(attachment)"><img :src="attachmentUrl(attachment)" :alt="attachmentName(attachment)" class="h-20 w-full object-cover"></template>
+                                                        <template x-if="isPdfAttachment(attachment)"><iframe :src="attachmentUrl(attachment) + '#toolbar=0'" :title="attachmentName(attachment)" class="h-20 w-full bg-white" loading="lazy"></iframe></template>
+                                                        <template x-if="!isImageAttachment(attachment) && !isPdfAttachment(attachment)"><div class="flex h-20 items-center justify-center text-2xl">📎</div></template>
+                                                        <div class="flex items-center gap-1 p-2"><span class="min-w-0 flex-1 truncate text-[10px] text-slate-300" x-text="attachmentName(attachment)"></span><span class="text-cyan-300">↗</span></div>
                                                     </a>
                                                 </template>
                                             </div>
@@ -315,15 +324,35 @@
                             </div>
                         </div>
 
-                        <form method="POST" action="{{ route('client.tickets.reply', $ticket) }}" enctype="multipart/form-data" 
+                        <form method="POST" action="{{ route('client.tickets.reply', $ticket) }}" enctype="multipart/form-data"
+                              x-data="attachmentUploader()"
                               class="relative rounded-2xl border shadow-2xl backdrop-blur-2xl transition-all duration-300 overflow-hidden bg-slate-900/90 border-white/10 shadow-[0_0_50px_rgba(0,0,0,0.6)]">
                             @csrf
 
+                            <x-validation-errors class="mx-4 mt-4" />
+
+                            <div x-show="errors.length" x-cloak class="mx-4 mt-4 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-xs text-red-200" role="alert">
+                                <template x-for="error in errors" :key="error"><p x-text="error"></p></template>
+                            </div>
+
+                            <div x-show="files.length" x-cloak class="grid grid-cols-2 gap-2 border-b border-white/5 p-4 sm:grid-cols-5">
+                                <template x-for="(item, index) in files" :key="item.file.name + item.file.size">
+                                    <article class="relative overflow-hidden rounded-xl border border-white/10 bg-slate-950/60">
+                                        <template x-if="item.isImage"><img :src="item.preview" :alt="item.file.name" class="h-20 w-full object-cover"></template>
+                                        <template x-if="item.isPdf"><iframe :src="item.preview" :title="'Prévia de ' + item.file.name" class="h-20 w-full bg-white" loading="lazy"></iframe></template>
+                                        <template x-if="!item.isImage && !item.isPdf"><div class="flex h-20 items-center justify-center text-2xl">📎</div></template>
+                                        <div class="flex items-center gap-1 p-2"><span class="min-w-0 flex-1 truncate text-[10px] text-slate-300" x-text="item.file.name"></span><button type="button" @click="removeFile(index)" class="text-slate-500 hover:text-red-300" :aria-label="'Remover ' + item.file.name">×</button></div>
+                                    </article>
+                                </template>
+                            </div>
+
                             <div class="flex items-end gap-2 p-4">
                                 <div class="relative shrink-0">
-                                    <input type="file" name="attachments[]" multiple id="client-file-upload" class="hidden" 
-                                           onchange="document.getElementById('client-upload-icon').classList.add('text-indigo-400');">
-                                    <label for="client-file-upload" class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-400 cursor-pointer transition active:scale-95 shadow-inner">
+                                    <input type="file" name="attachments[]" multiple id="client-file-upload" class="hidden"
+                                           x-ref="attachmentsInput"
+                                           accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.doc,.docx,.xls,.xlsx,.zip"
+                                           @change="handleFiles($event.target.files)">
+                                    <label for="client-file-upload" title="Anexar arquivos" class="flex h-12 w-12 items-center justify-center rounded-xl bg-white/5 border border-white/10 hover:bg-indigo-500/10 hover:border-indigo-400/40 hover:text-indigo-300 text-slate-400 cursor-pointer transition active:scale-95 shadow-inner">
                                         <svg id="client-upload-icon" class="w-6 h-6 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path></svg>
                                     </label>
                                 </div>
@@ -349,7 +378,7 @@
                                     </div>
                                 </div>
 
-                                <button type="submit" class="shrink-0 h-12 px-6 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95">
+                                <button type="submit" :disabled="files.length > 5" class="shrink-0 h-12 px-6 flex items-center justify-center gap-2 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold shadow-lg shadow-indigo-600/30 transition-all hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50">
                                     <span class="hidden sm:block text-sm">Enviar</span>
                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
                                 </button>

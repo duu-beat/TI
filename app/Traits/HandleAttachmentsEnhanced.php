@@ -18,22 +18,15 @@ trait HandleAttachmentsEnhanced
         }
 
         foreach ($request->file('attachments') as $file) {
-            // Validação adicional
-            if (!$file->isValid()) {
+            if (! $file->isValid()) {
                 continue;
             }
 
-            // Gerar nome único
-            $filename = time() . '_' . $file->getClientOriginalName();
-            
-            // Salvar arquivo
-            $path = $file->storeAs('ticket-attachments', $filename, 'public');
+            // O armazenamento gera um nome aleatório no servidor, sem reutilizar o nome enviado pelo usuário.
+            $path = $file->store('ticket-attachments', 'public');
 
-            // Criar registro com informações detalhadas
             $message->attachments()->create([
-                'filename' => $file->getClientOriginalName(),
                 'file_name' => $file->getClientOriginalName(),
-                'path' => $path,
                 'file_path' => $path,
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize(),
@@ -54,7 +47,7 @@ trait HandleAttachmentsEnhanced
         }
 
         // Deletar arquivo físico
-        $path = $attachment->path ?? $attachment->file_path;
+        $path = $attachment->file_path;
         $disk = $attachment->disk ?? 'public';
 
         if ($path && Storage::disk($disk)->exists($path)) {

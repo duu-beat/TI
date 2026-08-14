@@ -53,8 +53,10 @@
                     <form action="{{ route('client.tickets.store') }}" 
                           method="POST" 
                           enctype="multipart/form-data"
-                          x-data="ticketForm()">
+                          x-data="attachmentUploader()">
                         @csrf
+
+                        <x-validation-errors class="mb-6" />
 
                         <div class="grid grid-cols-1 gap-y-8 gap-x-6 sm:grid-cols-2">
                             
@@ -126,43 +128,58 @@
                             </div>
 
                             <div class="col-span-2">
-                                <label class="block font-medium text-sm text-slate-300 mb-2">Anexos (Prints, Logs, PDFs)</label>
-                                
-                                <div 
-                                    class="border-2 border-dashed border-white/10 rounded-xl p-8 text-center bg-slate-950/30 hover:bg-slate-900/50 hover:border-indigo-500/50 transition-all cursor-pointer relative group"
-                                    @dragover.prevent="dragover = true"
-                                    @dragleave.prevent="dragover = false"
-                                    @drop.prevent="handleDrop($event)"
-                                    @click="$refs.fileInput.click()"
-                                    :class="{ 'bg-indigo-500/10 border-indigo-500': dragover }"
-                                >
-                                    <input type="file" multiple name="attachments[]" class="hidden" x-ref="fileInput" @change="handleFiles($event.target.files)">
-                                    
-                                    <div class="space-y-2 pointer-events-none">
-                                        <svg class="mx-auto h-10 w-10 text-slate-500 group-hover:text-indigo-400 transition-colors" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
-                                        </svg>
-                                        <div class="text-sm text-slate-400">
-                                            <span class="font-medium text-indigo-400 group-hover:text-indigo-300">Clique para enviar</span> ou arraste arquivos aqui
+                                <div class="mb-3 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+                                    <div>
+                                        <label class="block text-sm font-bold text-slate-200">Anexos de apoio</label>
+                                        <p class="mt-1 text-xs text-slate-500">Veja fotos, PDFs e documentos antes de enviar o chamado.</p>
+                                    </div>
+                                    <span class="text-xs font-medium text-slate-500">Até 5 arquivos · 10 MB cada</span>
+                                </div>
+
+                                <div class="relative rounded-2xl border-2 border-dashed border-white/10 bg-slate-950/30 p-7 text-center transition cursor-pointer hover:border-indigo-400/50 hover:bg-indigo-500/[0.04]"
+                                     @dragover.prevent="dragover = true"
+                                     @dragleave.prevent="dragover = false"
+                                     @drop.prevent="handleDrop($event)"
+                                     @click="$refs.attachmentsInput.click()"
+                                     :class="dragover ? 'border-indigo-400 bg-indigo-500/10' : ''">
+                                    <input type="file" multiple name="attachments[]" class="hidden" x-ref="attachmentsInput" accept=".jpg,.jpeg,.png,.webp,.pdf,.txt,.doc,.docx,.xls,.xlsx,.zip" @change="handleFiles($event.target.files)">
+                                    <div class="pointer-events-none">
+                                        <div class="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-500/15 text-indigo-300">
+                                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 16V4m0 0L8 8m4-4 4 4M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2" /></svg>
                                         </div>
-                                        <p class="text-xs text-slate-600">PNG, JPG, PDF até 5MB (Max 5 arquivos)</p>
+                                        <p class="mt-3 text-sm font-semibold text-slate-200"><span class="text-indigo-300">Selecionar arquivos</span> ou arrastar para esta área</p>
+                                        <p class="mt-1 text-xs text-slate-500">Imagens, PDF, TXT, Word, Excel e ZIP.</p>
                                     </div>
                                 </div>
 
-                                <div class="mt-4 space-y-2" x-show="files.length > 0" style="display: none;">
-                                    <template x-for="(file, index) in files" :key="index">
-                                        <div class="flex items-center justify-between p-3 bg-slate-800/50 border border-white/5 rounded-xl shadow-sm">
-                                            <div class="flex items-center space-x-3 truncate">
-                                                <div class="flex-shrink-0 h-8 w-8 rounded bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <div x-show="errors.length" x-cloak class="mt-3 rounded-xl border border-red-500/20 bg-red-500/10 p-3 text-sm text-red-200" role="alert">
+                                    <template x-for="error in errors" :key="error"><p x-text="error"></p></template>
+                                </div>
+
+                                <div x-show="files.length" x-cloak class="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
+                                    <template x-for="(item, index) in files" :key="item.file.name + item.file.size">
+                                        <article class="group overflow-hidden rounded-2xl border border-white/10 bg-slate-950/50">
+                                            <template x-if="item.isImage">
+                                                <img :src="item.preview" :alt="item.file.name" class="h-32 w-full object-cover bg-slate-900">
+                                            </template>
+                                            <template x-if="item.isPdf">
+                                                <iframe :src="item.preview" :title="'Pré-visualização de ' + item.file.name" class="h-32 w-full bg-white" loading="lazy"></iframe>
+                                            </template>
+                                            <template x-if="!item.isImage && !item.isPdf">
+                                                <div class="flex h-32 items-center justify-center bg-slate-900/80 text-4xl">📎</div>
+                                            </template>
+                                            <div class="p-3">
+                                                <div class="flex items-start gap-2">
+                                                    <div class="min-w-0 flex-1">
+                                                        <p class="truncate text-sm font-semibold text-slate-200" x-text="item.file.name"></p>
+                                                        <p class="mt-1 text-xs text-slate-500"><span x-text="fileKind(item)"></span> · <span x-text="formatBytes(item.file.size)"></span></p>
+                                                    </div>
+                                                    <button type="button" @click.stop="removeFile(index)" class="rounded-lg p-1.5 text-slate-500 hover:bg-red-500/10 hover:text-red-300 transition" :aria-label="'Remover ' + item.file.name">
+                                                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18 18 6M6 6l12 12" /></svg>
+                                                    </button>
                                                 </div>
-                                                <span class="text-sm font-medium text-slate-200 truncate" x-text="file.name"></span>
-                                                <span class="text-xs text-slate-500" x-text="(file.size / 1024).toFixed(0) + ' KB'"></span>
                                             </div>
-                                            <button type="button" @click="removeFile(index)" class="text-slate-500 hover:text-red-400 transition-colors">
-                                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                                            </button>
-                                        </div>
+                                        </article>
                                     </template>
                                 </div>
                                 <x-input-error for="attachments" class="mt-2" />
@@ -187,32 +204,4 @@
         </div>
     </div>
 
-    <script>
-        function ticketForm() {
-            return {
-                files: [],
-                dragover: false,
-                handleDrop(e) {
-                    this.dragover = false;
-                    const droppedFiles = e.dataTransfer.files;
-                    this.handleFiles(droppedFiles);
-                },
-                handleFiles(fileList) {
-                    for (let i = 0; i < fileList.length; i++) {
-                        if (this.files.length >= 5) break;
-                        this.files.push(fileList[i]);
-                    }
-                    const dataTransfer = new DataTransfer();
-                    this.files.forEach(file => dataTransfer.items.add(file));
-                    this.$refs.fileInput.files = dataTransfer.files;
-                },
-                removeFile(index) {
-                    this.files.splice(index, 1);
-                    const dataTransfer = new DataTransfer();
-                    this.files.forEach(file => dataTransfer.items.add(file));
-                    this.$refs.fileInput.files = dataTransfer.files;
-                }
-            }
-        }
-    </script>
 </x-app-layout>

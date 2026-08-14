@@ -7,14 +7,14 @@ use App\Models\TicketMessage;
 use App\Models\User;
 use App\Enums\TicketStatus;
 use App\Notifications\TicketUpdated;
-use App\Traits\HandleAttachments;
+use App\Traits\HandleAttachmentsEnhanced;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 use App\Services\SlaService;
 
 class ReplyToTicket
 {
-    use HandleAttachments;
+    use HandleAttachmentsEnhanced;
 
     public function execute(User $user, Ticket $ticket, array $data, $request): TicketMessage
     {
@@ -30,7 +30,7 @@ class ReplyToTicket
             ]);
 
             // 2. Processar Anexos
-            $this->processAttachments($request, $message);
+            $this->processAttachmentsEnhanced($request, $message);
 
             // 3. Atualizar Status e Notificar
             // Lógica para Cliente respondendo
