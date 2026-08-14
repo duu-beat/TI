@@ -67,6 +67,32 @@ class TicketAttachmentExperienceTest extends TestCase
         Storage::disk('public')->assertExists($storedAttachment->file_path);
     }
 
+    public function test_client_can_view_the_rebranded_ticket_workspace(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $ticket = Ticket::factory()->create(['user_id' => $client->id]);
+
+        $this->actingAs($client)
+            ->get(route('client.tickets.show', $ticket))
+            ->assertOk()
+            ->assertSee('Resumo do chamado')
+            ->assertSee('Atualizações do atendimento')
+            ->assertSee('Adicionar atualização');
+    }
+
+    public function test_administrator_can_view_the_rebranded_ticket_workspace(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $ticket = Ticket::factory()->create();
+
+        $this->actingAs($admin)
+            ->get(route('admin.tickets.show', $ticket))
+            ->assertOk()
+            ->assertSee('Controle do chamado')
+            ->assertSee('Comunicação e notas técnicas')
+            ->assertSee('Resposta pública');
+    }
+
     public function test_attachment_uploader_factory_is_available_before_alpine_initializes(): void
     {
         $this->view('components.ticket-attachment-uploader-script')
