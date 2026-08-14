@@ -67,6 +67,14 @@ class TicketAttachmentExperienceTest extends TestCase
         Storage::disk('public')->assertExists($storedAttachment->file_path);
     }
 
+    public function test_attachment_uploader_factory_is_available_before_alpine_initializes(): void
+    {
+        $this->view('components.ticket-attachment-uploader-script')
+            ->assertSee('window.attachmentUploader', false)
+            ->assertSee('handleFiles', false)
+            ->assertSee('syncInput', false);
+    }
+
     public function test_new_error_pages_render_with_safe_recovery_actions(): void
     {
         $this->view('errors.401')->assertSee('Entre na sua conta para continuar.');

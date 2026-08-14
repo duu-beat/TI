@@ -189,6 +189,7 @@
     <x-flash-notifications />
 
     @stack('modals')
+    <x-ticket-attachment-uploader-script />
     @livewireScripts
 
 
