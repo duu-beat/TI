@@ -127,6 +127,12 @@
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-2">
+                                                <a href="{{ route('admin.assets.show', $asset) }}"
+                                                   title="Abrir ficha e QR Code"
+                                                   aria-label="Abrir ficha e QR Code de {{ $asset->name }}"
+                                                   class="p-2 rounded-lg bg-slate-800 hover:bg-violet-600 text-slate-400 hover:text-white border border-white/5 transition-all">
+                                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5h4M5 5v4m14-4h-4m4 0v4M5 19h4m-4 0v-4m14 4h-4m4 0v-4M9 9h6v6H9z" /></svg>
+                                                </a>
                                                 <a href="{{ route('admin.assets.edit', $asset) }}" 
                                                    class="p-2 rounded-lg bg-slate-800 hover:bg-cyan-600 text-slate-400 hover:text-white border border-white/5 transition-all">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path></svg>

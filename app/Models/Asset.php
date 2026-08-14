@@ -9,6 +9,7 @@ use App\Traits\Searchable;
 use App\Traits\Auditable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Str;
 
 /**
  * Representa um equipamento ou ativo de TI (Notebook, Monitor, Impressora, etc.)
@@ -34,6 +35,21 @@ class Asset extends Model
         'purchase_date' => 'date',
         'warranty_expiration' => 'date',
     ];
+
+    protected static function booted(): void
+    {
+        static::creating(function (Asset $asset): void {
+            $asset->qr_token ??= (string) Str::uuid();
+        });
+    }
+
+    /**
+     * URL interna codificada no QR Code do ativo.
+     */
+    public function qrCodeUrl(): string
+    {
+        return route('admin.assets.scan', ['asset' => $this->qr_token]);
+    }
 
     /**
      * Usuário ao qual este ativo está vinculado (ex: dono do notebook)

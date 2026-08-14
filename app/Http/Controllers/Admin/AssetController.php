@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\AssetHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Services\AssetQrCodeService;
 
 /**
  * Gerencia o inventário de equipamentos (Assets)
@@ -118,6 +119,39 @@ class AssetController extends Controller
 
         return redirect()->route('admin.assets.index')
             ->with('success', 'Equipamento cadastrado com sucesso!');
+    }
+
+    /**
+     * Exibe a ficha interna do ativo, inclusive quando acessada pelo QR Code.
+     */
+    public function show(Asset $asset)
+    {
+        $asset->load([
+            'user',
+            'history.user',
+            'tickets' => fn ($query) => $query->latest()->limit(5),
+        ]);
+
+        return view('admin.assets.show', compact('asset'));
+    }
+
+    /**
+     * Exibe uma etiqueta compacta para impressão e fixação no equipamento.
+     */
+    public function qrLabel(Asset $asset)
+    {
+        return view('admin.assets.qr-label', compact('asset'));
+    }
+
+    /**
+     * Retorna o QR Code SVG do ativo para exibição e impressão no inventário.
+     */
+    public function qrCode(Asset $asset, AssetQrCodeService $qrCodeService)
+    {
+        return response($qrCodeService->toSvg($asset), 200, [
+            'Content-Type' => 'image/svg+xml; charset=UTF-8',
+            'Cache-Control' => 'private, max-age=3600',
+        ]);
     }
 
     public function edit(Asset $asset)
