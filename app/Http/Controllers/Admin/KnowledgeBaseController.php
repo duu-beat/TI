@@ -56,6 +56,28 @@ class KnowledgeBaseController extends Controller
         return view('admin.wiki.show', compact('article'));
     }
 
+    public function search(Request $request)
+    {
+        $query = $request->get('q');
+        
+        $articles = KnowledgeBase::where('is_published', true)
+            ->where(function($q) use ($query) {
+                $q->where('title', 'like', "%{$query}%")
+                  ->orWhere('category', 'like', "%{$query}%");
+            })
+            ->limit(5)
+            ->get(['id', 'title', 'slug', 'category']);
+
+        return response()->json($articles->map(function($article) {
+            return [
+                'id' => $article->id,
+                'title' => $article->title,
+                'category' => $article->category,
+                'url' => route('faq', ['search' => $article->title]),
+            ];
+        }));
+    }
+
     public function edit(KnowledgeBase $article)
     {
         return view('admin.wiki.edit', compact('article'));

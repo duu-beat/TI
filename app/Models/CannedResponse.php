@@ -6,5 +6,5 @@ use Illuminate\Database\Eloquent\Model;
 
 class CannedResponse extends Model
 {
-    protected $fillable = ['title', 'content'];
+    protected $fillable = ['title', 'category', 'content'];
 }

@@ -10,14 +10,17 @@ class CannedResponseController extends Controller
 {
     public function index()
     {
-        $responses = CannedResponse::latest()->get();
-        return view('admin.canned.index', compact('responses'));
+        $responses = CannedResponse::orderBy('category')->orderBy('title')->get();
+        $categories = CannedResponse::distinct()->whereNotNull('category')->pluck('category');
+        
+        return view('admin.canned.index', compact('responses', 'categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:100',
             'content' => 'required|string',
         ]);
 
@@ -26,9 +29,23 @@ class CannedResponseController extends Controller
         return back()->with('success', 'Resposta pronta criada com sucesso!');
     }
 
+    public function update(Request $request, CannedResponse $cannedResponse)
+    {
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'category' => 'nullable|string|max:100',
+            'content' => 'required|string',
+        ]);
+
+        $cannedResponse->update($validated);
+
+        return back()->with('success', 'Resposta pronta atualizada!');
+    }
+
     public function destroy(CannedResponse $cannedResponse)
     {
         $cannedResponse->delete();
+
         return back()->with('success', 'Resposta removida.');
     }
 }

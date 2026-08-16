@@ -215,6 +215,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::resource('checklists', \App\Http\Controllers\Admin\ChecklistController::class);
 
     // 📚 Rotas da Wiki (Base de Conhecimento)
+    Route::get('wiki/search', [\App\Http\Controllers\Admin\KnowledgeBaseController::class, 'search'])->name('wiki.search');
     Route::resource('wiki', \App\Http\Controllers\Admin\KnowledgeBaseController::class)
         ->parameters(['wiki' => 'article']);
 });

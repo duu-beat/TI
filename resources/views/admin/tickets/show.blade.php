@@ -140,10 +140,69 @@
             <div class="pointer-events-none fixed inset-x-0 bottom-0 z-40 px-3 pb-3 sm:px-6 sm:pb-5">
                 <div class="pointer-events-auto mx-auto max-w-5xl">
                     <div class="flex items-end gap-1 pl-3"><button type="button" @click="replyMode = 'public'" class="rounded-t-xl border-x border-t px-3 py-2 text-[11px] font-bold transition" :class="replyMode === 'public' ? 'border-white/10 bg-slate-900 text-white' : 'border-transparent bg-slate-950/60 text-slate-500 hover:text-slate-300'">Resposta pública</button><button type="button" @click="replyMode = 'internal'" class="inline-flex items-center gap-1.5 rounded-t-xl border-x border-t px-3 py-2 text-[11px] font-bold transition" :class="replyMode === 'internal' ? 'border-amber-400/30 bg-amber-950 text-amber-200' : 'border-transparent bg-slate-950/60 text-slate-500 hover:text-amber-200'"><svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2Zm10-10V7a4 4 0 0 0-8 0v4" /></svg>Nota interna</button></div>
-                    <form method="POST" action="{{ route('admin.tickets.reply', $ticket) }}" enctype="multipart/form-data" x-data="attachmentUploader()" class="overflow-hidden rounded-2xl border bg-slate-900/95 shadow-2xl shadow-slate-950/60 backdrop-blur-2xl transition" :class="replyMode === 'internal' ? 'border-amber-400/30 shadow-amber-950/20' : 'border-white/10'">
+                    <form method="POST" action="{{ route('admin.tickets.reply', $ticket) }}" enctype="multipart/form-data" 
+                          x-data="{
+                            ...attachmentUploader(),
+                            wikiQuery: '',
+                            wikiResults: [],
+                            showWiki: false,
+                            async searchWiki() {
+                                if (this.wikiQuery.length < 2) { this.wikiResults = []; return; }
+                                const res = await fetch(`{{ route('admin.wiki.search') }}?q=${this.wikiQuery}`);
+                                this.wikiResults = await res.json();
+                            },
+                            insertWiki(article) {
+                                const link = `\n📖 *Veja mais detalhes aqui:* [${article.title}](${article.url})\n`;
+                                this.replyMessage += link;
+                                this.wikiQuery = '';
+                                this.wikiResults = [];
+                                this.showWiki = false;
+                            }
+                          }"
+                          class="overflow-hidden rounded-2xl border bg-slate-900/95 shadow-2xl shadow-slate-950/60 backdrop-blur-2xl transition" :class="replyMode === 'internal' ? 'border-amber-400/30 shadow-amber-950/20' : 'border-white/10'">
                         @csrf
                         <input type="hidden" name="is_internal" :value="replyMode === 'internal' ? 1 : 0">
-                        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/5 bg-slate-950/35 px-3 py-2.5"><div class="relative"><select @change="replyMessage += $event.target.value ? $event.target.value + '\n' : ''; $event.target.value = ''" class="cursor-pointer appearance-none bg-transparent py-1 pr-5 text-xs font-semibold text-slate-300 focus:outline-none"><option value="" class="bg-slate-900 text-slate-500">Inserir resposta pronta</option>@foreach($cannedResponses ?? [] as $canned)<option value="{{ $canned->content }}" class="bg-slate-900 text-white">{{ $canned->title }}</option>@endforeach</select><svg class="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg></div><div class="h-4 w-px bg-white/10"></div><div x-show="replyMode === 'internal'" x-cloak class="flex items-center gap-2"><label for="time-spent" class="text-[10px] font-bold uppercase tracking-wider text-amber-200">Tempo</label><input id="time-spent" type="number" name="time_spent" min="0" placeholder="min" class="w-16 rounded-lg border border-amber-400/20 bg-amber-950/40 px-2 py-1 text-xs text-white placeholder:text-amber-200/30 focus:border-amber-400 focus:outline-none"></div><span x-show="replyMode === 'internal'" x-cloak class="ml-auto rounded-md border border-amber-400/15 bg-amber-400/[0.07] px-2 py-1 text-[10px] font-semibold text-amber-200">Visível apenas para a equipe</span></div>
+                        <div class="flex flex-wrap items-center gap-x-3 gap-y-2 border-b border-white/5 bg-slate-950/35 px-3 py-2.5">
+                            <div class="relative">
+                                <select @change="replyMessage += $event.target.value ? $event.target.value + '\n' : ''; $event.target.value = ''" class="cursor-pointer appearance-none bg-transparent py-1 pr-5 text-xs font-semibold text-slate-300 focus:outline-none">
+                                    <option value="" class="bg-slate-900 text-slate-500">Inserir resposta pronta</option>
+                                    @if(isset($cannedResponses))
+                                        @foreach($cannedResponses->groupBy('category') as $category => $items)
+                                            <optgroup label="{{ $category ?: 'Geral' }}" class="bg-slate-900 text-indigo-400 font-bold">
+                                                @foreach($items as $canned)
+                                                    <option value="{{ $canned->content }}" class="bg-slate-900 text-white font-normal">{{ $canned->title }}</option>
+                                                @endforeach
+                                            </optgroup>
+                                        @endforeach
+                                    @endif
+                                </select>
+                                <svg class="pointer-events-none absolute right-0 top-1/2 h-3 w-3 -translate-y-1/2 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m6 9 6 6 6-6" /></svg>
+                            </div>
+                            
+                            <div class="h-4 w-px bg-white/10"></div>
+
+                            <div class="relative flex-1 max-w-xs">
+                                <input type="text" x-model="wikiQuery" @input.debounce.300ms="searchWiki()" @focus="showWiki = true"
+                                       class="bg-transparent border-none focus:ring-0 text-[11px] text-slate-300 w-full p-0 placeholder-slate-600"
+                                       placeholder="Buscar ajuda na Wiki...">
+                                
+                                <div x-show="showWiki && wikiResults.length > 0" @click.away="showWiki = false" x-cloak
+                                     class="absolute bottom-full left-0 mb-2 w-72 bg-slate-800 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden">
+                                    <div class="p-2 bg-slate-900/50 border-b border-white/5 text-[9px] font-bold text-slate-500 uppercase tracking-widest">Sugestões da Wiki</div>
+                                    <template x-for="article in wikiResults" :key="article.id">
+                                        <button type="button" @click="insertWiki(article)"
+                                                class="w-full text-left p-3 hover:bg-indigo-600 group transition flex items-center justify-between gap-2 border-b border-white/5 last:border-0">
+                                            <div class="min-w-0">
+                                                <div class="text-[8px] font-bold text-indigo-400 group-hover:text-indigo-200 uppercase" x-text="article.category"></div>
+                                                <div class="text-xs text-white font-medium truncate" x-text="article.title"></div>
+                                            </div>
+                                            <svg class="w-3 h-3 text-slate-500 group-hover:text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                                        </button>
+                                    </template>
+                                </div>
+                            </div>
+
+                            <div class="h-4 w-px bg-white/10"></div><div x-show="replyMode === 'internal'" x-cloak class="flex items-center gap-2"><label for="time-spent" class="text-[10px] font-bold uppercase tracking-wider text-amber-200">Tempo</label><input id="time-spent" type="number" name="time_spent" min="0" placeholder="min" class="w-16 rounded-lg border border-amber-400/20 bg-amber-950/40 px-2 py-1 text-xs text-white placeholder:text-amber-200/30 focus:border-amber-400 focus:outline-none"></div><span x-show="replyMode === 'internal'" x-cloak class="ml-auto rounded-md border border-amber-400/15 bg-amber-400/[0.07] px-2 py-1 text-[10px] font-semibold text-amber-200">Visível apenas para a equipe</span></div>
                         <x-validation-errors class="mx-4 mt-3" />
                         <div x-show="errors.length" x-cloak class="mx-4 mt-3 rounded-xl border border-rose-500/20 bg-rose-500/10 p-2.5 text-xs text-rose-200" role="alert"><template x-for="error in errors" :key="error"><p x-text="error"></p></template></div>
                         <div x-show="files.length" x-cloak class="grid grid-cols-2 gap-2 border-b border-white/5 p-3 sm:grid-cols-5"><template x-for="(item, index) in files" :key="item.file.name + item.file.size"><article class="relative overflow-hidden rounded-xl border border-white/10 bg-slate-950/60"><template x-if="item.isImage"><img :src="item.preview" :alt="item.file.name" class="h-20 w-full object-cover" /></template><template x-if="item.isPdf"><iframe :src="item.preview" :title="'Prévia de ' + item.file.name" class="h-20 w-full bg-white" loading="lazy"></iframe></template><template x-if="!item.isImage && !item.isPdf"><div class="flex h-20 items-center justify-center text-2xl">📎</div></template><div class="flex items-center gap-1 p-2"><span class="min-w-0 flex-1 truncate text-[10px] text-slate-300" x-text="item.file.name"></span><button type="button" @click="removeFile(index)" class="rounded p-0.5 text-slate-500 hover:text-rose-300" :aria-label="'Remover ' + item.file.name">×</button></div></article></template></div>
