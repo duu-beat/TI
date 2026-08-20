@@ -170,10 +170,12 @@ class TicketController extends Controller
         return back()->with('success', 'Resposta enviada!');
     }
 
-    public function report()
+    public function report(SlaService $slaService)
     {
-        $tickets = Ticket::with('user')->latest()->limit(500)->get();
-        return view('admin.reports.tickets', compact('tickets'));
+        $tickets = Ticket::with(['user', 'assignee'])->latest()->limit(500)->get();
+        $stats = $slaService->getSlaStats();
+        
+        return view('admin.reports.tickets', compact('tickets', 'stats'));
     }
 
     public function escalate(Ticket $ticket)

@@ -108,4 +108,18 @@ class TicketAttachmentExperienceTest extends TestCase
         $this->view('errors.429')->assertSee('Muitas solicitações em pouco tempo.');
         $this->view('errors.503')->assertSee('Estamos preparando uma melhoria.');
     }
+
+    public function test_administrator_can_view_the_modernized_report(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        Ticket::factory()->count(3)->create();
+
+        $response = $this->actingAs($admin)->get(route('admin.tickets.report'));
+
+        $response->assertStatus(200);
+        $response->assertSee('Relatório Geral de Suporte TI');
+        $response->assertSee('Total de Chamados');
+        $response->assertSee('Dentro do SLA');
+        $response->assertSee('Imprimir Relatório');
+    }
 }
