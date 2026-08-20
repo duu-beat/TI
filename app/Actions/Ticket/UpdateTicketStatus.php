@@ -19,8 +19,8 @@ class UpdateTicketStatus
         $slaService = app(SlaService::class);
 
         DB::transaction(function () use ($ticket, $newStatus, $slaService) {
-            // Se está sendo marcado como resolvido, registrar o timestamp
-            if ($newStatus === TicketStatus::RESOLVED && !$ticket->resolved_at) {
+            // Se está sendo marcado como resolvido ou fechado, registrar o timestamp
+            if (in_array($newStatus, [TicketStatus::RESOLVED, TicketStatus::CLOSED]) && !$ticket->resolved_at) {
                 $ticket->update([
                     'status' => $newStatus,
                     'resolved_at' => now(),
@@ -28,6 +28,11 @@ class UpdateTicketStatus
                 
                 // Calcular tempo de resolução
                 $slaService->calculateResolutionTime($ticket);
+            } elseif (!in_array($newStatus, [TicketStatus::RESOLVED, TicketStatus::CLOSED])) {
+                $ticket->update([
+                    'status' => $newStatus,
+                    'resolved_at' => null,
+                ]);
             } else {
                 $ticket->update(['status' => $newStatus]);
             }

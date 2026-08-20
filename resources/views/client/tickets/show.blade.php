@@ -9,6 +9,14 @@
                     <div class="flex flex-wrap items-center gap-2">
                         <span class="rounded-md border border-indigo-400/20 bg-indigo-500/10 px-2 py-1 text-[10px] font-bold uppercase tracking-[0.14em] text-indigo-300">{{ $ticket->category ?? 'Suporte' }}</span>
                         <span class="text-[11px] text-slate-500">Aberto {{ $ticket->created_at->diffForHumans() }}</span>
+                        @if($ticket->sla_due_at && !in_array($ticket->status, [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED]))
+                            <div class="flex items-center gap-1.5 rounded-md border px-2 py-1 text-[10px] font-bold uppercase tracking-wider
+                                {{ $ticket->sla_status === 'danger' ? 'border-rose-500/30 bg-rose-500/10 text-rose-400' : 
+                                   ($ticket->sla_status === 'warning' ? 'border-amber-500/30 bg-amber-500/10 text-amber-400' : 'border-emerald-500/30 bg-emerald-500/10 text-emerald-400') }}">
+                                <svg class="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                <span>Prazo: {{ $ticket->sla_remaining }}</span>
+                            </div>
+                        @endif
                     </div>
                     <h2 class="mt-1 truncate text-lg font-bold text-white sm:text-xl">Chamado #{{ $ticket->id }}</h2>
                 </div>

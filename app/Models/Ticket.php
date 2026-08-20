@@ -31,6 +31,7 @@ class Ticket extends Model
         'is_escalated',
         'assigned_to', // ✅ ADICIONADO: Necessário para a atribuição funcionar
         'sla_due_at',
+        'sla_warning_sent',
         'first_response_at',
         'resolved_at',
         'response_time_minutes',
@@ -42,9 +43,22 @@ class Ticket extends Model
         'priority' => TicketPriority::class,
         'is_escalated' => 'boolean',
         'sla_due_at' => 'datetime',
+        'sla_warning_sent' => 'boolean',
         'first_response_at' => 'datetime',
         'resolved_at' => 'datetime',
     ];
+
+    protected $appends = ['sla_status', 'sla_remaining'];
+
+    public function getSlaStatusAttribute()
+    {
+        return app(\App\Services\SlaService::class)->getSlaStatus($this);
+    }
+
+    public function getSlaRemainingAttribute()
+    {
+        return app(\App\Services\SlaService::class)->getSlaTimeRemaining($this);
+    }
 
     public function user(): BelongsTo
     {

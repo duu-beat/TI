@@ -102,6 +102,7 @@
                                     <th class="px-6 py-4">Assunto</th>
                                     <th class="px-6 py-4">Prioridade</th>
                                     <th class="px-6 py-4">Status</th>
+                                    <th class="px-6 py-4">SLA</th>
                                     <th class="px-6 py-4 text-right">Ações</th>
                                 </tr>
                             </thead>
@@ -161,6 +162,20 @@
                                             <div class="text-[10px] text-slate-600 mt-1">
                                                 {{ $ticket->updated_at->diffForHumans() }}
                                             </div>
+                                        </td>
+
+                                        {{-- SLA --}}
+                                        <td class="px-6 py-4">
+                                            @if($ticket->sla_due_at && !in_array($ticket->status, [\App\Enums\TicketStatus::RESOLVED, \App\Enums\TicketStatus::CLOSED]))
+                                                <div class="flex items-center gap-1.5 font-bold text-[10px] uppercase tracking-wider
+                                                    {{ $ticket->sla_status === 'danger' ? 'text-rose-400' : 
+                                                       ($ticket->sla_status === 'warning' ? 'text-amber-400' : 'text-emerald-400') }}">
+                                                    <svg class="h-3 w-3 {{ $ticket->sla_status === 'danger' ? 'animate-pulse' : '' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+                                                    {{ $ticket->sla_remaining }}
+                                                </div>
+                                            @else
+                                                <span class="text-[10px] text-slate-600">—</span>
+                                            @endif
                                         </td>
 
                                         {{-- Ações --}}

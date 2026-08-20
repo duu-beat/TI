@@ -32,6 +32,15 @@ class EscalateOverdueTickets extends Command
      */
     public function handle()
     {
+        $this->processOverdueTickets();
+        $this->processSlaWarnings();
+    }
+
+    /**
+     * Processa chamados que já venceram o SLA
+     */
+    private function processOverdueTickets()
+    {
         $overdueTickets = Ticket::query()
             ->whereIn('status', TicketStatus::openStatuses())
             ->whereNotNull('sla_due_at')
@@ -43,36 +52,65 @@ class EscalateOverdueTickets extends Command
             ->get();
 
         if ($overdueTickets->isEmpty()) {
-            $this->info('Nenhum chamado vencido encontrado.');
+            $this->info('Nenhum chamado recém-vencido encontrado.');
             return;
         }
 
-        $this->info("Processando {$overdueTickets->count()} chamados vencidos...");
+        $this->info("Escalonando {$overdueTickets->count()} chamados vencidos...");
 
         foreach ($overdueTickets as $ticket) {
             DB::transaction(function () use ($ticket) {
                 $oldPriority = $ticket->priority->label();
                 
-                // Escalonar e aumentar prioridade
                 $ticket->update([
                     'is_escalated' => true,
                     'priority' => TicketPriority::HIGH,
                 ]);
 
-                // Registrar no histórico
                 $ticket->messages()->create([
-                    'user_id' => null, // Sistema
+                    'user_id' => null,
                     'is_internal' => true,
-                    'message' => "🤖 **SISTEMA**: SLA vencido em {$ticket->sla_due_at->format('d/m/Y H:i')}. Chamado escalonado automaticamente e prioridade alterada de **{$oldPriority}** para **Alta**."
+                    'message' => "🚨 **SISTEMA**: SLA violado em {$ticket->sla_due_at->format('d/m/Y H:i')}. Chamado escalonado automaticamente para Segurança."
                 ]);
 
-                // Notificar Admins
-                Notification::send(User::admins()->get(), new TicketUpdated($ticket, 'status_updated'));
+                Notification::send(User::admins()->get(), new TicketUpdated($ticket, 'sla_breached'));
             });
-
             $this->line("- Chamado #{$ticket->id} escalonado.");
         }
+    }
 
-        $this->info('Escalonamento concluído.');
+    /**
+     * Processa avisos preventivos para chamados próximos do vencimento
+     */
+    private function processSlaWarnings()
+    {
+        $slaService = app(\App\Services\SlaService::class);
+        
+        // Busca chamados que ainda não venceram, mas estão em status de 'warning'
+        $openTickets = Ticket::query()
+            ->whereIn('status', TicketStatus::openStatuses())
+            ->whereNotNull('sla_due_at')
+            ->where('sla_due_at', '>', now())
+            ->where('sla_warning_sent', false)
+            ->get();
+
+        $warningCount = 0;
+        foreach ($openTickets as $ticket) {
+            if ($slaService->getSlaStatus($ticket) === 'warning') {
+                $ticket->update(['sla_warning_sent' => true]);
+                
+                // Notificar responsável (se houver) ou todos os admins
+                $notifiables = $ticket->assigned_to 
+                    ? collect([$ticket->assignee]) 
+                    : User::admins()->get();
+
+                Notification::send($notifiables, new TicketUpdated($ticket, 'sla_warning'));
+                $warningCount++;
+            }
+        }
+
+        if ($warningCount > 0) {
+            $this->info("Enviados {$warningCount} avisos preventivos de SLA.");
+        }
     }
 }

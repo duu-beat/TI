@@ -48,11 +48,39 @@ class SlaService
         }
 
         // Se já foi resolvido, não considera vencido
-        if ($ticket->resolved_at) {
+        if ($ticket->resolved_at || in_array($ticket->status, [TicketStatus::RESOLVED, TicketStatus::CLOSED])) {
             return false;
         }
 
         return now()->isAfter($ticket->sla_due_at);
+    }
+
+    /**
+     * Retorna o status visual do SLA (danger, warning, success)
+     */
+    public function getSlaStatus(Ticket $ticket): string
+    {
+        if (!$ticket->sla_due_at || $ticket->resolved_at || in_array($ticket->status, [TicketStatus::RESOLVED, TicketStatus::CLOSED])) {
+            return 'success';
+        }
+
+        $now = now();
+        $due = $ticket->sla_due_at;
+
+        if ($now->isAfter($due)) {
+            return 'danger';
+        }
+
+        // Alerta se faltar menos de 20% do tempo total ou menos de 1 hora
+        $createdAt = $ticket->created_at;
+        $totalMinutes = $createdAt->diffInMinutes($due);
+        $remainingMinutes = $now->diffInMinutes($due);
+
+        if ($remainingMinutes <= 60 || ($remainingMinutes / $totalMinutes) <= 0.2) {
+            return 'warning';
+        }
+
+        return 'info';
     }
 
     /**
