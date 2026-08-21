@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\AuditLog;
 use App\Models\Ticket;
 use App\Models\User;
+use App\Enums\TicketStatus;
+use App\Services\SlaService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
@@ -16,15 +18,39 @@ class DashboardController extends Controller
 {
     public function index()
     {
-        $escalatedTickets = Ticket::with('user')
+        $openStatuses = TicketStatus::openStatuses();
+
+        $escalatedTickets = Ticket::with(['user', 'assignee'])
             ->where('is_escalated', true)
-            ->where('status', '!=', 'resolved')
-            ->latest()
+            ->whereIn('status', $openStatuses)
+            ->latest('updated_at')
             ->get();
 
-        $admins = User::where('role', User::ROLE_ADMIN)->get();
+        $recentSecurityEvents = AuditLog::with('user')
+            ->whereIn('level', ['WARNING', 'DANGER'])
+            ->latest()
+            ->limit(6)
+            ->get();
 
-        return view('master.dashboard', compact('escalatedTickets', 'admins'));
+        $masterMetrics = [
+            'escalated' => $escalatedTickets->count(),
+            'overdue_sla' => Ticket::query()
+                ->whereIn('status', $openStatuses)
+                ->whereNotNull('sla_due_at')
+                ->where('sla_due_at', '<', now())
+                ->count(),
+            'unassigned' => Ticket::query()
+                ->whereIn('status', $openStatuses)
+                ->whereNull('assigned_to')
+                ->count(),
+            'admins_without_2fa' => User::query()
+                ->where('role', User::ROLE_ADMIN)
+                ->whereNull('two_factor_confirmed_at')
+                ->count(),
+            'recent_warnings' => $recentSecurityEvents->count(),
+        ];
+
+        return view('master.dashboard', compact('escalatedTickets', 'recentSecurityEvents', 'masterMetrics'));
     }
 
     // --- AUDITORIA (ATUALIZADO) ---
@@ -149,27 +175,39 @@ class DashboardController extends Controller
     /**
      * Resolução imediata via Painel de Segurança.
      */
-    public function resolveEscalated(Request $request, Ticket $ticket)
+    public function resolveEscalated(Request $request, Ticket $ticket, SlaService $slaService)
     {
-        // 1. Atualiza o status para RESOLVIDO
-        $ticket->update([
-            'status' => \App\Enums\TicketStatus::RESOLVED,
-            'is_escalated' => false, // Remove o alerta de escalonamento pois foi resolvido
+        $request->validate([
+            'solution' => ['nullable', 'string', 'max:4000'],
         ]);
 
-        // 2. Adiciona uma mensagem automática no chat avisando o cliente
-        $ticket->messages()->create([
-            'user_id' => auth()->id(),
-            'message' => "Chamado resolvido pela equipe de Segurança/Infraestrutura.\n\nSolução Técnica: " . ($request->solution ?? 'Intervenção direta no sistema.'),
-        ]);
+        if (!$ticket->is_escalated || !in_array($ticket->status->value, TicketStatus::openStatuses())) {
+            return back()->with('warning', 'Este incidente não está mais pendente de supervisão.');
+        }
 
-        // 3. Grava no Log de Auditoria
-        AuditLog::record(
-            'Ticket Resolved',
-            "Master resolveu o chamado #{$ticket->id} via Painel de Controle.",
-            'SUCCESS'
-        );
+        DB::transaction(function () use ($ticket, $request, $slaService) {
+            $ticket->update([
+                'status' => TicketStatus::RESOLVED,
+                'resolved_at' => now(),
+                'is_escalated' => false,
+            ]);
 
-        return back()->with('success', "Chamado #{$ticket->id} encerrado com sucesso.");
+            $slaService->calculateResolutionTime($ticket);
+
+            $ticket->messages()->create([
+                'user_id' => auth()->id(),
+                'message' => "Chamado resolvido pela equipe de Segurança/Infraestrutura.\n\nSolução técnica: " . ($request->input('solution') ?: 'Intervenção direta no sistema.'),
+            ]);
+
+            AuditLog::record(
+                'Ticket Resolved',
+                "Master resolveu o incidente escalonado #{$ticket->id} pelo painel de supervisão.",
+                'SUCCESS'
+            );
+        });
+
+        $ticket->user->notify(new \App\Notifications\TicketUpdated($ticket->fresh(), 'status_updated'));
+
+        return back()->with('success', "Incidente #{$ticket->id} resolvido e registrado com sucesso.");
     }
 }

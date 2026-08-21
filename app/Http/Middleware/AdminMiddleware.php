@@ -16,10 +16,12 @@ class AdminMiddleware
      */
     public function handle($request, Closure $next)
 {
-    // Verifica se é Admin OU Master (usando o método que criamos no Model)
-    if (!Auth::check() || !Auth::user()->isAdmin()) {
+    // A operação diária é exclusiva do papel Admin. O Master possui um plano
+    // de supervisão separado em /seguranca e não deve acessar fluxos operacionais.
+    if (!Auth::check() || Auth::user()->role !== \App\Models\User::ROLE_ADMIN) {
         abort(403);
     }
+
     return $next($request);
 }
 

@@ -174,7 +174,7 @@
                             Cancelar
                         </button>
 
-                        <form method="POST" action="{{ (request()->routeIs('admin.*') || request()->routeIs('master.*')) ? route('admin.logout') : route('logout') }}">
+                        <form method="POST" action="{{ request()->routeIs('master.*') ? route('master.logout') : (request()->routeIs('admin.*') ? route('admin.logout') : route('logout')) }}">
                             @csrf
                             <button type="submit" class="rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">
                                 Sair agora
