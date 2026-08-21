@@ -5,7 +5,8 @@
 @section('meta_description', 'Conheça a Suporte TI em Seropédica. Transformamos a tecnologia de empresas com prevenção, monitoramento proativo e agilidade.')
 
 @section('content')
-<div class="relative py-24 min-h-screen overflow-hidden">
+{{-- ✅ WRAPPER ALPINE ADICIONADO --}}
+<div class="relative py-24 min-h-screen overflow-hidden" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
     
     {{-- Background Glow --}}
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
@@ -15,7 +16,32 @@
 
     <div class="relative z-10 max-w-5xl mx-auto px-6">
         
-        <div>
+        {{-- 💀 SKELETON LOADER --}}
+        <div x-show="!loaded" class="animate-pulse space-y-32">
+            <div class="text-center space-y-6">
+                <div class="h-8 w-40 bg-white/5 rounded-full mx-auto"></div>
+                <div class="h-16 w-3/4 bg-white/5 rounded-2xl mx-auto"></div>
+                <div class="h-4 w-1/2 bg-white/5 rounded mx-auto"></div>
+            </div>
+            
+            <div class="grid md:grid-cols-12 gap-12">
+                <div class="md:col-span-5 h-[400px] bg-white/5 rounded-3xl"></div>
+                <div class="md:col-span-7 space-y-6">
+                    <div class="h-10 w-3/4 bg-white/5 rounded-xl"></div>
+                    <div class="space-y-3">
+                        <div class="h-4 w-full bg-white/5 rounded"></div>
+                        <div class="h-4 w-full bg-white/5 rounded"></div>
+                        <div class="h-4 w-2/3 bg-white/5 rounded"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {{-- ✅ CONTEÚDO REAL --}}
+        <div x-show="loaded" style="display: none;"
+             x-transition:enter="transition ease-out duration-700"
+             x-transition:enter-start="opacity-0 translate-y-8"
+             x-transition:enter-end="opacity-100 translate-y-0">
             
             {{-- 1. HERO SECTION --}}
             <div class="text-center mb-32">
