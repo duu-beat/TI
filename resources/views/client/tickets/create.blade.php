@@ -49,7 +49,45 @@
                 </ol>
             </div>
 
-            <form action="{{ route('client.tickets.store') }}" method="POST" enctype="multipart/form-data" x-data="attachmentUploader()" class="grid gap-6 lg:grid-cols-12">
+            <form action="{{ route('client.tickets.store') }}" method="POST" enctype="multipart/form-data"
+                  x-data="Object.assign(attachmentUploader(), {
+                      articleSuggestions: [],
+                      suggestionsLoading: false,
+                      suggestionsError: '',
+                      suggestionsTimer: null,
+                      knowledgeSuggestionsUrl: @js(route('client.knowledge.suggestions')),
+                      queueKnowledgeSuggestions() {
+                          window.clearTimeout(this.suggestionsTimer);
+                          const subject = this.$el.querySelector('#subject')?.value || '';
+                          const description = this.$el.querySelector('#description')?.value || '';
+                          const category = this.$el.querySelector('#category')?.value || '';
+                          const categoryTerms = { hardware: 'hardware equipamento', software: 'software programa', network: 'rede internet', access: 'acesso senha', printer: 'impressora' };
+                          const query = [subject, description, categoryTerms[category] || category].join(' ').trim();
+
+                          if (query.length < 3) {
+                              this.articleSuggestions = [];
+                              this.suggestionsError = '';
+                              return;
+                          }
+
+                          this.suggestionsTimer = window.setTimeout(() => this.fetchKnowledgeSuggestions(query), 350);
+                      },
+                      async fetchKnowledgeSuggestions(query) {
+                          this.suggestionsLoading = true;
+                          this.suggestionsError = '';
+                          try {
+                              const response = await fetch(this.knowledgeSuggestionsUrl + '?' + new URLSearchParams({ q: query }), { headers: { Accept: 'application/json' } });
+                              if (!response.ok) throw new Error('Falha ao buscar sugestões.');
+                              this.articleSuggestions = await response.json();
+                          } catch (error) {
+                              this.articleSuggestions = [];
+                              this.suggestionsError = 'Não foi possível buscar artigos agora.';
+                          } finally {
+                              this.suggestionsLoading = false;
+                          }
+                      }
+                  })"
+                  class="grid gap-6 lg:grid-cols-12">
                 @csrf
 
                 <section class="space-y-6 lg:col-span-8" aria-label="Informações do chamado">
@@ -70,7 +108,7 @@
                             <div>
                                 <label for="category" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">Categoria</label>
                                 <div class="relative">
-                                    <select id="category" name="category" required class="block w-full appearance-none rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 pr-10 text-sm text-slate-200 shadow-inner shadow-black/10 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
+                                    <select id="category" name="category" required @change="queueKnowledgeSuggestions()" class="block w-full appearance-none rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 pr-10 text-sm text-slate-200 shadow-inner shadow-black/10 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20">
                                         <option value="" disabled {{ old('category') ? '' : 'selected' }} class="bg-slate-900">Selecione uma categoria</option>
                                         <option value="hardware" {{ old('category') === 'hardware' ? 'selected' : '' }} class="bg-slate-900">Hardware / Equipamento</option>
                                         <option value="software" {{ old('category') === 'software' ? 'selected' : '' }} class="bg-slate-900">Software / Programas</option>
@@ -119,7 +157,7 @@
                         <div class="space-y-5">
                             <div>
                                 <label for="subject" class="mb-2 block text-xs font-bold uppercase tracking-wider text-slate-400">Assunto</label>
-                                <input id="subject" type="text" name="subject" value="{{ old('subject') }}" required maxlength="255" class="block w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-600 shadow-inner shadow-black/10 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Ex.: Não consigo acessar a VPN" />
+                                <input id="subject" type="text" name="subject" value="{{ old('subject') }}" required maxlength="255" @input="queueKnowledgeSuggestions()" class="block w-full rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm text-white placeholder:text-slate-600 shadow-inner shadow-black/10 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Ex.: Não consigo acessar a VPN" />
                                 <x-input-error for="subject" class="mt-2" />
                             </div>
                             <div>
@@ -127,11 +165,16 @@
                                     <label for="description" class="block text-xs font-bold uppercase tracking-wider text-slate-400">Detalhes do problema</label>
                                     <span class="text-[11px] text-slate-600">Seja o mais específico possível</span>
                                 </div>
-                                <textarea id="description" name="description" rows="8" required class="block w-full resize-y rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm leading-6 text-white placeholder:text-slate-600 shadow-inner shadow-black/10 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Descreva o problema e informe o que aparece na tela ou o que você já tentou fazer.">{{ old('description') }}</textarea>
+                                <textarea id="description" name="description" rows="8" required @input="queueKnowledgeSuggestions()" class="block w-full resize-y rounded-xl border border-white/10 bg-slate-950/70 px-4 py-3 text-sm leading-6 text-white placeholder:text-slate-600 shadow-inner shadow-black/10 transition focus:border-indigo-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" placeholder="Descreva o problema e informe o que aparece na tela ou o que você já tentou fazer.">{{ old('description') }}</textarea>
                                 <x-input-error for="description" class="mt-2" />
                             </div>
                         </div>
                     </article>
+
+                    <section x-show="suggestionsLoading || articleSuggestions.length || suggestionsError" x-cloak class="overflow-hidden rounded-3xl border border-cyan-400/20 bg-cyan-500/[0.05] shadow-xl shadow-cyan-950/10" aria-live="polite" aria-label="Sugestões da Base de Conhecimento">
+                        <div class="flex items-start gap-3 border-b border-cyan-400/10 px-5 py-4 sm:px-6"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-400/10 text-cyan-300"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.25C7.7 4.15 4.55 5.18 3 6.16v11.16c1.55-.98 4.7-2.01 9 0 4.3-2.01 7.45-.98 9 0V6.16c-1.55-.98-4.7-2.01-9 0Zm0 0v11.07" /></svg></span><div><h2 class="text-sm font-bold text-cyan-100">Talvez este procedimento ajude</h2><p class="mt-1 text-xs leading-5 text-slate-400">Antes de enviar, veja se algum artigo resolve o problema.</p></div></div>
+                        <div class="p-4 sm:p-5"><div x-show="suggestionsLoading" class="flex items-center gap-2 text-xs text-cyan-200"><span class="h-3 w-3 animate-spin rounded-full border-2 border-cyan-300/30 border-t-cyan-300"></span>Buscando artigos relevantes...</div><p x-show="suggestionsError" x-text="suggestionsError" class="text-xs text-amber-200"></p><div x-show="!suggestionsLoading && articleSuggestions.length" class="grid gap-3"><template x-for="article in articleSuggestions" :key="article.id"><a :href="article.url" class="group rounded-2xl border border-white/10 bg-slate-950/45 p-4 transition hover:border-cyan-400/35 hover:bg-slate-950/70"><div class="flex items-center justify-between gap-3"><span class="rounded-md border border-cyan-400/15 bg-cyan-500/[0.08] px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-cyan-300" x-text="article.category || 'Geral'"></span><span class="text-[10px] font-bold text-cyan-300 transition group-hover:text-cyan-100">Abrir artigo →</span></div><h3 class="mt-2 text-sm font-bold text-slate-100" x-text="article.title"></h3><p class="mt-1 text-xs leading-5 text-slate-400" x-text="article.excerpt"></p></a></template></div></div>
+                    </section>
 
                     <article class="rounded-3xl border border-white/10 bg-slate-900/70 p-5 shadow-xl shadow-slate-950/20 backdrop-blur-xl sm:p-7">
                         <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">

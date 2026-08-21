@@ -132,13 +132,13 @@
                     </div>
                 </div>
 
-                {{-- Card: FAQ / Ajuda --}}
-                <a href="{{ route('faq') }}" class="relative overflow-hidden rounded-2xl p-6 bg-indigo-600/10 border border-indigo-500/20 group hover:bg-indigo-600/20 hover:border-indigo-500/40 transition duration-300 cursor-pointer flex flex-col justify-center">
+                {{-- Card: Base de Conhecimento --}}
+                <a href="{{ route('client.knowledge.index') }}" class="relative overflow-hidden rounded-2xl p-6 bg-indigo-600/10 border border-indigo-500/20 group hover:bg-indigo-600/20 hover:border-indigo-500/40 transition duration-300 cursor-pointer flex flex-col justify-center">
                     <div class="absolute -right-6 -top-6 h-24 w-24 bg-indigo-500/20 rounded-full blur-2xl group-hover:bg-indigo-500/30 transition"></div>
                     <div class="relative flex items-center justify-between">
                         <div>
                             <div class="text-indigo-300 text-xs font-bold uppercase tracking-wider mb-1">Precisa de Ajuda?</div>
-                            <div class="font-bold text-white group-hover:text-indigo-200 transition">Ver FAQ </div>
+                            <div class="font-bold text-white group-hover:text-indigo-200 transition">Base de Conhecimento</div>
                         </div>
                         <svg class="w-8 h-8 text-indigo-400 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     </div>
@@ -222,18 +222,18 @@
                     </div>
                 </div>
 
-                {{-- COLUNA LATERAL: FAQs Rápidas --}}
+                {{-- COLUNA LATERAL: Ajuda rápida --}}
                 <div class="space-y-6">
                     <h3 class="text-xl font-bold text-white flex items-center gap-2 px-1">
                         <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                        Dúvidas Comuns
+                        Ajuda rápida
                     </h3>
                     
                     <div class="rounded-3xl bg-slate-900/50 border border-white/10 p-6 backdrop-blur-sm shadow-xl shadow-black/20">
                         <ul class="space-y-4">
                             @forelse($faqs as $faq)
                                 <li>
-                                    <a href="{{ route('faq') }}#faq-{{ $faq->id }}" class="group flex items-start gap-3">
+                                    <a href="{{ route('client.knowledge.index', ['search' => $faq->question]) }}" class="group flex items-start gap-3">
                                         <div class="mt-1 shrink-0 h-2 w-2 rounded-full bg-slate-600 group-hover:bg-cyan-400 transition-colors"></div>
                                         <span class="text-sm font-medium text-slate-300 group-hover:text-white transition leading-relaxed">
                                             {{ $faq->question }}
@@ -248,8 +248,8 @@
                         </ul>
 
                         <div class="mt-8 pt-6 border-t border-white/5">
-                            <a href="{{ route('faq') }}" class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-sm font-bold text-white transition hover:shadow-lg">
-                                <span>Acessar Central de Ajuda</span>
+                            <a href="{{ route('client.knowledge.index') }}" class="flex items-center justify-center gap-2 w-full py-3 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/5 text-sm font-bold text-white transition hover:shadow-lg">
+                                <span>Explorar Base de Conhecimento</span>
                             </a>
                         </div>
                     </div>

@@ -75,7 +75,14 @@ Route::get('/auth/{provider}/callback', function ($provider) {
 Route::middleware(['auth', 'verified'])->prefix('cliente')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('/perfil', 'profile.show')->name('profile');
-    Route::get('/faq', [\App\Http\Controllers\Client\FaqController::class, 'index'])->name('faq');
+    // Base de conhecimento: somente artigos publicados ficam disponíveis ao cliente.
+    Route::controller(\App\Http\Controllers\Client\FaqController::class)->prefix('base-conhecimento')->name('knowledge.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/sugestoes', 'suggestions')->name('suggestions');
+        Route::get('/{article:slug}', 'show')->name('show');
+    });
+    // Compatibilidade com o atalho antigo de FAQ.
+    Route::get('/faq', fn () => redirect()->route('client.knowledge.index'))->name('faq');
 
     Route::resource('chamados', ClientTicketController::class)
         ->names('tickets')

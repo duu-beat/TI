@@ -16,10 +16,10 @@
         🎫 Meus Chamados
     </a>
 
-    {{-- FAQ --}}
-    <a href="{{ route('client.faq') }}"
-       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.faq') ? $activeClass : $inactiveClass }}">
-        ❓ Perguntas Frequentes
+    {{-- Base de Conhecimento --}}
+    <a href="{{ route('client.knowledge.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.knowledge.*') ? $activeClass : $inactiveClass }}">
+        Base de Conhecimento
     </a>
 
 </div>
