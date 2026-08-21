@@ -231,18 +231,18 @@
                     
                     <div class="rounded-3xl bg-slate-900/50 border border-white/10 p-6 backdrop-blur-sm shadow-xl shadow-black/20">
                         <ul class="space-y-4">
-                            @forelse($faqs as $faq)
+                            @forelse($quickArticles as $article)
                                 <li>
-                                    <a href="{{ route('client.knowledge.index', ['search' => $faq->question]) }}" class="group flex items-start gap-3">
-                                        <div class="mt-1 shrink-0 h-2 w-2 rounded-full bg-slate-600 group-hover:bg-cyan-400 transition-colors"></div>
-                                        <span class="text-sm font-medium text-slate-300 group-hover:text-white transition leading-relaxed">
-                                            {{ $faq->question }}
+                                    <a href="{{ route('client.knowledge.show', $article) }}" class="group flex items-start gap-3">
+                                        <div class="mt-1 shrink-0 h-2 w-2 rounded-full bg-slate-600 transition-colors group-hover:bg-cyan-400"></div>
+                                        <span class="text-sm font-medium leading-relaxed text-slate-300 transition group-hover:text-white">
+                                            {{ $article->title }}
                                         </span>
                                     </a>
                                 </li>
                             @empty
-                                <li class="text-sm text-slate-500 italic text-center py-4">
-                                    Nenhuma pergunta frequente cadastrada no momento.
+                                <li class="py-4 text-center text-sm italic text-slate-500">
+                                    Nenhum artigo publicado disponível no momento.
                                 </li>
                             @endforelse
                         </ul>

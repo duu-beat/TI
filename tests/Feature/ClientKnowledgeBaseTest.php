@@ -88,6 +88,48 @@ class ClientKnowledgeBaseTest extends TestCase
             ->assertJsonPath('0.url', route('client.knowledge.show', $published));
     }
 
+    public function test_client_dashboard_uses_only_published_knowledge_base_articles_for_quick_help(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $author = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $published = KnowledgeBase::create([
+            'title' => 'Configurar autenticação corporativa',
+            'content' => 'Guia publicado para acesso corporativo.',
+            'category' => 'Acessos',
+            'author_id' => $author->id,
+            'is_published' => true,
+            'views_count' => 5,
+        ]);
+        KnowledgeBase::create([
+            'title' => 'Guia em revisão interna',
+            'content' => 'Rascunho que não pode aparecer na dashboard.',
+            'category' => 'Acessos',
+            'author_id' => $author->id,
+            'is_published' => false,
+        ]);
+
+        $this->actingAs($client)
+            ->get(route('client.dashboard'))
+            ->assertOk()
+            ->assertSee('Configurar autenticação corporativa')
+            ->assertDontSee('Guia em revisão interna')
+            ->assertSee(route('client.knowledge.show', $published), false);
+    }
+
+    public function test_admin_and_master_cannot_access_client_area(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $master = User::factory()->create(['role' => User::ROLE_MASTER]);
+
+        $this->actingAs($admin)
+            ->get(route('client.dashboard'))
+            ->assertForbidden();
+
+        $this->actingAs($master)
+            ->get(route('client.dashboard'))
+            ->assertForbidden();
+    }
+
     public function test_ticket_form_exposes_knowledge_suggestions_without_removing_attachment_preview(): void
     {
         $client = User::factory()->create(['role' => User::ROLE_CLIENT]);

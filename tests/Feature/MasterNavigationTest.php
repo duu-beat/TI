@@ -15,6 +15,8 @@ class MasterNavigationTest extends TestCase
         $master = User::factory()->create([
             'role' => User::ROLE_MASTER,
             'email_verified_at' => now(),
+            'two_factor_secret' => encrypt('MASTER-2FA-SECRET'),
+            'two_factor_confirmed_at' => now(),
         ]);
 
         $response = $this->actingAs($master)->get(route('master.dashboard'));
@@ -28,11 +30,31 @@ class MasterNavigationTest extends TestCase
         $response->assertDontSee('Relatórios');
     }
 
+    public function test_master_dashboard_counts_all_privileged_profiles_without_confirmed_two_factor(): void
+    {
+        $master = User::factory()->create([
+            'role' => User::ROLE_MASTER,
+            'email_verified_at' => now(),
+            'two_factor_secret' => encrypt('MASTER-2FA-SECRET'),
+            'two_factor_confirmed_at' => now(),
+        ]);
+        User::factory()->create(['role' => User::ROLE_ADMIN]);
+        User::factory()->create(['role' => User::ROLE_MASTER]);
+
+        $this->actingAs($master)
+            ->get(route('master.dashboard'))
+            ->assertOk()
+            ->assertSee('Perfis privilegiados sem 2FA')
+            ->assertSee('>2<', false);
+    }
+
     public function test_master_cannot_access_the_admin_operational_dashboard(): void
     {
         $master = User::factory()->create([
             'role' => User::ROLE_MASTER,
             'email_verified_at' => now(),
+            'two_factor_secret' => encrypt('MASTER-2FA-SECRET'),
+            'two_factor_confirmed_at' => now(),
         ]);
 
         $this->actingAs($master)
@@ -45,6 +67,8 @@ class MasterNavigationTest extends TestCase
         $master = User::factory()->create([
             'role' => User::ROLE_MASTER,
             'email_verified_at' => now(),
+            'two_factor_secret' => encrypt('MASTER-2FA-SECRET'),
+            'two_factor_confirmed_at' => now(),
         ]);
 
         $response = $this->actingAs($master)->get(route('master.health'));
@@ -59,6 +83,8 @@ class MasterNavigationTest extends TestCase
         $master = User::factory()->create([
             'role' => User::ROLE_MASTER,
             'email_verified_at' => now(),
+            'two_factor_secret' => encrypt('MASTER-2FA-SECRET'),
+            'two_factor_confirmed_at' => now(),
         ]);
         $ticket = \App\Models\Ticket::factory()->create([
             'is_escalated' => true,

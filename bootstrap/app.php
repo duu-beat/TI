@@ -18,6 +18,7 @@ return Application::configure(basePath: dirname(__DIR__))
         // ✅ AQUI ESTÁ A CORREÇÃO: Registre os dois middlewares
         $middleware->alias([
             'admin' => \App\Http\Middleware\AdminMiddleware::class,   // <--- Essa linha estava faltando
+            'client' => \App\Http\Middleware\ClientMiddleware::class,
             'master' => \App\Http\Middleware\MasterMiddleware::class,
         ]);
 

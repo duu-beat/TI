@@ -40,7 +40,7 @@ class DashboardStatsService
      */
     public function getAdminDashboardData(): array
     {
-        // 1. Dados Pesados (Cacheados por 5 minutos)
+        // 1. Dados Pesados (Cacheados por 15 minutos)
         // Inclui contagens globais, dados do gráfico e métricas de SLA.
         $cachedData = Cache::remember(DashboardCache::ADMIN_STATS, 900, function () {
             return $this->calculateCachedStats();

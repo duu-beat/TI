@@ -6,7 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use App\Models\Ticket;
-use App\Models\Faq; // ✅ Importar o Modelo FAQ
+use App\Models\KnowledgeBase;
 use App\Enums\TicketStatus; // ✅ Importar o Enum
 
 class DashboardController extends Controller
@@ -42,11 +42,16 @@ class DashboardController extends Controller
         // Tickets recentes não são cacheados para garantir que o usuário veja o status atualizado
         $recentTickets = $user->tickets()->latest()->take(5)->get();
 
-        // FAQs podem ser cacheadas globalmente
-        $faqs = Cache::remember('global_faqs_dashboard', 3600, function() {
-            return Faq::take(3)->get();
+        // Os artigos publicados oferecem ajuda contextual sem expor rascunhos da Wiki.
+        $quickArticles = Cache::remember('client_dashboard_quick_articles', 3600, function () {
+            return KnowledgeBase::query()
+                ->where('is_published', true)
+                ->orderByDesc('views_count')
+                ->latest('updated_at')
+                ->limit(3)
+                ->get(['id', 'title', 'slug', 'category', 'views_count']);
         });
 
-        return view('client.dashboard', compact('stats', 'recentTickets', 'waitingForUser', 'faqs'));
+        return view('client.dashboard', compact('stats', 'recentTickets', 'waitingForUser', 'quickArticles'));
     }
 }

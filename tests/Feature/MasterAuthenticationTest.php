@@ -10,7 +10,7 @@ class MasterAuthenticationTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_master_without_two_factor_can_access_security_dashboard_after_login(): void
+    public function test_master_without_two_factor_is_redirected_to_configure_security_before_accessing_dashboard(): void
     {
         $master = User::factory()->create([
             'role' => User::ROLE_MASTER,
@@ -24,6 +24,15 @@ class MasterAuthenticationTest extends TestCase
 
         $this->assertAuthenticatedAs($master);
         $response->assertRedirect(route('master.dashboard'));
+
+        $this->actingAs($master)
+            ->get(route('master.dashboard'))
+            ->assertRedirect(route('master.profile') . '#seguranca-da-conta')
+            ->assertSessionHas('warning');
+
+        $this->actingAs($master)
+            ->get(route('master.profile'))
+            ->assertOk();
     }
 
     public function test_master_with_confirmed_two_factor_is_challenged_before_accessing_security_dashboard(): void

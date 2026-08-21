@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\Asset;
+use App\Models\KnowledgeBase;
 use App\Models\NpsSurvey;
 use App\Models\Ticket;
 use App\Observers\AssetObserver;
+use App\Observers\KnowledgeBaseObserver;
 use App\Observers\NpsSurveyObserver;
 use App\Observers\TicketObserver;
 use App\Policies\TicketPolicy;
@@ -38,6 +40,7 @@ class AppServiceProvider extends ServiceProvider
 
         Ticket::observe(TicketObserver::class);
         Asset::observe(AssetObserver::class);
+        KnowledgeBase::observe(KnowledgeBaseObserver::class);
         NpsSurvey::observe(NpsSurveyObserver::class);
 
         View::composer('layouts.app', function ($view) {

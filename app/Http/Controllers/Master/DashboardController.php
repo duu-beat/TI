@@ -43,9 +43,12 @@ class DashboardController extends Controller
                 ->whereIn('status', $openStatuses)
                 ->whereNull('assigned_to')
                 ->count(),
-            'admins_without_2fa' => User::query()
-                ->where('role', User::ROLE_ADMIN)
-                ->whereNull('two_factor_confirmed_at')
+            'privileged_without_2fa' => User::query()
+                ->whereIn('role', [User::ROLE_ADMIN, User::ROLE_MASTER])
+                ->where(function ($query) {
+                    $query->whereNull('two_factor_secret')
+                        ->orWhereNull('two_factor_confirmed_at');
+                })
                 ->count(),
             'recent_warnings' => $recentSecurityEvents->count(),
         ];

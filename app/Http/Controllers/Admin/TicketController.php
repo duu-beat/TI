@@ -37,7 +37,7 @@ class TicketController extends Controller
         $tickets = Ticket::with(['user', 'assignee', 'tags'])
             ->filter($request->only([
                 'search', 'status', 'priority', 'category', 
-                'assigned_to', 'tag', 'date_from', 'date_to', 'sla_overdue'
+                'assigned_to', 'tag', 'date_from', 'date_to', 'sla_overdue', 'open_only'
             ]))
             ->latest()
             ->paginate(15)

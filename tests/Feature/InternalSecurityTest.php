@@ -50,6 +50,64 @@ class InternalSecurityTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_admin_dashboard_keeps_operational_indicators_in_the_loaded_content(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+        $agent = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+
+        $this->makeTicket($client, [
+            'priority' => TicketPriority::HIGH,
+            'assigned_to' => null,
+        ]);
+        $this->makeTicket($client, [
+            'assigned_to' => $agent->id,
+            'status' => TicketStatus::RESOLVED,
+            'resolved_at' => now(),
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('admin.dashboard'));
+
+        $response->assertOk()
+            ->assertSee('sem responsável')
+            ->assertSee('Top agentes')
+            ->assertSee('priority=high&amp;open_only=1', false);
+
+        $content = $response->getContent();
+        $this->assertGreaterThan(
+            strpos($content, 'x-show="loaded"'),
+            strpos($content, 'Top agentes')
+        );
+    }
+
+    public function test_admin_open_high_priority_filter_excludes_resolved_tickets(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $openTicket = $this->makeTicket($client, [
+            'subject' => 'Incidente crítico aberto',
+            'priority' => TicketPriority::HIGH,
+            'status' => TicketStatus::IN_PROGRESS,
+        ]);
+        $resolvedTicket = $this->makeTicket($client, [
+            'subject' => 'Incidente crítico resolvido',
+            'priority' => TicketPriority::HIGH,
+            'status' => TicketStatus::RESOLVED,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.tickets.index', ['priority' => 'high', 'open_only' => 1]))
+            ->assertOk()
+            ->assertSee($openTicket->subject)
+            ->assertDontSee($resolvedTicket->subject);
+    }
+
     public function test_internal_dashboard_stats_are_portable_and_cache_invalidates(): void
     {
         $client = User::factory()->create(['role' => 'client']);

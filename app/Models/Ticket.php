@@ -144,6 +144,11 @@ class Ticket extends Model
             $q->where('priority', $priority);
         });
 
+        // Mantém alertas operacionais restritos aos chamados ainda abertos.
+        $query->when($filters['open_only'] ?? false, function ($q) {
+            $q->whereIn('status', TicketStatus::openStatuses());
+        });
+
         // Filtro por categoria
         $query->when($filters['category'] ?? null, function ($q, $category) {
             $q->where('category', $category);

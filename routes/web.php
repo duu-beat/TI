@@ -72,7 +72,7 @@ Route::get('/auth/{provider}/callback', function ($provider) {
 | ÁREA DO CLIENTE
 |--------------------------------------------------------------------------
 */
-Route::middleware(['auth', 'verified'])->prefix('cliente')->name('client.')->group(function () {
+Route::middleware(['auth', 'verified', 'client'])->prefix('cliente')->name('client.')->group(function () {
     Route::get('/', [DashboardController::class, 'index'])->name('dashboard');
     Route::view('/perfil', 'profile.show')->name('profile');
     // Base de conhecimento: somente artigos publicados ficam disponíveis ao cliente.

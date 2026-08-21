@@ -64,8 +64,8 @@
                     </article>
 
                     <a href="{{ route('master.users.index') }}" class="group rounded-2xl border border-violet-500/20 bg-violet-500/[0.07] p-5 shadow-lg shadow-violet-950/10 transition hover:border-violet-400/40 hover:bg-violet-500/[0.11]">
-                        <div class="flex items-start justify-between gap-3"><p class="text-[10px] font-bold uppercase tracking-[0.16em] text-violet-300">Admins sem 2FA</p><span class="flex h-8 w-8 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10 text-violet-300"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.66 0 3-1.34 3-3S13.66 5 12 5 9 6.34 9 8s1.34 3 3 3Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z" /></svg></span></div>
-                        <p class="mt-4 text-3xl font-black text-white">{{ $masterMetrics['admins_without_2fa'] }}</p>
+                        <div class="flex items-start justify-between gap-3"><p class="text-[10px] font-bold uppercase tracking-[0.16em] text-violet-300">Perfis privilegiados sem 2FA</p><span class="flex h-8 w-8 items-center justify-center rounded-lg border border-violet-500/20 bg-violet-500/10 text-violet-300"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11c1.66 0 3-1.34 3-3S13.66 5 12 5 9 6.34 9 8s1.34 3 3 3Zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4Z" /></svg></span></div>
+                        <p class="mt-4 text-3xl font-black text-white">{{ $masterMetrics['privileged_without_2fa'] }}</p>
                         <p class="mt-1 text-xs text-violet-200/70 group-hover:text-violet-100">Revisar identidades e acessos</p>
                     </a>
                 </div>
