@@ -4,9 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Acessibilidade */
-@import './accessibility.css';
-
 [x-cloak] {
     display: none;
 }
