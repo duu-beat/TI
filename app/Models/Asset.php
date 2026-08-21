@@ -76,6 +76,14 @@ class Asset extends Model
     }
 
     /**
+     * Termos de responsabilidade emitidos para a movimentação deste ativo.
+     */
+    public function responsibilityTerms(): HasMany
+    {
+        return $this->hasMany(AssetResponsibilityTerm::class)->latest();
+    }
+
+    /**
      * Retorna a cor do status para exibição na interface
      */
     public function getStatusColor(): string

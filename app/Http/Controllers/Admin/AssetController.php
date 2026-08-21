@@ -129,6 +129,8 @@ class AssetController extends Controller
         $asset->load([
             'user',
             'history.user',
+            'responsibilityTerms.recipient',
+            'responsibilityTerms.issuer',
             'tickets' => fn ($query) => $query->latest()->limit(5),
         ]);
 

@@ -216,6 +216,17 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('assets/scan/{asset:qr_token}', [\App\Http\Controllers\Admin\AssetController::class, 'show'])->name('assets.scan');
     Route::get('assets/{asset}/etiqueta-qr', [\App\Http\Controllers\Admin\AssetController::class, 'qrLabel'])->name('assets.qr-label');
     Route::get('assets/{asset}/qr-code.svg', [\App\Http\Controllers\Admin\AssetController::class, 'qrCode'])->name('assets.qr-code');
+    Route::controller(\App\Http\Controllers\Admin\AssetResponsibilityTermController::class)
+        ->prefix('assets/{asset}/termos-responsabilidade')
+        ->name('assets.terms.')
+        ->group(function () {
+            Route::get('/novo', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{term}/assinar', 'sign')->name('sign');
+            Route::post('/{term}/assinar', 'storeSignature')->name('store-signature');
+            Route::post('/{term}/cancelar', 'cancel')->name('cancel');
+            Route::get('/{term}/pdf', 'download')->name('download');
+        });
     Route::resource('assets', \App\Http\Controllers\Admin\AssetController::class);
 
     // 📋 Rotas de Checklist

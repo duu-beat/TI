@@ -9,6 +9,9 @@
                 <a href="{{ route('admin.assets.index') }}" class="rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition">
                     Voltar ao inventário
                 </a>
+                <a href="{{ route('admin.assets.terms.create', $asset) }}" class="rounded-xl border border-indigo-400/25 bg-indigo-500/10 px-4 py-2 text-sm font-bold text-indigo-200 hover:bg-indigo-500 hover:text-white transition">
+                    Emitir termo
+                </a>
                 <a href="{{ route('admin.assets.edit', $asset) }}" class="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 transition">
                     Manutenção e edição
                 </a>
@@ -124,6 +127,32 @@
                     </div>
                 </section>
             </div>
+
+            <section class="rounded-3xl border border-indigo-400/15 bg-slate-900/60 p-6 shadow-xl">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                    <div><p class="text-xs font-bold uppercase tracking-[0.18em] text-indigo-300">Responsabilidade digital</p><h3 class="mt-1 text-lg font-bold text-white">Termos de entrega e devolução</h3></div>
+                    <a href="{{ route('admin.assets.terms.create', $asset) }}" class="inline-flex w-fit items-center gap-2 rounded-xl bg-indigo-500 px-4 py-2.5 text-xs font-bold text-white transition hover:bg-indigo-400"><svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 4v16m8-8H4" /></svg>Novo termo</a>
+                </div>
+
+                <div class="mt-5 grid gap-3 xl:grid-cols-2">
+                    @forelse($asset->responsibilityTerms as $term)
+                        <article class="rounded-2xl border border-white/10 bg-slate-950/35 p-4">
+                            <div class="flex flex-wrap items-start justify-between gap-3"><div><p class="text-sm font-bold text-slate-100">{{ $term->typeLabel() }}</p><p class="mt-1 text-xs text-slate-500">{{ $term->recipient->name }} · emitido por {{ $term->issuer->name }}</p></div><span class="rounded-lg px-2 py-1 text-[10px] font-bold uppercase tracking-wider {{ $term->isSigned() ? 'border border-emerald-400/20 bg-emerald-500/10 text-emerald-300' : ($term->status === 'cancelled' ? 'border border-slate-400/15 bg-slate-500/10 text-slate-400' : 'border border-amber-400/20 bg-amber-500/10 text-amber-300') }}">{{ $term->isSigned() ? 'Assinado' : ($term->status === 'cancelled' ? 'Cancelado' : 'Pendente') }}</span></div>
+                            <p class="mt-3 text-xs text-slate-500">{{ $term->isSigned() ? 'Assinado em ' . $term->signed_at?->format('d/m/Y H:i') : 'Aguardando assinatura do responsável' }}</p>
+                            <div class="mt-4 flex flex-wrap gap-2">
+                                @if($term->isSigned())
+                                    <a href="{{ route('admin.assets.terms.download', [$asset, $term]) }}" class="inline-flex rounded-lg border border-indigo-400/20 bg-indigo-500/10 px-3 py-2 text-xs font-bold text-indigo-200 transition hover:bg-indigo-500 hover:text-white">Baixar PDF</a>
+                                @elseif($term->isPending())
+                                    <a href="{{ route('admin.assets.terms.sign', [$asset, $term]) }}" class="inline-flex rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-xs font-bold text-amber-200 transition hover:bg-amber-500/20">Abrir assinatura</a>
+                                    <form method="POST" action="{{ route('admin.assets.terms.cancel', [$asset, $term]) }}" onsubmit="return confirm('Cancelar este termo pendente?')">@csrf<button type="submit" class="rounded-lg px-3 py-2 text-xs font-semibold text-slate-500 transition hover:bg-rose-500/10 hover:text-rose-200">Cancelar</button></form>
+                                @endif
+                            </div>
+                        </article>
+                    @empty
+                        <div class="xl:col-span-2 rounded-2xl border border-dashed border-white/10 px-5 py-8 text-center"><p class="text-sm font-semibold text-slate-300">Nenhum termo emitido para este ativo.</p><p class="mt-1 text-xs text-slate-500">Emita um termo antes de entregar ou receber o equipamento.</p></div>
+                    @endforelse
+                </div>
+            </section>
         </div>
     </div>
 </x-app-layout>
