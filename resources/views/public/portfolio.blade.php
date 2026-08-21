@@ -5,8 +5,7 @@
 @section('meta_description', 'Veja como a Suporte TI ajudou empresas a otimizar sua infraestrutura. Cases reais de otimização, segurança, redes e montagem de computadores.')
 
 @section('content')
-{{-- ✅ WRAPPER ALPINE ADICIONADO --}}
-<div class="relative py-24 min-h-screen" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
+<div class="relative py-24 min-h-screen">
     
     {{-- Background Glow --}}
     <div class="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none overflow-hidden">
@@ -16,26 +15,7 @@
 
     <div class="relative z-10 max-w-7xl mx-auto px-6">
         
-        {{-- 💀 SKELETON LOADER --}}
-        <div x-show="!loaded" class="animate-pulse space-y-20">
-            <div class="text-center space-y-4">
-                <div class="h-8 w-32 bg-purple-500/20 rounded-full mx-auto"></div>
-                <div class="h-12 w-1/2 bg-white/5 rounded-2xl mx-auto"></div>
-                <div class="h-6 w-1/3 bg-white/5 rounded-full mx-auto"></div>
-            </div>
-            
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-                @for($i=0; $i<6; $i++)
-                <div class="h-80 rounded-3xl border border-white/5 bg-slate-900/50"></div>
-                @endfor
-            </div>
-        </div>
-
-        {{-- ✅ CONTEÚDO REAL --}}
-        <div x-show="loaded" style="display: none;"
-             x-transition:enter="transition ease-out duration-500"
-             x-transition:enter-start="opacity-0 translate-y-4"
-             x-transition:enter-end="opacity-100 translate-y-0">
+        <div>
             
             {{-- HERO SECTION --}}
             <div class="text-center mb-20">

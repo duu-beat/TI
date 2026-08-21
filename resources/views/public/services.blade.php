@@ -4,38 +4,13 @@
 @section('meta_description', 'Serviços completos de TI: Manutenção, redes e segurança.')
 
 @section('content')
-{{-- ✅ WRAPPER ALPINE ADICIONADO --}}
-<div class="relative py-20" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
+<div class="relative py-20">
     {{-- Glow --}}
     <div class="absolute top-0 right-0 w-full h-[600px] bg-indigo-900/20 blur-[150px] pointer-events-none"></div>
 
     <div class="relative z-10 max-w-7xl mx-auto px-6">
         
-        {{-- 💀 SKELETON LOADER --}}
-        <div x-show="!loaded" class="animate-pulse space-y-20">
-            {{-- Header Skeleton --}}
-            <div class="text-center space-y-4">
-                <div class="h-12 w-1/2 bg-white/5 rounded-2xl mx-auto"></div>
-                <div class="h-6 w-1/3 bg-white/5 rounded-full mx-auto"></div>
-            </div>
-
-            {{-- Grid Skeleton --}}
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                @for($i=0; $i<6; $i++)
-                <div class="p-8 rounded-3xl border border-white/5 bg-slate-900/50 h-64 flex flex-col justify-center space-y-4">
-                    <div class="h-10 w-10 bg-white/5 rounded-lg"></div>
-                    <div class="h-6 w-3/4 bg-white/5 rounded"></div>
-                    <div class="h-16 w-full bg-white/5 rounded"></div>
-                </div>
-                @endfor
-            </div>
-        </div>
-
-        {{-- ✅ CONTEÚDO REAL --}}
-        <div x-show="loaded" style="display: none;"
-             x-transition:enter="transition ease-out duration-500"
-             x-transition:enter-start="opacity-0 translate-y-4"
-             x-transition:enter-end="opacity-100 translate-y-0">
+        <div>
             
             <div class="text-center mb-20">
                 <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">
