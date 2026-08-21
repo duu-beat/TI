@@ -5,9 +5,20 @@ namespace App\Traits;
 use App\Models\AuditLog;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 
 trait Auditable
 {
+    /**
+     * Campos que nunca podem ser expostos em logs de auditoria.
+     */
+    private const SENSITIVE_AUDIT_ATTRIBUTES = [
+        'password',
+        'remember_token',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+    ];
+
     /**
      * Boot the trait to listen for model events.
      */
@@ -27,18 +38,27 @@ trait Auditable
                 return;
             }
 
-            $description = "Atualizou o registro #{$model->id}. Alterações: ";
+            $descriptions = [];
             foreach ($changes as $key => $value) {
+                if (in_array($key, self::SENSITIVE_AUDIT_ATTRIBUTES, true)) {
+                    $descriptions[] = "[{$key}: conteúdo protegido]";
+                    continue;
+                }
+
                 $oldValue = $model->getOriginal($key);
-                
-                // Tratar Enums
-                $oldStr = $oldValue instanceof \UnitEnum ? ($oldValue->value ?? $oldValue->name) : (string)$oldValue;
-                $newStr = $value instanceof \UnitEnum ? ($value->value ?? $value->name) : (string)$value;
-                
-                $description .= "[{$key}: {$oldStr} -> {$newStr}] ";
+
+                // Trata enums e reduz valores extensos sem perder o contexto da alteração.
+                $oldStr = $oldValue instanceof \UnitEnum ? ($oldValue->value ?? $oldValue->name) : (string) $oldValue;
+                $newStr = $value instanceof \UnitEnum ? ($value->value ?? $value->name) : (string) $value;
+                $descriptions[] = sprintf(
+                    '[%s: %s -> %s]',
+                    $key,
+                    Str::limit($oldStr, 70, '…'),
+                    Str::limit($newStr, 70, '…')
+                );
             }
 
-            $model->recordAudit('UPDATE', trim($description));
+            $model->recordAudit('UPDATE', "Atualizou o registro #{$model->id}. Alterações: " . implode(' ', $descriptions));
         });
 
         static::deleted(function (Model $model) {
@@ -57,7 +77,7 @@ trait Auditable
         AuditLog::create([
             'user_id' => $userId,
             'action' => $action . ' ' . class_basename($this),
-            'description' => $description,
+            'description' => Str::limit($description, 250, '…'),
             'ip_address' => request()->ip(),
             'level' => 'INFO',
         ]);

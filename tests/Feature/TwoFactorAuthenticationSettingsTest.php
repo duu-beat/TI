@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\AuditLog;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Laravel\Fortify\Features;
@@ -30,6 +31,17 @@ class TwoFactorAuthenticationSettingsTest extends TestCase
 
         $this->assertNotNull($user->two_factor_secret);
         $this->assertCount(8, $user->recoveryCodes());
+
+        $audit = AuditLog::query()
+            ->where('user_id', $user->id)
+            ->where('action', 'UPDATE User')
+            ->latest('id')
+            ->firstOrFail();
+
+        $this->assertStringContainsString('[two_factor_secret: conteúdo protegido]', $audit->description);
+        $this->assertStringContainsString('[two_factor_recovery_codes: conteúdo protegido]', $audit->description);
+        $this->assertStringNotContainsString($user->two_factor_secret, $audit->description);
+        $this->assertLessThanOrEqual(255, mb_strlen($audit->description));
     }
 
     public function test_recovery_codes_can_be_regenerated(): void
