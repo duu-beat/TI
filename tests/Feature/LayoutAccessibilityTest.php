@@ -55,4 +55,29 @@ class LayoutAccessibilityTest extends TestCase
         $response->assertSee('@keydown.home.prevent="focusFirst()"', false);
         $response->assertSee('@keydown.end.prevent="focusLast()"', false);
     }
+
+    public function test_authenticated_layout_has_global_accessible_skeleton_loader(): void
+    {
+        $user = User::factory()->create(['role' => User::ROLE_CLIENT]);
+
+        $this->actingAs($user)
+            ->get(route('client.knowledge.index'))
+            ->assertOk()
+            ->assertSee('pageReady: false', false)
+            ->assertSee('aria-label="Carregando conteúdo da página"', false)
+            ->assertSee('animate-pulse', false)
+            ->assertSee('prefers-reduced-motion', false);
+    }
+
+    public function test_standalone_ticket_report_has_skeleton_loader(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.tickets.report'))
+            ->assertOk()
+            ->assertSee('id="report-skeleton"', false)
+            ->assertSee('Carregando relatório de chamados.', false)
+            ->assertSee('report-content--ready', false);
+    }
 }

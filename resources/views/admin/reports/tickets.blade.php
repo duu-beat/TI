@@ -13,14 +13,31 @@
             background-color: #0f172a;
             color: #f1f5f9;
         }
+        .report-content--hidden {
+            opacity: 0;
+            transform: translateY(12px);
+            pointer-events: none;
+        }
+        .report-content--ready {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            transition: opacity 500ms ease-out, transform 500ms ease-out;
+        }
 
         @media print {
             body {
                 background-color: white;
                 color: black;
             }
-            .no-print {
-                display: none;
+            .no-print,
+            #report-skeleton {
+                display: none !important;
+            }
+            #report-content {
+                display: block !important;
+                opacity: 1 !important;
+                transform: none !important;
             }
             .print-only {
                 display: block;
@@ -52,7 +69,15 @@
     </style>
 </head>
 <body class="p-8 antialiased">
-    
+    <div id="report-skeleton" class="animate-pulse space-y-8" role="status" aria-live="polite" aria-label="Carregando relatório de chamados">
+        <span class="sr-only">Carregando relatório de chamados.</span>
+        <div class="ml-auto h-11 w-44 rounded-xl bg-slate-800"></div>
+        <div class="flex items-end justify-between border-b border-white/10 pb-8"><div class="space-y-4"><div class="h-10 w-96 max-w-full rounded-xl bg-slate-800"></div><div class="h-4 w-72 max-w-full rounded-lg bg-slate-800/80"></div></div><div class="hidden space-y-3 text-right sm:block"><div class="ml-auto h-3 w-24 rounded bg-slate-800"></div><div class="ml-auto h-5 w-36 rounded bg-slate-800/80"></div></div></div>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">@for($i = 0; $i < 4; $i++)<div class="h-32 rounded-3xl border border-white/5 bg-slate-900/60"></div>@endfor</div>
+        <div class="overflow-hidden rounded-3xl border border-white/5 bg-slate-900/60"><div class="h-14 bg-white/5"></div>@for($i = 0; $i < 6; $i++)<div class="h-16 border-t border-white/5"></div>@endfor</div>
+    </div>
+
+    <div id="report-content" class="report-content--hidden">
     {{-- Botão de Impressão (Apenas Tela) --}}
     <div class="no-print mb-8 flex justify-end">
         <button onclick="window.print()" class="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
@@ -157,6 +182,15 @@
     <footer class="mt-12 text-center text-slate-500 text-[10px] uppercase tracking-[0.3em] font-bold pb-12">
         Sistema de Inventário e Suporte TI &copy; {{ date('Y') }}
     </footer>
+    </div>
 
+    <script>
+        window.addEventListener('load', function () {
+            window.setTimeout(function () {
+                document.getElementById('report-skeleton')?.remove();
+                document.getElementById('report-content')?.classList.replace('report-content--hidden', 'report-content--ready');
+            }, 160);
+        });
+    </script>
 </body>
 </html>

@@ -47,6 +47,10 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
         ::-webkit-scrollbar-thumb:hover { background: #475569; }
         [x-cloak] { display: none !important; }
+        @media (prefers-reduced-motion: reduce) {
+            .page-loader-motion { transition: none !important; }
+            .page-loader-pulse { animation: none !important; }
+        }
     </style>
 
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -106,6 +110,17 @@
                  if (!this.logoutModalOpen) return;
                  this.logoutModalOpen = false;
                  this.$nextTick(() => this.lastFocusedElement?.focus?.());
+             },
+             pageReady: false,
+             init() {
+                 // Páginas legadas que já controlam um skeleton próprio usam a
+                 // transição global sem repetir o placeholder visual.
+                 const hasLocalLoader = Array.from(this.$el.querySelectorAll('[x-data]'))
+                     .some((element) => (element.getAttribute('x-data') || '').includes('loaded'));
+
+                 window.requestAnimationFrame(() => {
+                     window.setTimeout(() => this.pageReady = true, hasLocalLoader ? 0 : 180);
+                 });
              }
          }"
          @keydown.escape.window="closeSidebar(); closeLogoutModal()">
@@ -134,7 +149,21 @@
             </header>
 
             <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
-                {{ $slot }}
+                <div x-show="!pageReady" class="page-loader-pulse animate-pulse mx-auto max-w-7xl space-y-6" role="status" aria-live="polite" aria-label="Carregando conteúdo da página">
+                    <span class="sr-only">Carregando conteúdo da página.</span>
+                    <div class="h-32 rounded-3xl border border-white/5 bg-slate-900/65"></div>
+                    <div class="grid gap-6 lg:grid-cols-12">
+                        <div class="space-y-5 lg:col-span-8"><div class="h-56 rounded-3xl border border-white/5 bg-slate-900/60"></div><div class="h-40 rounded-3xl border border-white/5 bg-slate-900/60"></div></div>
+                        <div class="space-y-5 lg:col-span-4"><div class="h-36 rounded-3xl border border-white/5 bg-slate-900/60"></div><div class="h-44 rounded-3xl border border-white/5 bg-slate-900/60"></div></div>
+                    </div>
+                </div>
+
+                <div x-show="pageReady" x-cloak
+                     x-transition:enter="page-loader-motion transition ease-out duration-500"
+                     x-transition:enter-start="opacity-0 translate-y-3"
+                     x-transition:enter-end="opacity-100 translate-y-0">
+                    {{ $slot }}
+                </div>
             </div>
         </main>
 
