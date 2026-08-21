@@ -35,6 +35,30 @@ class AssetResponsibilityTermTest extends TestCase
         $this->assertStringContainsString('NB-TERM-001', $term->terms_text);
     }
 
+    public function test_signature_page_prepares_canvas_for_responsive_pointer_input(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $recipient = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $asset = Asset::factory()->create();
+        $term = AssetResponsibilityTerm::create([
+            'asset_id' => $asset->id,
+            'recipient_id' => $recipient->id,
+            'issued_by' => $admin->id,
+            'type' => AssetResponsibilityTerm::TYPE_DELIVERY,
+            'status' => AssetResponsibilityTerm::STATUS_PENDING,
+            'terms_text' => 'Termo pendente para validar o canvas.',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.assets.terms.sign', [$asset, $term]))
+            ->assertOk()
+            ->assertSee('Assinatura do responsável')
+            ->assertSee('ResizeObserver', false)
+            ->assertSee('setTransform(ratio', false)
+            ->assertSee("'pointerdown'", false)
+            ->assertSee('canvas 1×1', false);
+    }
+
     public function test_signing_delivery_term_updates_asset_records_audit_and_pdf(): void
     {
         Storage::fake('local');

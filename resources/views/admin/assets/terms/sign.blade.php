@@ -32,51 +32,85 @@
         function termSignaturePad() {
             return {
                 signatureData: '',
+                canvas: null,
                 context: null,
                 drawing: false,
+                resizeObserver: null,
+                cssWidth: 0,
+                cssHeight: 0,
                 init() {
-                    const canvas = this.$refs.canvas;
-                    const prepare = () => {
-                        const ratio = Math.max(window.devicePixelRatio || 1, 1);
-                        canvas.width = Math.floor(canvas.offsetWidth * ratio);
-                        canvas.height = Math.floor(canvas.offsetHeight * ratio);
-                        this.context = canvas.getContext('2d');
-                        this.context.scale(ratio, ratio);
-                        this.context.strokeStyle = '#111827';
-                        this.context.lineWidth = 2.5;
-                        this.context.lineCap = 'round';
-                        this.context.lineJoin = 'round';
-                    };
-                    this.$nextTick(prepare);
+                    this.canvas = this.$refs.canvas;
+                    this.resizeCanvas();
+
+                    if ('ResizeObserver' in window) {
+                        this.resizeObserver = new ResizeObserver(() => this.resizeCanvas());
+                        this.resizeObserver.observe(this.canvas);
+                    }
+
+                    // O layout global exibe o conteúdo após uma transição curta;
+                    // esta segunda medição evita um canvas 1×1 em telas móveis.
+                    this.$nextTick(() => window.requestAnimationFrame(() => {
+                        this.resizeCanvas();
+                        window.setTimeout(() => this.resizeCanvas(), 240);
+                    }));
 
                     const position = (event) => {
-                        const rect = canvas.getBoundingClientRect();
+                        const rect = this.canvas.getBoundingClientRect();
                         return { x: event.clientX - rect.left, y: event.clientY - rect.top };
                     };
-                    canvas.addEventListener('pointerdown', (event) => {
+                    this.canvas.addEventListener('pointerdown', (event) => {
                         event.preventDefault();
-                        canvas.setPointerCapture(event.pointerId);
+                        this.resizeCanvas();
+                        this.canvas.setPointerCapture?.(event.pointerId);
                         const point = position(event);
                         this.drawing = true;
                         this.context.beginPath();
                         this.context.moveTo(point.x, point.y);
                     });
-                    canvas.addEventListener('pointermove', (event) => {
+                    this.canvas.addEventListener('pointermove', (event) => {
                         if (!this.drawing) return;
                         event.preventDefault();
                         const point = position(event);
                         this.context.lineTo(point.x, point.y);
                         this.context.stroke();
                     });
-                    ['pointerup', 'pointercancel', 'pointerleave'].forEach((type) => canvas.addEventListener(type, () => {
-                        if (!this.drawing) return;
-                        this.drawing = false;
-                        this.signatureData = canvas.toDataURL('image/png');
-                    }));
+                    ['pointerup', 'pointercancel'].forEach((type) => this.canvas.addEventListener(type, () => this.finish()));
+                },
+                resizeCanvas() {
+                    const rect = this.canvas.getBoundingClientRect();
+                    const width = Math.max(1, Math.round(rect.width));
+                    const height = Math.max(1, Math.round(rect.height));
+                    const ratio = Math.max(window.devicePixelRatio || 1, 1);
+                    const pixelWidth = Math.round(width * ratio);
+                    const pixelHeight = Math.round(height * ratio);
+
+                    if (this.canvas.width === pixelWidth && this.canvas.height === pixelHeight && this.context) return;
+
+                    const drawing = this.signatureData;
+                    this.canvas.width = pixelWidth;
+                    this.canvas.height = pixelHeight;
+                    this.cssWidth = width;
+                    this.cssHeight = height;
+                    this.context = this.canvas.getContext('2d');
+                    this.context.setTransform(ratio, 0, 0, ratio, 0, 0);
+                    this.context.strokeStyle = '#111827';
+                    this.context.lineWidth = 2.5;
+                    this.context.lineCap = 'round';
+                    this.context.lineJoin = 'round';
+
+                    if (drawing) {
+                        const image = new Image();
+                        image.onload = () => this.context.drawImage(image, 0, 0, this.cssWidth, this.cssHeight);
+                        image.src = drawing;
+                    }
+                },
+                finish() {
+                    if (!this.drawing) return;
+                    this.drawing = false;
+                    this.signatureData = this.canvas.toDataURL('image/png');
                 },
                 clear() {
-                    const canvas = this.$refs.canvas;
-                    this.context.clearRect(0, 0, canvas.width, canvas.height);
+                    this.context.clearRect(0, 0, this.cssWidth, this.cssHeight);
                     this.signatureData = '';
                 }
             };
