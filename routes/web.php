@@ -15,6 +15,7 @@ use App\Http\Controllers\Master\AuthController as MasterAuthController;
 use App\Http\Controllers\Master\DashboardController as MasterDashboardController;
 use App\Http\Controllers\Public\FaqController;
 use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\SitemapController;
 use App\Http\Controllers\Public\LegalController;
 use App\Http\Controllers\Client\DashboardController;
 use App\Http\Controllers\Public\ContactController;
@@ -26,6 +27,7 @@ use App\Http\Controllers\Admin\CannedResponseController;
 |--------------------------------------------------------------------------
 */
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/sitemap.xml', SitemapController::class)->name('sitemap');
 Route::view('/servicos', 'public.services')->name('services');
 Route::view('/portfolio', 'public.portfolio')->name('portfolio');
 Route::view('/sobre', 'public.sobre')->name('sobre');

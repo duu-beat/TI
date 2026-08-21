@@ -1,213 +1,122 @@
 @extends('layouts.site')
 
-@section('title', auth()->check() ? 'Dashboard - Suporte TI' : 'Suporte TI - Soluções Corporativas')
-@section('meta_description', 'Gestão de TI especializada. Segurança, Infraestrutura e Suporte para empresas.')
+@section('title', 'Suporte TI | Operação, segurança e continuidade para sua empresa')
+@section('meta_description', 'Centralize suporte, inventário, segurança e conhecimento em uma única operação de TI. Acompanhe chamados, SLA, ativos e governança com clareza.')
 
 @section('content')
-
-@php
-    $escalatedCount = $escalatedCount ?? 0;
-    $adminsCount = $adminsCount ?? 0;
-    $urgentCount = $urgentCount ?? 0;
-    $openTickets = $openTickets ?? 0;
-    $recentTickets = $recentTickets ?? collect();
-    $ticketsMonth = $ticketsMonth ?? 0;
-@endphp
-
-{{-- ✅ WRAPPER ALPINE ADICIONADO --}}
-<div class="relative min-h-screen flex flex-col" x-data="{ loaded: false }" x-init="setTimeout(() => loaded = true, 400)">
-    
-    {{-- Background Global --}}
-    <div class="absolute inset-0 pointer-events-none overflow-hidden -z-10">
-        <div class="absolute top-[-10%] left-[-10%] w-[800px] h-[800px] bg-indigo-600/10 rounded-full blur-[120px] animate-pulse"></div>
-        <div class="absolute bottom-[-10%] right-[-10%] w-[600px] h-[600px] bg-cyan-600/5 rounded-full blur-[100px]"></div>
-    </div>
-
-    {{-- 💀 SKELETON LOADER (Adaptativo) --}}
-    <div x-show="!loaded" class="max-w-7xl mx-auto px-6 py-12 w-full animate-pulse">
-        {{-- Header Skeleton --}}
-        <div class="flex flex-col md:flex-row items-center justify-between mb-10 border-b border-white/5 pb-8 gap-4">
-            <div class="space-y-3">
-                <div class="h-6 w-32 bg-white/5 rounded-full"></div>
-                <div class="h-10 w-64 bg-white/5 rounded-xl"></div>
+    <section class="relative overflow-hidden" aria-labelledby="home-hero-title">
+        <div class="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[34rem] bg-gradient-to-b from-indigo-500/[0.09] via-slate-950/20 to-transparent"></div>
+        <div class="mx-auto max-w-7xl px-6 pb-20 pt-16 sm:pb-28 sm:pt-24 lg:px-8">
+            <div class="mx-auto max-w-4xl text-center">
+                <p class="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-200">
+                    <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]"></span>
+                    Operação de TI em um só lugar
+                </p>
+                <h1 id="home-hero-title" class="mt-7 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-7xl">
+                    TI que funciona.
+                    <span class="block bg-gradient-to-r from-indigo-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">Negócio que segue em frente.</span>
+                </h1>
+                <p class="mx-auto mt-7 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
+                    Organize chamados, acompanhe prazos, proteja acessos e mantenha seus ativos sob controle com uma experiência simples para quem solicita, atende e supervisiona.
+                </p>
+                <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
+                    <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-7 py-4 text-sm font-bold text-slate-950 transition hover:brightness-110 hover:shadow-[0_0_28px_rgba(34,211,238,0.25)] focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">
+                        Criar conta
+                        <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" /></svg>
+                    </a>
+                    <a href="{{ route('contact') }}" class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-7 py-4 text-sm font-bold text-white transition hover:border-white/20 hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 focus:ring-offset-slate-950">
+                        Falar com especialista
+                    </a>
+                </div>
             </div>
-            @auth
-            <div class="flex gap-4">
-                <div class="h-20 w-32 bg-white/5 rounded-xl"></div>
-                <div class="h-20 w-32 bg-white/5 rounded-xl"></div>
+
+            <div class="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-3">
+                <article class="rounded-2xl border border-white/10 bg-slate-900/55 p-5 text-left shadow-xl shadow-slate-950/15 backdrop-blur-sm">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-400/20 bg-indigo-500/10 text-indigo-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>
+                    <h2 class="mt-4 text-sm font-bold text-white">Atendimento com contexto</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-400">Chamados, anexos, atualizações e histórico reunidos no mesmo fluxo.</p>
+                </article>
+                <article class="rounded-2xl border border-white/10 bg-slate-900/55 p-5 text-left shadow-xl shadow-slate-950/15 backdrop-blur-sm">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-500/10 text-cyan-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6h12Z" /></svg></div>
+                    <h2 class="mt-4 text-sm font-bold text-white">Segurança e governança</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-400">2FA, auditoria, SLA e tratamento controlado de incidentes críticos.</p>
+                </article>
+                <article class="rounded-2xl border border-white/10 bg-slate-900/55 p-5 text-left shadow-xl shadow-slate-950/15 backdrop-blur-sm">
+                    <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/10 text-emerald-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M7 4v6m10-6v6M6 12h12v7H6z" /></svg></div>
+                    <h2 class="mt-4 text-sm font-bold text-white">Ativos rastreáveis</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-400">Inventário, QR Code e termos digitais para cada movimentação importante.</p>
+                </article>
             </div>
-            @endauth
         </div>
-        
-        {{-- Grid Skeleton --}}
-        <div class="grid md:grid-cols-3 gap-6">
-            <div class="h-64 bg-white/5 rounded-2xl border border-white/5"></div>
-            <div class="h-64 bg-white/5 rounded-2xl border border-white/5"></div>
-            <div class="h-64 bg-white/5 rounded-2xl border border-white/5"></div>
-        </div>
-    </div>
+    </section>
 
-    {{-- ✅ CONTEÚDO REAL --}}
-    <div x-show="loaded" style="display: none;"
-         x-transition:enter="transition ease-out duration-500"
-         x-transition:enter-start="opacity-0 translate-y-4"
-         x-transition:enter-end="opacity-100 translate-y-0"
-         class="w-full">
-
-        @auth
-            
-            {{-- ======================================================================
-                 🛑 1. VISÃO DO MASTER (SEGURANÇA / ROOT)
-                 ====================================================================== --}}
-            @if(auth()->user()->isMaster())
-                <div class="max-w-7xl mx-auto px-6 py-12 w-full">
-                    
-                    {{-- Header Segurança --}}
-                    <div class="flex flex-col md:flex-row items-center justify-between mb-10 border-b border-red-500/20 pb-8 gap-4">
-                        <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-bold uppercase tracking-widest mb-2 shadow-[0_0_10px_rgba(239,68,68,0.2)]">
-                                🛡️ Security Clearance: Level 1
-                            </div>
-                            <h1 class="text-3xl md:text-4xl font-black text-white">Comando Central</h1>
-                        </div>
-                        
-                        {{-- Status Segurança --}}
-                        <div class="flex gap-4">
-                            <div class="px-5 py-3 rounded-xl bg-slate-950 border border-red-500/30 flex flex-col items-center justify-center min-w-[140px] shadow-lg shadow-red-500/10">
-                                <span class="text-2xl font-black text-red-500 animate-pulse">{{ $escalatedCount }}</span>
-                                <span class="text-[10px] uppercase font-bold text-red-400/70">Alertas Críticos</span>
-                            </div>
-                            <div class="px-5 py-3 rounded-xl bg-slate-900 border border-white/10 flex flex-col items-center justify-center min-w-[120px]">
-                                <span class="text-2xl font-black text-white">{{ $adminsCount }}</span>
-                                <span class="text-[10px] uppercase font-bold text-slate-400">Admins Ativos</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="grid md:grid-cols-3 gap-6 mb-12">
-                        {{-- Card: Painel de Segurança --}}
-                        <a href="{{ route('master.dashboard') }}" class="group p-6 rounded-2xl bg-slate-950 border border-red-500/20 hover:border-red-500 hover:bg-red-500/5 transition relative overflow-hidden">
-                            <div class="absolute right-0 top-0 p-4 opacity-10 text-6xl text-red-500 group-hover:scale-110 transition">🚨</div>
-                            <h3 class="font-bold text-red-100 mb-2">Painel de Incidentes</h3>
-                            <p class="text-xs text-red-200/50 mb-4 h-8">Resolver chamados escalonados.</p>
-                            <div class="w-full py-2 rounded-lg bg-red-500/10 text-red-400 text-xs font-bold uppercase group-hover:bg-red-500 group-hover:text-white transition text-center">
-                                Acessar Agora
-                            </div>
-                        </a>
-
-                        {{-- Card: Gestão de Admins --}}
-                        <a href="{{ route('master.users.index') }}" class="group p-6 rounded-2xl bg-slate-900 border border-white/10 hover:border-white/30 transition relative overflow-hidden">
-                            <div class="absolute right-0 top-0 p-4 opacity-5 text-6xl text-white group-hover:scale-110 transition">👮</div>
-                            <h3 class="font-bold text-white mb-2">Hierarquia</h3>
-                            <p class="text-xs text-slate-400 mb-4 h-8">Promover ou rebaixar administradores.</p>
-                            <div class="w-full py-2 rounded-lg bg-white/5 text-slate-300 text-xs font-bold uppercase group-hover:bg-white/20 group-hover:text-white transition text-center">
-                                Gerenciar Equipe
-                            </div>
-                        </a>
-
-                        {{-- Card: Atalho Admin --}}
-                        <a href="{{ route('admin.dashboard') }}" class="group p-6 rounded-2xl bg-slate-900 border border-white/10 hover:border-cyan-500 transition relative overflow-hidden">
-                            <div class="absolute right-0 top-0 p-4 opacity-5 text-6xl text-cyan-500 group-hover:scale-110 transition">📊</div>
-                            <h3 class="font-bold text-white mb-2">Visão Administrativa</h3>
-                            <p class="text-xs text-slate-400 mb-4 h-8">Acessar o painel padrão de atendimento.</p>
-                            <div class="w-full py-2 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-bold uppercase group-hover:bg-cyan-500 group-hover:text-white transition text-center">
-                                Ir para Admin
-                            </div>
-                        </a>
-                    </div>
-                </div>
-
-            {{-- ======================================================================
-                 📊 2. VISÃO DO ADMINISTRADOR
-                 ====================================================================== --}}
-            @elseif(auth()->user()->isAdmin())
-                <div class="max-w-7xl mx-auto px-6 py-12 w-full">
-                    <div class="flex flex-col md:flex-row items-center justify-between mb-10 border-b border-white/10 pb-8 gap-4">
-                        <div>
-                            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-2">
-                                ⚡ Admin Panel
-                            </div>
-                            <h1 class="text-3xl md:text-4xl font-black text-white">Centro de Controle</h1>
-                        </div>
-                        <div class="flex gap-4">
-                            <div class="px-5 py-3 rounded-xl bg-slate-900 border {{ $urgentCount > 0 ? 'border-orange-500/50 bg-orange-500/10' : 'border-white/10' }} flex flex-col items-center justify-center min-w-[120px]">
-                                <span class="text-2xl font-black {{ $urgentCount > 0 ? 'text-orange-400' : 'text-white' }}">{{ $urgentCount }}</span>
-                                <span class="text-[10px] uppercase font-bold text-slate-400">Urgentes</span>
-                            </div>
-                            <div class="px-5 py-3 rounded-xl bg-slate-900 border border-white/10 flex flex-col items-center justify-center min-w-[120px]">
-                                <span class="text-2xl font-black text-white">{{ $openTickets }}</span>
-                                <span class="text-[10px] uppercase font-bold text-slate-400">Em Aberto</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
-                        <a href="{{ route('admin.dashboard') }}" class="group p-6 rounded-2xl bg-slate-900 border border-white/10 hover:border-cyan-500 transition relative overflow-hidden">
-                            <div class="absolute right-0 top-0 p-4 opacity-5 text-6xl text-cyan-500 group-hover:scale-110 transition">🎫</div>
-                            <h3 class="font-bold text-white mb-2">Chamados</h3>
-                            <p class="text-xs text-slate-400 mb-4 h-8">Ver fila de atendimento.</p>
-                            <div class="w-full py-2 rounded-lg bg-cyan-500/10 text-cyan-400 text-xs font-bold uppercase group-hover:bg-cyan-500 group-hover:text-white transition text-center">Acessar</div>
-                        </a>
-                        {{-- Outros cards podem vir aqui --}}
-                    </div>
-                </div>
-
-            {{-- ======================================================================
-                 🚀 3. VISÃO DO CLIENTE
-                 ====================================================================== --}}
-            @else
-                <div class="max-w-7xl mx-auto px-6 py-12 w-full">
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 mb-12">
-                        <div>
-                            <h1 class="text-3xl md:text-4xl font-black text-white">Meu Espaço</h1>
-                            <p class="text-slate-400">Gerencie sua assinatura e acompanhe seus tickets.</p>
-                        </div>
-                        <a href="{{ route('client.tickets.create') }}" class="w-full md:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 text-white font-bold hover:brightness-110 transition shadow-lg shadow-indigo-500/25 flex items-center justify-center gap-2">
-                            <span>+</span> Abrir Chamado
-                        </a>
-                    </div>
-                    
-                    <div class="grid lg:grid-cols-3 gap-8">
-                        <div class="lg:col-span-2 space-y-8">
-                            <div class="p-8 rounded-3xl border border-white/10 bg-slate-900/80 relative overflow-hidden">
-                                <div class="absolute top-0 right-0 p-0">
-                                    <div class="bg-emerald-500 text-white text-xs font-bold px-4 py-2 rounded-bl-2xl uppercase tracking-wider">Ativo</div>
-                                </div>
-                                <div class="flex items-center gap-6 mb-8">
-                                    <div class="h-16 w-16 rounded-2xl bg-indigo-500/20 flex items-center justify-center text-3xl border border-indigo-500/20 text-indigo-400">🏢</div>
-                                    <div>
-                                        <h2 class="text-2xl font-bold text-white mb-1">Business Standard</h2>
-                                        <p class="text-slate-400 text-sm">Renova em: <span class="text-white font-bold">15/02/2026</span></p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            @endif
-
-        {{-- ======================================================================
-             🌍 4. VISÃO DO VISITANTE (LANDING PAGE)
-             ====================================================================== --}}
-        @else
-            <div class="w-full">
-                <div class="max-w-7xl mx-auto px-6 pt-20 pb-20 text-center">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-slate-800 border border-slate-700 text-indigo-400 text-xs font-bold uppercase tracking-widest mb-6">
-                        🚀 Suporte TI Premium
-                    </div>
-                    <h1 class="text-5xl md:text-7xl font-black text-white tracking-tight mb-6 leading-tight">
-                        TI que funciona. <br>
-                        <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400">Negócio que cresce.</span>
-                    </h1>
-                    <p class="text-xl text-slate-400 max-w-2xl mx-auto mb-10">
-                        Tenha um departamento de TI completo por uma fração do custo.
-                    </p>
-                    <div class="flex flex-col sm:flex-row justify-center gap-4">
-                        <a href="{{ route('register') }}" class="px-8 py-4 rounded-xl bg-indigo-600 text-white font-bold hover:bg-indigo-500 transition shadow-lg shadow-indigo-500/25">Ver Planos</a>
-                        <a href="{{ route('contact') }}" class="px-8 py-4 rounded-xl bg-white/10 text-white font-bold hover:bg-white/20 transition border border-white/5">Falar com Especialista</a>
-                    </div>
-                </div>
+    <section class="border-y border-white/5 bg-slate-900/35 py-20 sm:py-24" aria-labelledby="services-title">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="max-w-2xl">
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">Uma operação mais clara</p>
+                <h2 id="services-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Tudo o que sua equipe precisa para manter a TI em movimento.</h2>
+                <p class="mt-5 text-base leading-7 text-slate-400">O sistema foi pensado para reduzir ruído operacional, dar visibilidade à liderança e tornar o suporte mais simples para cada pessoa atendida.</p>
             </div>
-        @endauth
-    </div>
-</div>
+
+            <div class="mt-12 grid gap-5 md:grid-cols-2">
+                <article class="group rounded-3xl border border-white/10 bg-slate-950/45 p-6 transition hover:border-indigo-400/30 hover:bg-slate-900/65 sm:p-7">
+                    <div class="flex items-start gap-4"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/10 text-indigo-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 17v-2a4 4 0 0 1 4-4h5m0 0-3-3m3 3-3 3M5 19V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v2" /></svg></span><div><h3 class="text-lg font-bold text-white">Chamados que evoluem com o atendimento</h3><p class="mt-2 text-sm leading-6 text-slate-400">Abertura guiada, prévia de anexos, histórico em linha do tempo, respostas internas e comunicação clara com quem solicitou.</p></div></div>
+                </article>
+                <article class="group rounded-3xl border border-white/10 bg-slate-950/45 p-6 transition hover:border-cyan-400/30 hover:bg-slate-900/65 sm:p-7">
+                    <div class="flex items-start gap-4"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-cyan-500/10 text-cyan-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></span><div><h3 class="text-lg font-bold text-white">SLA que deixa os riscos visíveis</h3><p class="mt-2 text-sm leading-6 text-slate-400">Contagem regressiva, alertas preventivos, escalonamento e relatórios para que prazos não virem surpresas.</p></div></div>
+                </article>
+                <article class="group rounded-3xl border border-white/10 bg-slate-950/45 p-6 transition hover:border-emerald-400/30 hover:bg-slate-900/65 sm:p-7">
+                    <div class="flex items-start gap-4"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-emerald-500/10 text-emerald-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 13h2l2-6 4 12 3-8 2 2h5" /></svg></span><div><h3 class="text-lg font-bold text-white">Inventário com responsabilidade</h3><p class="mt-2 text-sm leading-6 text-slate-400">Ativos identificados por QR Code, histórico de movimentação e termos digitais assinados no celular ou tablet.</p></div></div>
+                </article>
+                <article class="group rounded-3xl border border-white/10 bg-slate-950/45 p-6 transition hover:border-violet-400/30 hover:bg-slate-900/65 sm:p-7">
+                    <div class="flex items-start gap-4"><span class="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-violet-500/10 text-violet-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 6.25a8.5 8.5 0 0 0-7.42 4.35.8.8 0 0 0 0 .8A8.5 8.5 0 0 0 12 15.75a8.5 8.5 0 0 0 7.42-4.35.8.8 0 0 0 0-.8A8.5 8.5 0 0 0 12 6.25ZM12 13a2 2 0 1 1 0-4 2 2 0 0 1 0 4Z" /></svg></span><div><h3 class="text-lg font-bold text-white">Conhecimento que reduz demanda repetitiva</h3><p class="mt-2 text-sm leading-6 text-slate-400">Artigos publicados, busca por categoria e sugestões contextuais antes mesmo da abertura de um chamado.</p></div></div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 sm:py-24" aria-labelledby="flow-title">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+                <div>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">Do pedido à solução</p>
+                    <h2 id="flow-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Um fluxo simples para quem solicita, atende e supervisiona.</h2>
+                    <p class="mt-5 max-w-xl text-base leading-7 text-slate-400">Cada área recebe apenas o que precisa. Clientes acompanham seus próprios pedidos, Admins cuidam da operação e o Master enxerga riscos, acessos, auditoria e saúde do ambiente.</p>
+                    <a href="{{ route('services') }}" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-cyan-300 transition hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-4 focus:ring-offset-slate-950">Conhecer os serviços <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" /></svg></a>
+                </div>
+                <ol class="space-y-4" aria-label="Etapas de atendimento">
+                    <li class="flex gap-4 rounded-2xl border border-white/10 bg-slate-900/55 p-5"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-sm font-black text-indigo-200">01</span><div><h3 class="font-bold text-white">Solicite com clareza</h3><p class="mt-1 text-sm leading-6 text-slate-400">Abra um chamado, detalhe o contexto e anexe fotos, PDFs ou outros arquivos necessários.</p></div></li>
+                    <li class="flex gap-4 rounded-2xl border border-white/10 bg-slate-900/55 p-5"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-cyan-500/15 text-sm font-black text-cyan-200">02</span><div><h3 class="font-bold text-white">Acompanhe com transparência</h3><p class="mt-1 text-sm leading-6 text-slate-400">Status, prazo de SLA, mensagens e decisões técnicas ficam registrados no mesmo lugar.</p></div></li>
+                    <li class="flex gap-4 rounded-2xl border border-white/10 bg-slate-900/55 p-5"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-emerald-500/15 text-sm font-black text-emerald-200">03</span><div><h3 class="font-bold text-white">Melhore com governança</h3><p class="mt-1 text-sm leading-6 text-slate-400">Relatórios, auditoria, indicadores e Base de Conhecimento ajudam a reduzir recorrências.</p></div></li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <section class="border-y border-white/5 bg-gradient-to-r from-indigo-500/[0.08] via-slate-900/65 to-cyan-500/[0.07] py-20 sm:py-24" aria-labelledby="governance-title">
+        <div class="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8">
+            <div>
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-violet-200">Projetado para continuidade</p>
+                <h2 id="governance-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Segurança não precisa ficar separada da operação.</h2>
+                <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300">O mesmo ambiente que organiza o atendimento também ajuda a proteger identidades, registrar mudanças, acompanhar incidentes críticos e dar visibilidade para decisões de governança.</p>
+            </div>
+            <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+                <div class="rounded-2xl border border-violet-400/15 bg-slate-950/40 p-4"><p class="text-sm font-bold text-white">Acessos protegidos</p><p class="mt-1 text-sm leading-6 text-slate-400">Autenticação em dois fatores para o núcleo de segurança e perfis privilegiados monitorados.</p></div>
+                <div class="rounded-2xl border border-amber-400/15 bg-slate-950/40 p-4"><p class="text-sm font-bold text-white">Decisões auditáveis</p><p class="mt-1 text-sm leading-6 text-slate-400">Eventos relevantes e resoluções críticas deixam rastreabilidade para a gestão.</p></div>
+                <div class="rounded-2xl border border-emerald-400/15 bg-slate-950/40 p-4"><p class="text-sm font-bold text-white">Ativos com termo digital</p><p class="mt-1 text-sm leading-6 text-slate-400">Entregas e devoluções registradas com assinatura e PDF armazenado de forma privada.</p></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="py-20 sm:py-28" aria-labelledby="home-cta-title">
+        <div class="mx-auto max-w-4xl px-6 text-center lg:px-8">
+            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">Próximo passo</p>
+            <h2 id="home-cta-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-5xl">Mais clareza para sua TI começa com uma boa operação.</h2>
+            <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-400">Conheça a solução, fale com a equipe ou crie sua conta para começar a organizar os fluxos que mais impactam seu dia a dia.</p>
+            <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
+                <a href="{{ route('contact') }}" class="inline-flex items-center justify-center rounded-2xl bg-white px-7 py-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-950">Falar com especialista</a>
+                <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/[0.04] px-7 py-4 text-sm font-bold text-white transition hover:bg-white/[0.09] focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 focus:ring-offset-slate-950">Criar conta</a>
+            </div>
+        </div>
+    </section>
 @endsection

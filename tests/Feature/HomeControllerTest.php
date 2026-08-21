@@ -2,9 +2,6 @@
 
 namespace Tests\Feature;
 
-use App\Enums\TicketPriority;
-use App\Enums\TicketStatus;
-use App\Models\Ticket;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -13,53 +10,59 @@ class HomeControllerTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_guest_can_render_home_page(): void
+    public function test_guest_can_render_complete_public_landing_page(): void
     {
         $response = $this->get(route('home'));
 
-        $response->assertOk();
-        $response->assertViewIs('public.home');
+        $response->assertOk()
+            ->assertViewIs('public.home')
+            ->assertSee('TI que funciona.')
+            ->assertSee('Tudo o que sua equipe precisa para manter a TI em movimento.')
+            ->assertSee('Um fluxo simples para quem solicita, atende e supervisiona.')
+            ->assertSee('Segurança não precisa ficar separada da operação.')
+            ->assertSee('Mais clareza para sua TI começa com uma boa operação.')
+            ->assertSee('Pular para o conteúdo principal')
+            ->assertSee('rel="canonical"', false)
+            ->assertSee('og:locale', false)
+            ->assertDontSee('Business Standard')
+            ->assertDontSee('livewire/livewire.js', false);
     }
 
-    public function test_admin_sees_cached_dashboard_stats_in_home_view(): void
+    public function test_client_is_redirected_from_home_to_client_dashboard(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+
+        $this->actingAs($client)
+            ->get(route('home'))
+            ->assertRedirect(route('client.dashboard'));
+    }
+
+    public function test_admin_is_redirected_from_home_to_admin_dashboard(): void
     {
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
-        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
 
-        Ticket::query()->create([
-            'user_id' => $client->id,
-            'subject' => 'Ticket urgente',
-            'description' => 'Falha crítica',
-            'status' => TicketStatus::NEW->value,
-            'priority' => TicketPriority::HIGH->value,
-        ]);
-
-        $response = $this->actingAs($admin)->get(route('home'));
-
-        $response->assertOk();
-        $response->assertViewHas('urgentCount', 1);
-        $response->assertViewHas('openTickets', 1);
+        $this->actingAs($admin)
+            ->get(route('home'))
+            ->assertRedirect(route('admin.dashboard'));
     }
 
-    public function test_master_sees_master_stats_in_home_view(): void
+    public function test_master_is_redirected_from_home_to_security_dashboard(): void
     {
         $master = User::factory()->create(['role' => User::ROLE_MASTER]);
-        User::factory()->create(['role' => User::ROLE_ADMIN]);
-        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
 
-        Ticket::query()->create([
-            'user_id' => $client->id,
-            'subject' => 'Ticket escalado',
-            'description' => 'Incidente de segurança',
-            'status' => TicketStatus::IN_PROGRESS->value,
-            'priority' => TicketPriority::HIGH->value,
-            'is_escalated' => true,
-        ]);
+        $this->actingAs($master)
+            ->get(route('home'))
+            ->assertRedirect(route('master.dashboard'));
+    }
 
-        $response = $this->actingAs($master)->get(route('home'));
+    public function test_public_sitemap_lists_institutional_pages(): void
+    {
+        $response = $this->get(route('sitemap'));
 
-        $response->assertOk();
-        $response->assertViewHas('escalatedCount', 1);
-        $response->assertViewHas('adminsCount', 1);
+        $response->assertOk()
+            ->assertHeader('Content-Type', 'application/xml; charset=UTF-8')
+            ->assertSee(route('home'), false)
+            ->assertSee(route('services'), false)
+            ->assertSee(route('contact'), false);
     }
 }

@@ -18,9 +18,12 @@
     
     {{-- Descrição para o Google --}}
     <meta name="description" content="@yield('meta_description', 'Suporte TI especializado. Abertura de chamados técnicos, manutenção e consultoria para empresas e particulares.')">
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta name="theme-color" content="#020617">
 
     {{-- Open Graph / Facebook / WhatsApp --}}
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
     <meta property="og:url" content="{{ url()->current() }}">
     <meta property="og:title" content="@yield('title', config('app.name', 'Suporte TI'))">
     <meta property="og:description" content="@yield('meta_description', 'Soluções rápidas em TI. Abra seu chamado agora.')">
@@ -64,11 +67,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Carrega assets do Vite: seu CSS e JS compilados (Tailwind, Alpine, etc.) --}}
 
-    @livewireStyles
 
 </head>
 
 <body class="bg-slate-950 text-slate-100 antialiased relative selection:bg-cyan-500 selection:text-white flex flex-col min-h-screen">
+    <x-skip-link />
 {{-- 
     Classes Tailwind no body:
     - bg-slate-950: fundo bem escuro
@@ -168,7 +171,7 @@
                     </a>
 
                     {{-- DESKTOP NAV --}}
-                    <nav class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                    <nav aria-label="Navegação principal" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
                         {{-- 
                             Nav só aparece no desktop (md:flex, hidden no mobile)
                             links com espaçamento e estilo
@@ -306,7 +309,7 @@
             </div>
         </header>
 
-        <main class="flex-1">
+        <main id="main-content" tabindex="-1" class="flex-1">
             {{-- Área principal. flex-1 faz ocupar o espaço entre header e footer --}}
             @yield('content')
             {{-- Injeta o conteúdo das páginas filhas --}}
@@ -330,8 +333,8 @@
                         <div class="space-y-4">
                             <div class="flex items-center gap-3">
                                 {{-- Logo Footer ajustado --}}
-                                <img src="{{ asset('images/logosuporteTI.png') }}" 
-                                class="h-12 md:h-16 w-auto opacity-90 object-contain" alt="Logo">
+                                <img src="{{ asset('images/logosuporteTI.png') }}" loading="lazy" width="409" height="443"
+                                class="h-12 md:h-16 w-auto opacity-90 object-contain" alt="Logo Suporte TI">
                                 {{-- Logo do footer, leve transparência com opacity-90 --}}
 
                                 {{-- Fonte aumentada para text-3xl --}}
@@ -351,7 +354,7 @@
                               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                               {{-- Bolinha sólida na frente --}}
                             </span>
-                            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Sistemas Operacionais</span>
+                            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Suporte e gestão de TI</span>
                             {{-- Texto do status (parece indicar "tudo ok") --}}
                         </div>
                     </div>
@@ -396,14 +399,12 @@
                         {{-- Título da coluna --}}
                         <ul class="space-y-3 text-sm text-slate-400 mb-6">
                             {{-- Informações de contato --}}
-                            <li class="flex items-center gap-2">
-                                <span class="text-cyan-400">📧</span> contato@suporteti.com
+                            <li>
+                                <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 transition hover:text-cyan-300"><span class="text-cyan-400">✦</span> Falar com nossa equipe</a>
                             </li>
-                            {{-- Email --}}
                             <li class="flex items-center gap-2">
-                                <span class="text-cyan-400">📍</span> Rio de Janeiro, RJ
+                                <span class="text-cyan-400">⌁</span> Atendimento e gestão de TI
                             </li>
-                            {{-- Localização --}}
                         </ul>
 
                         {{-- REDES SOCIAIS --}}
@@ -446,15 +447,11 @@
                 <div class="border-t border-white/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
                     {{-- Linha final com copyright e versão --}}
                     <p class="text-slate-500">
-                        &copy; {{ date('Y') }} Suporte TI Inc. CNPJ: 00.000.000/0001-00
+                        &copy; {{ date('Y') }} Suporte TI. Todos os direitos reservados.
                     </p>
                     {{-- Ano dinâmico via PHP date('Y') --}}
                     <div class="flex items-center gap-6 text-slate-500">
-                        <span>Todos os direitos reservados.</span>
-                        <span class="hidden md:inline text-slate-700">|</span>
-                        {{-- separador só aparece no desktop --}}
-                        <span>v2.0.0</span>
-                        {{-- versão exibida do site --}}
+                        <span>Operação, segurança e continuidade.</span>
                     </div>
                 </div>
             </div>
@@ -463,7 +460,5 @@
     </div>
 
 
-    @livewireScripts
-    {{-- Scripts do Livewire --}}
 </body>
 </html>
