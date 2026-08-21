@@ -25,7 +25,7 @@ class HomeControllerTest extends TestCase
             ->assertSee('rel="canonical"', false)
             ->assertSee('og:locale', false)
             ->assertDontSee('Business Standard')
-            ->assertDontSee('livewire/livewire.js', false);
+            ->assertSee('livewire/livewire.js', false);
     }
 
     public function test_client_is_redirected_from_home_to_client_dashboard(): void

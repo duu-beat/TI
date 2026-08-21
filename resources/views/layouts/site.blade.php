@@ -67,7 +67,7 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Carrega assets do Vite: seu CSS e JS compilados (Tailwind, Alpine, etc.) --}}
 
-
+    @livewireStyles
 </head>
 
 <body class="bg-slate-950 text-slate-100 antialiased relative selection:bg-cyan-500 selection:text-white flex flex-col min-h-screen">
@@ -460,5 +460,6 @@
     </div>
 
 
+    @livewireScripts
 </body>
 </html>
