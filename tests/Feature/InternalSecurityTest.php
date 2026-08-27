@@ -33,6 +33,31 @@ class InternalSecurityTest extends TestCase
         ]);
     }
 
+    public function test_internal_reply_defaults_empty_time_spent_to_zero(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $ticket = $this->makeTicket($client);
+
+        $this->actingAs($admin)
+            ->post(route('admin.tickets.reply', $ticket), [
+                'message' => 'Nota interna sem tempo informado',
+                'is_internal' => '1',
+                'time_spent' => '',
+            ])
+            ->assertSessionHas('success');
+
+        $this->assertDatabaseHas('ticket_messages', [
+            'ticket_id' => $ticket->id,
+            'message' => 'Nota interna sem tempo informado',
+            'is_internal' => 1,
+            'time_spent' => 0,
+        ]);
+    }
+
     public function test_admin_cannot_toggle_checklist_item_from_a_different_ticket(): void
     {
         $admin = User::factory()->create(['role' => 'admin']);

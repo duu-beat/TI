@@ -144,7 +144,7 @@ class TicketController extends Controller
                     'user_id' => auth()->id(),
                     'message' => $validated['message'],
                     'is_internal' => true,
-                    'time_spent' => $request->input('time_spent', 0),
+                    'time_spent' => (int) ($validated['time_spent'] ?? 0),
                 ]);
 
                 $this->processAttachmentsEnhanced($request, $message);
