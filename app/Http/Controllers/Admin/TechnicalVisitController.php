@@ -7,6 +7,8 @@ use App\Models\TechnicalVisit;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Admin\TechnicalVisitRequest;
+use App\Http\Requests\Admin\UpdateTechnicalVisitStatusRequest;
 
 /**
  * Controller de Visitas Técnicas (Admin)
@@ -38,14 +40,9 @@ class TechnicalVisitController extends Controller
     /**
      * Salva um novo agendamento.
      */
-    public function store(Request $request)
+    public function store(TechnicalVisitRequest $request)
     {
-        $validated = $request->validate([
-            'ticket_id' => 'required|exists:tickets,id',
-            'scheduled_at' => 'required|date|after:now',
-            'address' => 'required|string',
-            'notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $visit = TechnicalVisit::create([
             'ticket_id' => $validated['ticket_id'],
@@ -70,21 +67,19 @@ class TechnicalVisitController extends Controller
     /**
      * Atualiza o status da visita (Check-in, Check-out, etc).
      */
-    public function updateStatus(Request $request, TechnicalVisit $visit)
+    public function updateStatus(UpdateTechnicalVisitStatusRequest $request, TechnicalVisit $visit)
     {
-        $request->validate([
-            'status' => 'required|in:scheduled,in_transit,in_service,completed,cancelled',
-        ]);
 
         $oldStatus = $visit->getStatusLabel();
-        $visit->update(['status' => $request->status]);
+        $status = $request->validated()['status'];
+        $visit->update(['status' => $status]);
         $newStatus = $visit->getStatusLabel();
 
-        if ($request->status === 'in_service' && !$visit->started_at) {
+        if ($status === 'in_service' && !$visit->started_at) {
             $visit->update(['started_at' => now()]);
         }
 
-        if ($request->status === 'completed' && !$visit->completed_at) {
+        if ($status === 'completed' && !$visit->completed_at) {
             $visit->update(['completed_at' => now()]);
         }
 

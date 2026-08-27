@@ -6,11 +6,15 @@ use App\Models\Asset;
 use App\Models\KnowledgeBase;
 use App\Models\NpsSurvey;
 use App\Models\Ticket;
+use App\Models\Notification;
 use App\Observers\AssetObserver;
 use App\Observers\KnowledgeBaseObserver;
 use App\Observers\NpsSurveyObserver;
 use App\Observers\TicketObserver;
 use App\Policies\TicketPolicy;
+use App\Policies\NotificationPolicy;
+use App\Policies\AssetPolicy;
+use App\Policies\KnowledgeBasePolicy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -37,6 +41,9 @@ class AppServiceProvider extends ServiceProvider
         Carbon::setLocale('pt_BR');
 
         Gate::policy(Ticket::class, TicketPolicy::class);
+        Gate::policy(Notification::class, NotificationPolicy::class);
+        Gate::policy(Asset::class, AssetPolicy::class);
+        Gate::policy(KnowledgeBase::class, KnowledgeBasePolicy::class);
 
         Ticket::observe(TicketObserver::class);
         Asset::observe(AssetObserver::class);

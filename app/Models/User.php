@@ -39,6 +39,15 @@ class User extends Authenticatable
         return $this->hasMany(Ticket::class);
     }
 
+    /**
+     * Notificações persistidas no schema customizado do sistema.
+     * O projeto usa user_id, e não o schema polimórfico padrão do Laravel.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
     public function assignedTickets()
     {
         return $this->hasMany(Ticket::class, 'assigned_to');

@@ -9,12 +9,19 @@ use App\Models\AssetHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\AssetQrCodeService;
+use App\Http\Requests\Admin\StoreAssetRequest;
+use App\Http\Requests\Admin\UpdateAssetRequest;
 
 /**
  * Gerencia o inventário de equipamentos (Assets)
  */
 class AssetController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(Asset::class, 'asset');
+    }
+
     public function export(Request $request)
     {
         $assets = Asset::with('user')->latest()->get();
@@ -89,21 +96,9 @@ class AssetController extends Controller
         return view('admin.assets.create', compact('users'));
     }
 
-    public function store(Request $request)
+    public function store(StoreAssetRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'tag' => 'required|string|max:50|unique:assets',
-            'user_id' => 'nullable|exists:users,id',
-            'type' => 'required|string',
-            'brand' => 'nullable|string',
-            'model' => 'nullable|string',
-            'serial_number' => 'nullable|string',
-            'status' => 'required|in:active,maintenance,retired,lost',
-            'purchase_date' => 'nullable|date',
-            'warranty_expiration' => 'nullable|date',
-            'notes' => 'nullable|string',
-        ]);
+        $validated = $request->validated();
 
         $asset = Asset::create($validated);
 
@@ -162,22 +157,9 @@ class AssetController extends Controller
         return view('admin.assets.edit', compact('asset', 'users'));
     }
 
-    public function update(Request $request, Asset $asset)
+    public function update(UpdateAssetRequest $request, Asset $asset)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'tag' => 'required|string|max:50|unique:assets,tag,' . $asset->id,
-            'user_id' => 'nullable|exists:users,id',
-            'type' => 'required|string',
-            'brand' => 'nullable|string',
-            'model' => 'nullable|string',
-            'serial_number' => 'nullable|string',
-            'status' => 'required|in:active,maintenance,retired,lost',
-            'purchase_date' => 'nullable|date',
-            'warranty_expiration' => 'nullable|date',
-            'notes' => 'nullable|string',
-            'signature' => 'nullable|string', // Base64 da assinatura
-        ]);
+        $validated = $request->validated();
 
         $oldStatus = $asset->status;
         $oldUserId = $asset->user_id;

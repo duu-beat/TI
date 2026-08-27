@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Tag;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use App\Http\Requests\Admin\TagRequest;
 
 class TagController extends Controller
 {
@@ -18,13 +19,9 @@ class TagController extends Controller
         return view('admin.tags.index', compact('tags'));
     }
 
-    public function store(Request $request)
+    public function store(TagRequest $request)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:50|unique:tags,name',
-            'color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
-            'description' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $validated['slug'] = Str::slug($validated['name']);
 
@@ -33,13 +30,9 @@ class TagController extends Controller
         return back()->with('success', 'Tag criada com sucesso!');
     }
 
-    public function update(Request $request, Tag $tag)
+    public function update(TagRequest $request, Tag $tag)
     {
-        $validated = $request->validate([
-            'name' => 'required|string|max:50|unique:tags,name,' . $tag->id,
-            'color' => 'required|string|regex:/^#[0-9A-F]{6}$/i',
-            'description' => 'nullable|string|max:255',
-        ]);
+        $validated = $request->validated();
 
         $validated['slug'] = Str::slug($validated['name']);
 

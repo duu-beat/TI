@@ -6,9 +6,15 @@ use App\Http\Controllers\Controller;
 use App\Models\KnowledgeBase;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Admin\KnowledgeBaseRequest;
 
 class KnowledgeBaseController extends Controller
 {
+    public function __construct()
+    {
+        $this->authorizeResource(KnowledgeBase::class, 'article');
+    }
+
     public function index(Request $request)
     {
         $query = KnowledgeBase::with('author');
@@ -33,14 +39,9 @@ class KnowledgeBaseController extends Controller
         return view('admin.wiki.create');
     }
 
-    public function store(Request $request)
+    public function store(KnowledgeBaseRequest $request)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'category' => 'required|string|max:100',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['author_id'] = Auth::id();
         $validated['is_published'] = $request->has('is_published');
@@ -83,14 +84,9 @@ class KnowledgeBaseController extends Controller
         return view('admin.wiki.edit', compact('article'));
     }
 
-    public function update(Request $request, KnowledgeBase $article)
+    public function update(KnowledgeBaseRequest $request, KnowledgeBase $article)
     {
-        $validated = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'required|string',
-            'category' => 'required|string|max:100',
-            'is_published' => 'boolean',
-        ]);
+        $validated = $request->validated();
 
         $validated['is_published'] = $request->has('is_published');
         $article->update($validated);
