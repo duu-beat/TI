@@ -5,6 +5,9 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Http\Requests\Admin\UpdateTicketStatusRequest;
+use App\Http\Requests\Admin\ReplyTicketRequest as AdminReplyTicketRequest;
+use App\Http\Requests\Admin\AssignTicketRequest;
+use App\Http\Requests\Admin\MergeTicketRequest;
 use App\Enums\TicketStatus;
 use App\Http\Requests\ReplyTicketRequest;
 use App\Notifications\TicketUpdated;
@@ -128,15 +131,9 @@ class TicketController extends Controller
         return back()->with('success', 'Status atualizado.');
     }
 
-    public function reply(Request $request, Ticket $ticket, ReplyToTicket $replier)
+    public function reply(AdminReplyTicketRequest $request, Ticket $ticket, ReplyToTicket $replier)
     {
-        $validated = $request->validate([
-            'message' => ['required', 'string'],
-            'attachments' => ['nullable', 'array', 'max:5'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240'],
-            'is_internal' => ['boolean'],
-            'time_spent' => ['nullable', 'integer', 'min:0'],
-        ]);
+        $validated = $request->validated();
 
         if ($request->boolean('is_internal')) {
             \Illuminate\Support\Facades\DB::transaction(function () use ($ticket, $validated, $request) {
@@ -193,18 +190,13 @@ class TicketController extends Controller
         return back()->with('success', 'Escalonado com sucesso.');
     }
 
-    public function assign(Request $request, Ticket $ticket)
+    public function assign(AssignTicketRequest $request, Ticket $ticket)
     {
-        $request->validate([
-            'assigned_to' => [
-                'required',
-                \Illuminate\Validation\Rule::exists('users', 'id')->where(fn ($query) => $query->whereIn('role', ['admin', 'master'])),
-            ],
-        ]);
+        $validated = $request->validated();
 
-        \Illuminate\Support\Facades\DB::transaction(function () use ($request, $ticket) {
-            $user = User::findOrFail($request->assigned_to);
-            $ticket->update(['assigned_to' => $request->assigned_to]);
+        \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $ticket) {
+            $user = User::findOrFail($validated['assigned_to']);
+            $ticket->update(['assigned_to' => $validated['assigned_to']]);
 
             $ticket->messages()->create([
                 'user_id' => auth()->id(),
@@ -216,11 +208,9 @@ class TicketController extends Controller
         return back()->with('success', 'Chamado atribuído.');
     }
 
-    public function merge(Request $request, Ticket $ticket)
+    public function merge(MergeTicketRequest $request, Ticket $ticket)
     {
-        $request->validate(['target_ticket_id' => 'required|exists:tickets,id']);
-
-        $targetTicket = Ticket::findOrFail($request->target_ticket_id);
+        $targetTicket = Ticket::findOrFail($request->validated()['target_ticket_id']);
 
         if ($targetTicket->id === $ticket->id) {
             return back()->with('error', 'Não pode fundir o chamado com ele mesmo.');

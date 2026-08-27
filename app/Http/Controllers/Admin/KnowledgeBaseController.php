@@ -19,13 +19,16 @@ class KnowledgeBaseController extends Controller
     {
         $query = KnowledgeBase::with('author');
 
-        if ($request->has('search')) {
-            $query->where('title', 'like', '%' . $request->search . '%')
-                  ->orWhere('content', 'like', '%' . $request->search . '%');
+        if ($request->filled('search')) {
+            $search = $request->string('search')->toString();
+            $query->where(function ($query) use ($search): void {
+                $query->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
         }
 
-        if ($request->has('category')) {
-            $query->where('category', $request->category);
+        if ($request->filled('category')) {
+            $query->where('category', $request->string('category')->toString());
         }
 
         $articles = $query->latest()->paginate(12);

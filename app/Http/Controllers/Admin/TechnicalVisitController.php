@@ -49,7 +49,7 @@ class TechnicalVisitController extends Controller
             'user_id' => Auth::id(),
             'scheduled_at' => $validated['scheduled_at'],
             'address' => $validated['address'],
-            'notes' => $validated['notes'],
+            'notes' => $validated['notes'] ?? null,
             'status' => 'scheduled',
         ]);
 

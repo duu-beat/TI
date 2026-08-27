@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Client;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreTicketRequest;
 use App\Http\Requests\ReplyTicketRequest;
+use App\Http\Requests\Client\RateTicketRequest;
 use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -85,15 +86,11 @@ class TicketController extends Controller
         return back()->with('success', 'Mensagem enviada!');
     }
 
-    public function rate(Request $request, Ticket $ticket, RateTicket $rater)
+    public function rate(RateTicketRequest $request, Ticket $ticket, RateTicket $rater)
     {
-        $this->authorize('view', $ticket); // Confirma permissão básica
-        
-        // Pequena validação local antes de chamar a Action
-        $data = $request->validate([
-            'rating' => ['required', 'integer', 'min:1', 'max:5'],
-            'rating_comment' => ['nullable', 'string', 'max:500'],
-        ]);
+        $this->authorize('view', $ticket);
+
+        $data = $request->validated();
 
         // Executa a Action (O Observer limpará o cache pois o status muda para Closed)
         $rater->execute($request->user(), $ticket, $data);
