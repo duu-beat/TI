@@ -88,7 +88,7 @@ class SlaService
      */
     public function getSlaTimeRemaining(Ticket $ticket): ?string
     {
-        if (!$ticket->sla_due_at || $ticket->resolved_at) {
+        if (!$ticket->sla_due_at || $ticket->resolved_at || in_array($ticket->status, [TicketStatus::RESOLVED, TicketStatus::CLOSED], true)) {
             return null;
         }
 
@@ -198,12 +198,17 @@ class SlaService
             ->avg('resolution_time_minutes');
 
         // ✅ SÊNIOR: Cálculo da porcentagem de chamados dentro do SLA
-        $totalResolved = Ticket::whereIn('status', [TicketStatus::RESOLVED, TicketStatus::CLOSED])->count();
-        $withinSla = Ticket::whereIn('status', [TicketStatus::RESOLVED, TicketStatus::CLOSED])
-            ->where(function($query) {
-                $query->whereNull('resolved_at')
-                      ->orWhereColumn('resolved_at', '<=', 'sla_due_at');
-            })->count();
+        // Só entram no indicador chamados encerrados com os dois marcos registrados.
+        // Chamados antigos sem SLA não devem ser contabilizados como conformes.
+        $resolvedStatuses = [TicketStatus::RESOLVED, TicketStatus::CLOSED];
+        $resolvedWithSla = Ticket::whereIn('status', $resolvedStatuses)
+            ->whereNotNull('resolved_at')
+            ->whereNotNull('sla_due_at');
+
+        $totalResolved = (clone $resolvedWithSla)->count();
+        $withinSla = (clone $resolvedWithSla)
+            ->whereColumn('resolved_at', '<=', 'sla_due_at')
+            ->count();
 
         $withinSlaPercent = $totalResolved > 0 ? ($withinSla / $totalResolved) * 100 : 100;
 

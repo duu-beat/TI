@@ -78,6 +78,23 @@ class MasterNavigationTest extends TestCase
         $response->assertSee('Status dos Componentes do Sistema');
     }
 
+    public function test_system_health_does_not_query_jobs_table_for_sync_queue(): void
+    {
+        $master = User::factory()->create([
+            'role' => User::ROLE_MASTER,
+            'email_verified_at' => now(),
+            'two_factor_secret' => encrypt('MASTER-2FA-SECRET'),
+            'two_factor_confirmed_at' => now(),
+        ]);
+
+        config(['queue.default' => 'sync']);
+
+        $this->actingAs($master)
+            ->get(route('master.health'))
+            ->assertOk()
+            ->assertSee('Driver [sync] ativo. Os trabalhos são executados imediatamente.');
+    }
+
     public function test_master_resolution_of_escalated_incident_records_metrics_and_audit(): void
     {
         $master = User::factory()->create([

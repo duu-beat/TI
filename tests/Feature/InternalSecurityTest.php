@@ -130,6 +130,52 @@ class InternalSecurityTest extends TestCase
         $this->assertFalse(Cache::has(DashboardCache::ADMIN_STATS));
     }
 
+    public function test_sla_compliance_ignores_resolved_tickets_without_sla_metadata(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->makeTicket($client, [
+            'assigned_to' => $admin->id,
+            'status' => TicketStatus::RESOLVED,
+            'resolved_at' => now()->subHour(),
+            'sla_due_at' => now()->addHour(),
+        ]);
+        $this->makeTicket($client, [
+            'assigned_to' => $admin->id,
+            'status' => TicketStatus::CLOSED,
+            'resolved_at' => now()->subHour(),
+            'sla_due_at' => null,
+        ]);
+
+        $stats = app(\App\Services\SlaService::class)->getSlaStats();
+
+        $this->assertSame(100.0, (float) $stats['within_sla_percent']);
+    }
+
+    public function test_sla_compliance_counts_only_resolved_tickets_within_due_date(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->makeTicket($client, [
+            'assigned_to' => $admin->id,
+            'status' => TicketStatus::RESOLVED,
+            'resolved_at' => now()->subHour(),
+            'sla_due_at' => now()->addHour(),
+        ]);
+        $this->makeTicket($client, [
+            'assigned_to' => $admin->id,
+            'status' => TicketStatus::CLOSED,
+            'resolved_at' => now()->addHour(),
+            'sla_due_at' => now()->subHour(),
+        ]);
+
+        $stats = app(\App\Services\SlaService::class)->getSlaStats();
+
+        $this->assertSame(50.0, (float) $stats['within_sla_percent']);
+    }
+
     private function makeTicket(User $owner, array $attributes = []): Ticket
     {
         return Ticket::create(array_merge([

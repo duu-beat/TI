@@ -35,11 +35,31 @@ class HealthCheckController extends Controller
 
     protected function checkQueue(): array
     {
+        $connection = (string) config('queue.default');
+
         try {
-            $connection = config('queue.default');
-            $size = DB::table('jobs')->count();
-            return ['status' => 'ok', 'message' => "Driver [{$connection}] ativo. Trabalhos pendentes na fila: {$size}"];
-        } catch (\Exception $e) {
+            if ($connection === 'database') {
+                $size = DB::table('jobs')->count();
+
+                return [
+                    'status' => 'ok',
+                    'message' => "Driver [{$connection}] ativo. Trabalhos pendentes na fila: {$size}",
+                ];
+            }
+
+            if ($connection === 'sync') {
+                return [
+                    'status' => 'ok',
+                    'message' => 'Driver [sync] ativo. Os trabalhos são executados imediatamente.',
+                ];
+            }
+
+            // Redis, SQS e outros drivers não devem ser consultados pela tabela `jobs`.
+            return [
+                'status' => 'ok',
+                'message' => "Driver [{$connection}] ativo. A quantidade pendente é monitorada pelo backend da fila.",
+            ];
+        } catch (\Throwable $e) {
             return ['status' => 'error', 'message' => 'Erro ao verificar filas: ' . $e->getMessage()];
         }
     }
