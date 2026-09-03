@@ -46,8 +46,14 @@ class TicketController extends Controller
             ->paginate(15)
             ->withQueryString();
 
-        $tags = \App\Models\Tag::all();
-        $admins = User::whereIn('role', ['admin', 'master'])->get();
+        $tags = \App\Models\Tag::query()
+            ->orderBy('name')
+            ->limit(200)
+            ->get();
+        $admins = User::whereIn('role', ['admin', 'master'])
+            ->orderBy('name')
+            ->limit(200)
+            ->get();
         $statuses = TicketStatus::cases();
         $priorities = TicketPriority::cases();
 
@@ -61,6 +67,7 @@ class TicketController extends Controller
         $tickets = Ticket::with(['user', 'assignee', 'tags']) 
             ->where('status', '!=', TicketStatus::CLOSED)
             ->latest()
+            ->limit(100)
             ->get();
 
         // 2. Agrupa por status
@@ -85,8 +92,14 @@ class TicketController extends Controller
                 ->first(),
         ];
 
-        $cannedResponses = CannedResponse::all();
-        $admins = User::whereIn('role', ['admin', 'master'])->get();
+        $cannedResponses = CannedResponse::query()
+            ->latest()
+            ->limit(100)
+            ->get();
+        $admins = User::whereIn('role', ['admin', 'master'])
+            ->orderBy('name')
+            ->limit(200)
+            ->get();
 
         return view('admin.tickets.show', compact('ticket', 'clientHistory', 'cannedResponses', 'admins'));
     }
