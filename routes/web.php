@@ -103,6 +103,11 @@ Route::middleware(['auth', 'verified', 'client'])->prefix('cliente')->name('clie
     });
 });
 
+Route::middleware(['auth', 'verified'])->prefix('anexos')->name('ticket-attachments.')->group(function () {
+    Route::get('/{attachment}', [\App\Http\Controllers\TicketAttachmentController::class, 'show'])->name('show');
+    Route::get('/{attachment}/thumbnail', [\App\Http\Controllers\TicketAttachmentController::class, 'thumbnail'])->name('thumbnail');
+});
+
 /*
 |--------------------------------------------------------------------------
 | ÁREA DO ADMINISTRADOR

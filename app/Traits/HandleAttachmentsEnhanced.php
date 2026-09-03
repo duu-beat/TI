@@ -23,16 +23,61 @@ trait HandleAttachmentsEnhanced
             }
 
             // O armazenamento gera um nome aleatório no servidor, sem reutilizar o nome enviado pelo usuário.
-            $path = $file->store('ticket-attachments', 'public');
+            $disk = 'local';
+            $path = $file->store('ticket-attachments', $disk);
+            $thumbnailPath = $this->createImageThumbnail($file->getRealPath(), $file->getMimeType(), $disk);
 
             $message->attachments()->create([
                 'file_name' => $file->getClientOriginalName(),
                 'file_path' => $path,
+                'thumbnail_path' => $thumbnailPath,
                 'mime_type' => $file->getMimeType(),
                 'size' => $file->getSize(),
-                'disk' => 'public',
+                'disk' => $disk,
             ]);
         }
+    }
+
+    /**
+     * Gera uma miniatura privada para imagens, reduzindo o custo de carregamento nas telas.
+     */
+    private function createImageThumbnail(string $sourcePath, ?string $mimeType, string $disk): ?string
+    {
+        if (! str_starts_with((string) $mimeType, 'image/') || ! function_exists('imagecreatefromstring')) {
+            return null;
+        }
+
+        $contents = @file_get_contents($sourcePath);
+        $source = $contents !== false ? @imagecreatefromstring($contents) : false;
+        if (! $source) {
+            return null;
+        }
+
+        $width = imagesx($source);
+        $height = imagesy($source);
+        $max = 1200;
+        $scale = min(1, $max / max($width, $height));
+        $newWidth = max(1, (int) round($width * $scale));
+        $newHeight = max(1, (int) round($height * $scale));
+        $thumbnail = imagecreatetruecolor($newWidth, $newHeight);
+        $background = imagecolorallocate($thumbnail, 255, 255, 255);
+        imagefill($thumbnail, 0, 0, $background);
+        imagecopyresampled($thumbnail, $source, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+        ob_start();
+        imagejpeg($thumbnail, null, 82);
+        $encoded = ob_get_clean();
+        imagedestroy($source);
+        imagedestroy($thumbnail);
+
+        if (! is_string($encoded) || $encoded === '') {
+            return null;
+        }
+
+        $thumbnailPath = 'ticket-attachments/thumbs/'.bin2hex(random_bytes(16)).'.jpg';
+        Storage::disk($disk)->put($thumbnailPath, $encoded);
+
+        return $thumbnailPath;
     }
 
     /**

@@ -2,13 +2,14 @@
 
 @php
     $url = $attachment->url;
+    $previewUrl = $attachment->thumbnail_url ?: $url;
     $name = $attachment->name;
 @endphp
 
 <article class="overflow-hidden rounded-xl border border-white/10 bg-slate-950/45 {{ $compact ? 'w-40' : 'w-full sm:w-56' }}">
     @if ($attachment->isImage())
         <a href="{{ $url }}" target="_blank" rel="noopener" class="block bg-slate-900" title="Abrir {{ $name }} em tamanho maior">
-            <img src="{{ $url }}" alt="Prévia de {{ $name }}" class="h-28 w-full object-cover transition duration-200 hover:scale-[1.03] {{ $compact ? 'h-24' : '' }}">
+            <img src="{{ $previewUrl }}" alt="Prévia de {{ $name }}" class="h-28 w-full object-cover transition duration-200 hover:scale-[1.03] {{ $compact ? 'h-24' : '' }}" loading="lazy" decoding="async">
         </a>
     @elseif ($attachment->isPdf())
         <iframe src="{{ $url }}#toolbar=0&navpanes=0" title="Prévia do PDF {{ $name }}" class="h-28 w-full bg-white {{ $compact ? 'h-24' : '' }}" loading="lazy"></iframe>

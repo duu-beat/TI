@@ -10,6 +10,7 @@ class TicketAttachment extends Model
 {
     protected $appends = [
         'url',
+        'thumbnail_url',
         'name',
         'formatted_size',
         'icon',
@@ -19,6 +20,7 @@ class TicketAttachment extends Model
         'ticket_message_id',
         'file_name',
         'file_path',
+        'thumbnail_path',
         'mime_type',
         'size',
         'disk',
@@ -91,10 +93,14 @@ class TicketAttachment extends Model
      */
     public function getUrlAttribute(): string
     {
-        $path = $this->file_path;
-        $disk = $this->disk ?? 'public';
+        return route('ticket-attachments.show', $this);
+    }
 
-        return Storage::disk($disk)->url($path);
+    public function getThumbnailUrlAttribute(): ?string
+    {
+        return $this->thumbnail_path
+            ? route('ticket-attachments.thumbnail', $this)
+            : null;
     }
 
     /**

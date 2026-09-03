@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\SafeImage;
 
 class ReplyTicketRequest extends FormRequest
 {
@@ -25,7 +26,7 @@ class ReplyTicketRequest extends FormRequest
             'message' => ['required', 'string'],
             // Regras de anexo idênticas ao StoreTicketRequest
             'attachments' => ['nullable', 'array', 'max:5'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240', new SafeImage()],
         ];
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin;
 
 use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\SafeImage;
 
 class ReplyTicketRequest extends FormRequest
 {
@@ -16,7 +17,7 @@ class ReplyTicketRequest extends FormRequest
         return [
             'message' => ['required', 'string', 'max:50000'],
             'attachments' => ['nullable', 'array', 'max:5'],
-            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240'],
+            'attachments.*' => ['file', 'mimes:jpg,jpeg,png,webp,pdf,txt,doc,docx,xls,xlsx,zip', 'max:10240', new SafeImage()],
             'is_internal' => ['sometimes', 'boolean'],
             'time_spent' => ['nullable', 'integer', 'min:0', 'max:100000'],
         ];

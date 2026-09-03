@@ -15,7 +15,7 @@ class TicketAttachmentExperienceTest extends TestCase
 
     public function test_ticket_creation_persists_attachment_metadata_for_previews(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
         $image = UploadedFile::fake()->image('erro-tela.png', 800, 600);
         $pdf = UploadedFile::fake()->create('diagnostico.pdf', 120, 'application/pdf');
@@ -39,13 +39,33 @@ class TicketAttachmentExperienceTest extends TestCase
         $this->assertTrue($attachments->last()->isPdf());
         $this->assertNotNull($attachments->first()->mime_type);
         $this->assertGreaterThan(0, $attachments->first()->size);
-        Storage::disk('public')->assertExists($attachments->first()->file_path);
-        Storage::disk('public')->assertExists($attachments->last()->file_path);
+        $this->assertSame('local', $attachments->first()->disk);
+        Storage::disk('local')->assertExists($attachments->first()->file_path);
+        Storage::disk('local')->assertExists($attachments->last()->file_path);
+        $this->assertNotNull($attachments->first()->thumbnail_path);
+        Storage::disk('local')->assertExists($attachments->first()->thumbnail_path);
+    }
+
+    public function test_ticket_creation_rejects_images_with_excessive_dimensions(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $image = UploadedFile::fake()->image('imagem-grande.png', 6001, 100);
+
+        $this->actingAs($client)
+            ->post(route('client.tickets.store'), [
+                'category' => 'hardware',
+                'subject' => 'Imagem inválida',
+                'description' => 'Teste de dimensão máxima.',
+                'attachments' => [$image],
+            ])
+            ->assertSessionHasErrors('attachments.0');
+
+        $this->assertDatabaseCount('tickets', 0);
     }
 
     public function test_internal_note_persists_attachment_metadata_for_administrator(): void
     {
-        Storage::fake('public');
+        Storage::fake('local');
         $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
         $ticket = Ticket::factory()->create();
         $attachment = UploadedFile::fake()->create('analise.txt', 8, 'text/plain');
@@ -64,7 +84,40 @@ class TicketAttachmentExperienceTest extends TestCase
         $this->assertTrue($message->is_internal);
         $this->assertSame('analise.txt', $storedAttachment->name);
         $this->assertSame('text/plain', $storedAttachment->mime_type);
-        Storage::disk('public')->assertExists($storedAttachment->file_path);
+        $this->assertSame('local', $storedAttachment->disk);
+        Storage::disk('local')->assertExists($storedAttachment->file_path);
+    }
+
+    public function test_attachment_download_is_authorized_by_ticket_owner(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $other = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $ticket = Ticket::factory()->create(['user_id' => $owner->id]);
+        $message = $ticket->messages()->create([
+            'user_id' => $owner->id,
+            'message' => 'Anexo protegido',
+            'is_internal' => false,
+            'time_spent' => 0,
+        ]);
+        $path = 'ticket-attachments/protected.txt';
+        Storage::disk('local')->put($path, 'conteúdo privado');
+        $attachment = $message->attachments()->create([
+            'file_name' => 'protected.txt',
+            'file_path' => $path,
+            'mime_type' => 'text/plain',
+            'size' => 16,
+            'disk' => 'local',
+        ]);
+
+        $this->actingAs($other)
+            ->get(route('ticket-attachments.show', $attachment))
+            ->assertForbidden();
+
+        $this->actingAs($owner)
+            ->get(route('ticket-attachments.show', $attachment))
+            ->assertOk()
+            ->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 
     public function test_client_can_view_the_rebranded_ticket_workspace(): void
