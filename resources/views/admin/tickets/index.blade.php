@@ -6,7 +6,7 @@
                     <div class="p-2 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path></svg>
                     </div>
-                    {{ __('Gerenciar Chamados') }}
+                    {{ __('tickets.ui.manage') }}
                 </h2>
             </div>
             
@@ -14,7 +14,7 @@
             <a href="{{ route('admin.tickets.report') }}" target="_blank"
                class="group flex items-center gap-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-white/10 rounded-xl text-sm font-bold text-white transition hover:shadow-lg">
                 <svg class="w-4 h-4 text-slate-400 group-hover:text-white transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                <span>Gerar Relatório</span>
+                <span>{{ __('tickets.ui.report') }}</span>
             </a>
         </div>
     </x-slot>
@@ -62,7 +62,7 @@
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Buscar por ID, Assunto, Cliente..." 
+                                   placeholder="{{ __('tickets.ui.search_admin_placeholder') }}"
                                    class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950/50 border border-white/5 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition placeholder-slate-600 text-sm">
                         </div>
 
@@ -73,7 +73,7 @@
                             </div>
                             <select name="status" onchange="this.form.submit()" 
                                     class="w-full pl-10 pr-8 py-2.5 rounded-xl bg-slate-950/50 border border-white/5 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-2 focus:ring-indigo-500/20 outline-none transition cursor-pointer appearance-none text-sm">
-                                <option value="" class="bg-slate-900">Todos os Status</option>
+                                <option value="" class="bg-slate-900">{{ __('tickets.ui.all_statuses') }}</option>
                                 @foreach(\App\Enums\TicketStatus::cases() as $status)
                                     <option value="{{ $status->value }}" class="bg-slate-900" {{ request('status') == $status->value ? 'selected' : '' }}>
                                         {{ $status->label() }}
@@ -84,7 +84,7 @@
 
                         {{-- Botão Limpar --}}
                         @if(request()->hasAny(['search', 'status']))
-                            <a href="{{ route('admin.tickets.index') }}" class="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition flex items-center justify-center" title="Limpar Filtros">
+                            <a href="{{ route('admin.tickets.index') }}" class="px-4 py-2.5 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition flex items-center justify-center" title="{{ __('tickets.ui.clear_filters') }}">
                                 <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                             </a>
                         @endif
@@ -98,12 +98,12 @@
                             <thead>
                                 <tr class="bg-white/5 border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
                                     <th class="px-6 py-4 w-20">ID</th>
-                                    <th class="px-6 py-4">Solicitante</th>
-                                    <th class="px-6 py-4">Assunto</th>
-                                    <th class="px-6 py-4">Prioridade</th>
-                                    <th class="px-6 py-4">Status</th>
-                                    <th class="px-6 py-4">SLA</th>
-                                    <th class="px-6 py-4 text-right">Ações</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.requester') }}</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.subject') }}</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.priority_label') }}</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.status_label') }}</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.sla') }}</th>
+                                    <th class="px-6 py-4 text-right">{{ __('tickets.ui.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/5 text-sm">

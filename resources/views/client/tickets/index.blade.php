@@ -6,8 +6,8 @@
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
             </div>
             <div>
-                <h2 class="font-bold text-xl text-white leading-tight">Meus Chamados</h2>
-                <p class="text-xs text-slate-400">Gerencie suas solicitações de suporte</p>
+                <h2 class="font-bold text-xl text-white leading-tight">{{ __('tickets.ui.my_tickets') }}</h2>
+                <p class="text-xs text-slate-400">{{ __('tickets.ui.manage_requests') }}</p>
             </div>
         </div>
 
@@ -20,7 +20,7 @@
         class="absolute right-4 sm:right-8 top-1/2 -translate-y-1/2 group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold transition-all duration-300 shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 overflow-hidden text-sm z-50">
             <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
             <svg class="w-5 h-5 relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-            <span class="relative z-10 hidden sm:inline">Abrir Novo Chamado</span>
+            <span class="relative z-10 hidden sm:inline">{{ __('tickets.ui.open_new') }}</span>
         </a>
     </x-slot>
 
@@ -37,7 +37,7 @@
                     </svg>
                 </div>
                 <input type="text" name="search" value="{{ request('search') }}" 
-                       placeholder="Buscar por ID, assunto..." 
+                       placeholder="{{ __('tickets.ui.search_placeholder') }}"
                        class="w-full pl-10 pr-4 py-2 rounded-xl bg-slate-950/50 border border-white/10 text-slate-200 placeholder-slate-500 focus:border-cyan-500/50 focus:bg-slate-950 focus:ring-2 focus:ring-cyan-500/20 outline-none transition-all text-sm">
             </div>
 
@@ -49,7 +49,7 @@
                     </svg>
                 </div>
                 <select name="status" class="w-full pl-10 pr-8 py-2 rounded-xl bg-slate-950/50 border border-white/10 text-slate-200 focus:border-cyan-500/50 focus:bg-slate-950 focus:ring-2 focus:ring-cyan-500/20 outline-none appearance-none cursor-pointer transition-all text-sm">
-                    <option value="" class="bg-slate-900">Todos os Status</option>
+                    <option value="" class="bg-slate-900">{{ __('tickets.ui.all_statuses') }}</option>
                     @foreach(\App\Enums\TicketStatus::cases() as $status)
                         <option value="{{ $status->value }}" class="bg-slate-900" {{ request('status') === $status->value ? 'selected' : '' }}>
                             {{ $status->label() }}
@@ -60,12 +60,12 @@
 
             {{-- BOTÃO FILTRAR --}}
             <button type="submit" class="w-full md:w-auto px-6 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 border border-white/10 text-white font-medium transition hover:shadow-lg text-sm">
-                Filtrar
+                {{ __('tickets.ui.filter') }}
             </button>
             
             {{-- Botão Limpar --}}
             @if(request()->hasAny(['search', 'status']))
-                <a href="{{ route('client.tickets.index') }}" class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition flex items-center justify-center" title="Limpar Filtros">
+                <a href="{{ route('client.tickets.index') }}" class="px-3 py-2 rounded-xl bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 hover:text-red-300 transition flex items-center justify-center" title="{{ __('tickets.ui.clear_filters') }}">
                     <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </a>
             @endif
@@ -157,11 +157,11 @@
                                             @if($ticket->priority)
                                                 <div class="flex items-center justify-end gap-1.5">
                                                     @if($ticket->priority->value === 'high')
-                                                        <span class="text-red-400 font-bold flex items-center gap-1">🔥 Alta</span>
+                                                        <span class="text-red-400 font-bold flex items-center gap-1">🔥 {{ __('tickets.priority.high') }}</span>
                                                     @elseif($ticket->priority->value === 'medium')
-                                                        <span class="text-yellow-400 font-medium flex items-center gap-1">⚠️ Média</span>
+                                                        <span class="text-yellow-400 font-medium flex items-center gap-1">⚠️ {{ __('tickets.priority.medium') }}</span>
                                                     @else
-                                                        <span class="text-emerald-400 flex items-center gap-1">🟢 Normal</span>
+                                                        <span class="text-emerald-400 flex items-center gap-1">🟢 {{ __('tickets.ui.normal') }}</span>
                                                     @endif
                                                 </div>
                                             @endif
@@ -189,14 +189,14 @@
                             </svg>
                         </div>
                     </div>
-                    <h3 class="text-xl font-bold text-white mb-2">Tudo Limpo Por Aqui!</h3>
+                    <h3 class="text-xl font-bold text-white mb-2">{{ __('tickets.ui.empty_title') }}</h3>
                     <p class="text-sm text-slate-400 max-w-xs mx-auto mb-8">
-                        Você não tem nenhum chamado com esses filtros no momento. Aproveite a tranquilidade.
+                        {{ __('tickets.ui.empty_description') }}
                     </p>
                     <a href="{{ route('client.tickets.create') }}"
                        class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-cyan-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/50 hover:-translate-y-1 transition-all duration-300">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                        Abrir Novo Chamado
+                        {{ __('tickets.ui.open_new') }}
                     </a>
                 </div>
             @endif
