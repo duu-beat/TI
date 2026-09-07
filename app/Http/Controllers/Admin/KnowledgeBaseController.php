@@ -51,7 +51,7 @@ class KnowledgeBaseController extends Controller
 
         KnowledgeBase::create($validated);
 
-        return redirect()->route('admin.wiki.index')->with('success', 'Artigo criado com sucesso!');
+        return redirect()->route('admin.wiki.index')->with('success', __('knowledge.created'));
     }
 
     public function show(KnowledgeBase $article)
@@ -94,12 +94,12 @@ class KnowledgeBaseController extends Controller
         $validated['is_published'] = $request->has('is_published');
         $article->update($validated);
 
-        return redirect()->route('admin.wiki.index')->with('success', 'Artigo atualizado!');
+        return redirect()->route('admin.wiki.index')->with('success', __('knowledge.updated'));
     }
 
     public function destroy(KnowledgeBase $article)
     {
         $article->delete();
-        return redirect()->route('admin.wiki.index')->with('success', 'Artigo removido!');
+        return redirect()->route('admin.wiki.index')->with('success', __('knowledge.deleted'));
     }
 }

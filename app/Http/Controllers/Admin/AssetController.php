@@ -113,7 +113,7 @@ class AssetController extends Controller
         ]);
 
         return redirect()->route('admin.assets.index')
-            ->with('success', 'Equipamento cadastrado com sucesso!');
+            ->with('success', __('assets.created'));
     }
 
     /**
@@ -190,13 +190,13 @@ class AssetController extends Controller
         }
 
         return redirect()->route('admin.assets.index')
-            ->with('success', 'Equipamento atualizado com sucesso!');
+            ->with('success', __('assets.updated'));
     }
 
     public function destroy(Asset $asset)
     {
         $asset->delete();
         return redirect()->route('admin.assets.index')
-            ->with('success', 'Equipamento removido do inventário.');
+            ->with('success', __('assets.deleted'));
     }
 }

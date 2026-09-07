@@ -27,7 +27,7 @@ class TagController extends Controller
 
         Tag::create($validated);
 
-        return back()->with('success', 'Tag criada com sucesso!');
+        return back()->with('success', __('messages.success.created'));
     }
 
     public function update(TagRequest $request, Tag $tag)
@@ -38,7 +38,7 @@ class TagController extends Controller
 
         $tag->update($validated);
 
-        return back()->with('success', 'Tag atualizada com sucesso!');
+        return back()->with('success', __('messages.success.updated'));
     }
 
     public function destroy(Tag $tag)
@@ -47,7 +47,7 @@ class TagController extends Controller
         $tag->tickets()->detach();
         $tag->delete();
 
-        return back()->with('success', 'Tag removida com sucesso!');
+        return back()->with('success', __('messages.success.deleted'));
     }
 
     /**
@@ -63,6 +63,6 @@ class TagController extends Controller
         $ticket = \App\Models\Ticket::findOrFail($ticketId);
         $ticket->tags()->sync($request->tag_ids);
 
-        return back()->with('success', 'Tags atualizadas!');
+        return back()->with('success', __('messages.success.updated'));
     }
 }

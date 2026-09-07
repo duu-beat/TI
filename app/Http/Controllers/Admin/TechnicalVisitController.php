@@ -61,7 +61,7 @@ class TechnicalVisitController extends Controller
         ]);
 
         return redirect()->route('admin.tickets.show', $visit->ticket_id)
-            ->with('success', 'Visita técnica agendada com sucesso!');
+            ->with('success', __('visits.scheduled'));
     }
 
     /**
@@ -90,6 +90,6 @@ class TechnicalVisitController extends Controller
             'message' => "🔄 Status da visita técnica alterado de **{$oldStatus}** para **{$newStatus}**."
         ]);
 
-        return back()->with('success', 'Status da visita atualizado.');
+        return back()->with('success', __('visits.status_updated'));
     }
 }

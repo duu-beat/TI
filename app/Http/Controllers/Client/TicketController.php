@@ -60,7 +60,7 @@ class TicketController extends Controller
         $ticket = $creator->execute($request->user(), $request->validated(), $request);
 
         return redirect()->route('client.tickets.show', $ticket)
-                         ->with('success', 'Chamado criado com sucesso!');
+                         ->with('success', __('tickets.created'));
     }
 
     public function show(Ticket $ticket)
@@ -83,7 +83,7 @@ class TicketController extends Controller
         // Disparar evento para tempo real
         event(new \App\Events\TicketMessageSent($message));
 
-        return back()->with('success', 'Mensagem enviada!');
+        return back()->with('success', __('tickets.reply_sent'));
     }
 
     public function rate(RateTicketRequest $request, Ticket $ticket, RateTicket $rater)
@@ -95,6 +95,6 @@ class TicketController extends Controller
         // Executa a Action (O Observer limpará o cache pois o status muda para Closed)
         $rater->execute($request->user(), $ticket, $data);
 
-        return back()->with('success', 'Obrigado pela sua avaliação!');
+        return back()->with('success', __('tickets.rated'));
     }
 }
