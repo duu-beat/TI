@@ -6,7 +6,7 @@
                     <div class="p-2 rounded-lg bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                     </div>
-                    {{ __('Agenda de Visitas Técnicas') }}
+                    {{ __('visits.ui.schedule') }}
                 </h2>
             </div>
         </div>
@@ -34,12 +34,12 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-white/5 border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
-                                    <th class="px-6 py-4">Data/Hora</th>
-                                    <th class="px-6 py-4">Chamado</th>
-                                    <th class="px-6 py-4">Técnico</th>
-                                    <th class="px-6 py-4">Endereço</th>
-                                    <th class="px-6 py-4">Status</th>
-                                    <th class="px-6 py-4 text-right">Ações</th>
+                                    <th class="px-6 py-4">{{ __('visits.ui.date_time') }}</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.subject') }}</th>
+                                    <th class="px-6 py-4">{{ __('visits.ui.technician') }}</th>
+                                    <th class="px-6 py-4">{{ __('visits.ui.address') }}</th>
+                                    <th class="px-6 py-4">{{ __('tickets.ui.status_label') }}</th>
+                                    <th class="px-6 py-4 text-right">{{ __('visits.ui.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/5 text-sm">
@@ -78,15 +78,15 @@
                                                     @csrf
                                                     @method('PATCH')
                                                     @if($visit->status === 'scheduled')
-                                                        <button name="status" value="in_transit" class="p-2 rounded-lg bg-slate-800 hover:bg-yellow-500/20 text-slate-400 hover:text-yellow-400 border border-white/5 hover:border-yellow-500/30 transition-all" title="Iniciar Deslocamento">
+                                                        <button name="status" value="in_transit" class="p-2 rounded-lg bg-slate-800 hover:bg-yellow-500/20 text-slate-400 hover:text-yellow-400 border border-white/5 hover:border-yellow-500/30 transition-all" title="{{ __('visits.ui.start_travel') }}">
                                                             🚗
                                                         </button>
                                                     @elseif($visit->status === 'in_transit')
-                                                        <button name="status" value="in_service" class="p-2 rounded-lg bg-slate-800 hover:bg-purple-500/20 text-slate-400 hover:text-purple-400 border border-white/5 hover:border-purple-500/30 transition-all" title="Iniciar Atendimento">
+                                                        <button name="status" value="in_service" class="p-2 rounded-lg bg-slate-800 hover:bg-purple-500/20 text-slate-400 hover:text-purple-400 border border-white/5 hover:border-purple-500/30 transition-all" title="{{ __('visits.ui.start_service') }}">
                                                             🛠️
                                                         </button>
                                                     @elseif($visit->status === 'in_service')
-                                                        <button name="status" value="completed" class="p-2 rounded-lg bg-slate-800 hover:bg-green-500/20 text-slate-400 hover:text-green-400 border border-white/5 hover:border-green-500/30 transition-all" title="Concluir Visita">
+                                                        <button name="status" value="completed" class="p-2 rounded-lg bg-slate-800 hover:bg-green-500/20 text-slate-400 hover:text-green-400 border border-white/5 hover:border-green-500/30 transition-all" title="{{ __('visits.ui.complete') }}">
                                                             ✅
                                                         </button>
                                                     @endif
@@ -101,8 +101,8 @@
                                                 <div class="h-16 w-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
                                                     <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                                                 </div>
-                                                <h3 class="text-white font-medium mb-1">Nenhuma visita agendada</h3>
-                                                <p class="text-slate-500 text-sm">As visitas técnicas aparecerão aqui após serem agendadas nos chamados.</p>
+                                                <h3 class="text-white font-medium mb-1">{{ __('visits.ui.empty_title') }}</h3>
+                                                <p class="text-slate-500 text-sm">{{ __('visits.ui.empty_description') }}</p>
                                             </div>
                                         </td>
                                     </tr>

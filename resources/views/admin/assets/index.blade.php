@@ -6,7 +6,7 @@
                     <div class="p-2 rounded-lg bg-cyan-500/20 text-cyan-400 border border-cyan-500/30">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M9 19v2m6-2v2M5 9H3m2 6H3m18-6h-2m2 6h-2M7 19h10a2 2 0 002-2V7a2 2 0 00-2-2H7a2 2 0 00-2 2v10a2 2 0 002 2zM9 9h6v6H9V9z"></path></svg>
                     </div>
-                    {{ __('Gestão de Inventário') }}
+                    {{ __('assets.ui.inventory') }}
                 </h2>
             </div>
             
@@ -14,12 +14,12 @@
                 <a href="{{ route('admin.assets.export') }}" 
                    class="group flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-300 hover:text-white rounded-xl font-bold text-sm transition shadow-lg">
                     <svg class="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Exportar CSV</span>
+                    <span>{{ __('assets.ui.export_csv') }}</span>
                 </a>
                 <a href="{{ route('admin.assets.create') }}" 
                    class="group flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/30 rounded-xl text-sm font-bold text-white transition hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]">
                     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
-                    <span>Novo Equipamento</span>
+                    <span>{{ __('assets.ui.new_asset') }}</span>
                 </a>
             </div>
         </div>
@@ -49,14 +49,14 @@
                                 <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
                             </div>
                             <input type="text" name="search" value="{{ request('search') }}" 
-                                   placeholder="Buscar por Nome, Patrimônio ou Serial..." 
+                                   placeholder="{{ __('assets.ui.search') }}"
                                    class="w-full pl-10 pr-4 py-2.5 rounded-xl bg-slate-950/50 border border-white/5 text-slate-200 focus:border-cyan-500/50 focus:bg-slate-900 focus:ring-2 focus:ring-cyan-500/20 outline-none transition placeholder-slate-600 text-sm">
                         </div>
                         
                         <div class="relative w-full md:w-48 group">
                             <select name="type" onchange="this.form.submit()" 
                                     class="w-full px-4 py-2.5 rounded-xl bg-slate-950/50 border border-white/5 text-slate-200 focus:border-cyan-500/50 focus:bg-slate-900 focus:ring-2 focus:ring-cyan-500/20 outline-none transition cursor-pointer appearance-none text-sm">
-                                <option value="" class="bg-slate-900">Todos os Tipos</option>
+                                <option value="" class="bg-slate-900">{{ __('assets.ui.all_types') }}</option>
                                 <option value="Laptop" class="bg-slate-900" {{ request('type') == 'Laptop' ? 'selected' : '' }}>Laptop</option>
                                 <option value="Desktop" class="bg-slate-900" {{ request('type') == 'Desktop' ? 'selected' : '' }}>Desktop</option>
                                 <option value="Monitor" class="bg-slate-900" {{ request('type') == 'Monitor' ? 'selected' : '' }}>Monitor</option>
@@ -79,11 +79,11 @@
                         <table class="w-full text-left border-collapse">
                             <thead>
                                 <tr class="bg-white/5 border-b border-white/5 text-xs uppercase tracking-wider text-slate-400 font-bold">
-                                    <th class="px-6 py-4">Equipamento</th>
-                                    <th class="px-6 py-4">Identificação</th>
-                                    <th class="px-6 py-4">Responsável</th>
-                                    <th class="px-6 py-4">Status</th>
-                                    <th class="px-6 py-4 text-right">Ações</th>
+                                    <th class="px-6 py-4">{{ __('assets.ui.equipment') }}</th>
+                                    <th class="px-6 py-4">{{ __('assets.ui.identification') }}</th>
+                                    <th class="px-6 py-4">{{ __('assets.ui.responsible') }}</th>
+                                    <th class="px-6 py-4">{{ __('assets.ui.status') }}</th>
+                                    <th class="px-6 py-4 text-right">{{ __('assets.ui.actions') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-white/5 text-sm">
@@ -117,7 +117,7 @@
                                                     <span class="text-slate-300 font-medium">{{ $asset->user->name }}</span>
                                                 </div>
                                             @else
-                                                <span class="text-slate-600 italic text-xs">Disponível</span>
+                                                <span class="text-slate-600 italic text-xs">{{ __('assets.ui.available') }}</span>
                                             @endif
                                         </td>
                                         <td class="px-6 py-4">
@@ -140,7 +140,7 @@
                                                 <form action="{{ route('admin.assets.destroy', $asset) }}" method="POST" class="inline-block">
                                                     @csrf
                                                     @method('DELETE')
-                                                    <button type="submit" onclick="return confirm('Excluir este equipamento?')"
+                                                    <button type="submit" onclick="return confirm('{{ __('assets.ui.confirm_delete') }}')"
                                                             class="p-2 rounded-lg bg-slate-800 hover:bg-red-600 text-slate-400 hover:text-white border border-white/5 transition-all">
                                                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
                                                     </button>
@@ -155,8 +155,8 @@
                                                 <div class="h-16 w-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
                                                     <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path></svg>
                                                 </div>
-                                                <h3 class="text-white font-medium mb-1">Nenhum equipamento encontrado</h3>
-                                                <p class="text-slate-500 text-sm">Comece cadastrando os ativos de TI da empresa.</p>
+                                                <h3 class="text-white font-medium mb-1">{{ __('assets.ui.empty_title') }}</h3>
+                                                <p class="text-slate-500 text-sm">{{ __('assets.ui.empty_description') }}</p>
                                             </div>
                                         </td>
                                     </tr>
