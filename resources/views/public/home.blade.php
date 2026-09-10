@@ -53,9 +53,9 @@
     <section class="border-y border-white/5 bg-slate-900/35 py-20 sm:py-24" aria-labelledby="services-title">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="max-w-2xl">
-                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">Uma operação mais clara</p>
-                <h2 id="services-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Tudo o que sua equipe precisa para manter a TI em movimento.</h2>
-                <p class="mt-5 text-base leading-7 text-slate-400">O sistema foi pensado para reduzir ruído operacional, dar visibilidade à liderança e tornar o suporte mais simples para cada pessoa atendida.</p>
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">{{ __('messages.public.clearer_operation') }}</p>
+                <h2 id="services-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">{{ __('messages.public.services_title') }}</h2>
+                <p class="mt-5 text-base leading-7 text-slate-400">{{ __('messages.public.services_description') }}</p>
             </div>
 
             <div class="mt-12 grid gap-5 md:grid-cols-2">
@@ -79,10 +79,10 @@
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
             <div class="grid gap-12 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
                 <div>
-                    <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">Do pedido à solução</p>
-                    <h2 id="flow-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Um fluxo simples para quem solicita, atende e supervisiona.</h2>
-                    <p class="mt-5 max-w-xl text-base leading-7 text-slate-400">Cada área recebe apenas o que precisa. Clientes acompanham seus próprios pedidos, Admins cuidam da operação e o Master enxerga riscos, acessos, auditoria e saúde do ambiente.</p>
-                    <a href="{{ route('services') }}" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-cyan-300 transition hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-4 focus:ring-offset-slate-950">Conhecer os serviços <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" /></svg></a>
+                    <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-300">{{ __('messages.public.flow_label') }}</p>
+                    <h2 id="flow-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">{{ __('messages.public.flow_title') }}</h2>
+                    <p class="mt-5 max-w-xl text-base leading-7 text-slate-400">{{ __('messages.public.flow_description') }}</p>
+                    <a href="{{ route('services') }}" class="mt-8 inline-flex items-center gap-2 text-sm font-bold text-cyan-300 transition hover:text-cyan-100 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-4 focus:ring-offset-slate-950">{{ __('messages.public.learn_services') }} <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" /></svg></a>
                 </div>
                 <ol class="space-y-4" aria-label="Etapas de atendimento">
                     <li class="flex gap-4 rounded-2xl border border-white/10 bg-slate-900/55 p-5"><span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-indigo-500/15 text-sm font-black text-indigo-200">01</span><div><h3 class="font-bold text-white">Solicite com clareza</h3><p class="mt-1 text-sm leading-6 text-slate-400">Abra um chamado, detalhe o contexto e anexe fotos, PDFs ou outros arquivos necessários.</p></div></li>
@@ -96,8 +96,8 @@
     <section class="border-y border-white/5 bg-gradient-to-r from-indigo-500/[0.08] via-slate-900/65 to-cyan-500/[0.07] py-20 sm:py-24" aria-labelledby="governance-title">
         <div class="mx-auto grid max-w-7xl gap-10 px-6 lg:grid-cols-[1.15fr_0.85fr] lg:items-center lg:px-8">
             <div>
-                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-violet-200">Projetado para continuidade</p>
-                <h2 id="governance-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">Segurança não precisa ficar separada da operação.</h2>
+                <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-violet-200">{{ __('messages.public.governance_label') }}</p>
+                <h2 id="governance-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-4xl">{{ __('messages.public.governance_title') }}</h2>
                 <p class="mt-5 max-w-2xl text-base leading-7 text-slate-300">O mesmo ambiente que organiza o atendimento também ajuda a proteger identidades, registrar mudanças, acompanhar incidentes críticos e dar visibilidade para decisões de governança.</p>
             </div>
             <div class="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
@@ -110,9 +110,9 @@
 
     <section class="py-20 sm:py-28" aria-labelledby="home-cta-title">
         <div class="mx-auto max-w-4xl px-6 text-center lg:px-8">
-            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">Próximo passo</p>
-            <h2 id="home-cta-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-5xl">Mais clareza para sua TI começa com uma boa operação.</h2>
-            <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-400">Conheça a solução, fale com a equipe ou crie sua conta para começar a organizar os fluxos que mais impactam seu dia a dia.</p>
+            <p class="text-[11px] font-bold uppercase tracking-[0.2em] text-cyan-300">{{ __('messages.public.next_step') }}</p>
+            <h2 id="home-cta-title" class="mt-3 text-3xl font-black tracking-tight text-white sm:text-5xl">{{ __('messages.public.cta_title') }}</h2>
+            <p class="mx-auto mt-5 max-w-2xl text-base leading-7 text-slate-400">{{ __('messages.public.cta_description') }}</p>
             <div class="mt-9 flex flex-col justify-center gap-3 sm:flex-row">
                 <a href="{{ route('contact') }}" class="inline-flex items-center justify-center rounded-2xl bg-white px-7 py-4 text-sm font-bold text-slate-950 transition hover:bg-cyan-100 focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-slate-950">Falar com especialista</a>
                 <a href="{{ route('register') }}" class="inline-flex items-center justify-center rounded-2xl border border-white/15 bg-white/[0.04] px-7 py-4 text-sm font-bold text-white transition hover:bg-white/[0.09] focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 focus:ring-offset-slate-950">Criar conta</a>
