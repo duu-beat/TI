@@ -2,7 +2,7 @@
 <div x-data="notifications()" x-init="init()" class="relative">
     <button @click="open = !open" 
             class="relative p-2 rounded-xl bg-slate-900 border border-white/10 text-slate-400 hover:text-white hover:border-indigo-500/50 transition-all group"
-            aria-label="Notificações"
+            aria-label="{{ __('messages.navigation.notifications') }}"
             :aria-expanded="open.toString()">
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
         <template x-if="unreadCount > 0">
@@ -23,8 +23,8 @@
          style="display: none;">
         
         <div class="p-4 border-b border-white/5 flex items-center justify-between bg-white/5">
-            <h3 class="font-bold text-white text-sm">Notificações</h3>
-            <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 uppercase tracking-wider">Marcar todas como lidas</button>
+            <h3 class="font-bold text-white text-sm">{{ __('messages.navigation.notifications') }}</h3>
+            <button @click="markAllAsRead()" x-show="unreadCount > 0" class="text-[10px] font-bold text-indigo-400 hover:text-indigo-300 uppercase tracking-wider">{{ __('messages.navigation.mark_all_read') }}</button>
         </div>
 
         <div class="max-h-[400px] overflow-y-auto divide-y divide-white/5">
@@ -53,13 +53,13 @@
             <template x-if="list.length === 0">
                 <div class="p-8 text-center">
                     <div class="text-3xl mb-2 opacity-20">🔔</div>
-                    <p class="text-xs text-slate-500">Nenhuma notificação por aqui.</p>
+                    <p class="text-xs text-slate-500">{{ __('messages.navigation.empty_notifications') }}</p>
                 </div>
             </template>
         </div>
 
         <div class="p-3 bg-white/5 border-t border-white/5 text-center">
-            <a href="{{ route('notifications.index') }}" class="text-[10px] font-bold text-slate-500 hover:text-white transition uppercase tracking-widest">Ver histórico completo</a>
+            <a href="{{ route('notifications.index') }}" class="text-[10px] font-bold text-slate-500 hover:text-white transition uppercase tracking-widest">{{ __('messages.navigation.full_history') }}</a>
         </div>
     </div>
 </div>

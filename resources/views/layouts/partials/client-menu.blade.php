@@ -7,19 +7,19 @@
     {{-- Dashboard --}}
     <a href="{{ route('client.dashboard') }}"
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.dashboard') ? $activeClass : $inactiveClass }}">
-       🏠 Início
+       🏠 {{ __('messages.navigation.home') }}
     </a>
 
     {{-- Chamados (Ativo em: index, create, show) --}}
     <a href="{{ route('client.tickets.index') }}"
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.tickets.*') ? $activeClass : $inactiveClass }}">
-        🎫 Meus Chamados
+        🎫 {{ __('messages.navigation.my_tickets') }}
     </a>
 
     {{-- Base de Conhecimento --}}
     <a href="{{ route('client.knowledge.index') }}"
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('client.knowledge.*') ? $activeClass : $inactiveClass }}">
-        Base de Conhecimento
+        {{ __('messages.navigation.knowledge_base') }}
     </a>
 
 </div>

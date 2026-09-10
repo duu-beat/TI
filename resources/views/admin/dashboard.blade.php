@@ -5,12 +5,12 @@
             
             <h2 class="font-bold text-xl text-white leading-tight flex items-center gap-3">
                 <svg class="w-6 h-6 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                Painel de Controle
+                {{ __('messages.navigation.admin_dashboard') }}
             </h2>
 
             {{-- Adicionado 'shrink-0' para o horário não amassar --}}
             <div class="shrink-0 text-xs text-slate-400 bg-slate-800/50 px-3 py-1 rounded-full border border-white/5">
-                Atualizado: {{ now()->format('H:i') }}
+                {{ __('messages.navigation.updated_at') }}: {{ now()->format('H:i') }}
             </div>
             
         </div>
@@ -73,7 +73,7 @@
                                 </span>
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-white tracking-wide">Ação Imediata Necessária</h3>
+                                <h3 class="text-lg font-bold text-white tracking-wide">{{ __('messages.navigation.immediate_action') }}</h3>
                                 <p class="text-red-200/80 text-sm mt-1">
                                     Existem <strong class="text-red-400 text-lg border-b border-red-500/50">{{ $priorityStats['high'] ?? 0 }}</strong> chamados marcados como <strong>Alta Prioridade</strong> na fila.
                                 </p>
@@ -82,7 +82,7 @@
                         
                         <a href="{{ route('admin.tickets.index', ['priority' => 'high', 'open_only' => 1]) }}"
                            class="group whitespace-nowrap px-6 py-2.5 rounded-xl bg-red-600 hover:bg-red-500 text-white font-bold transition-all shadow-lg shadow-red-900/40 hover:shadow-red-600/40 hover:-translate-y-0.5 flex items-center gap-2">
-                            <span>Resolver Agora</span>
+                            <span>{{ __('messages.navigation.resolve_now') }}</span>
                             <svg class="w-4 h-4 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
                         </a>
                     </div>
@@ -97,8 +97,8 @@
                                 <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3Z" /></svg>
                             </div>
                             <div>
-                                <h3 id="unassigned-tickets-title" class="font-bold text-white">{{ $unassignedCount }} {{ $unassignedCount === 1 ? 'Chamado' : 'Chamados' }} sem responsável</h3>
-                                <p class="mt-1 text-sm text-amber-200/80">Atribua um agente para reduzir o tempo de primeira resposta.</p>
+                                <h3 id="unassigned-tickets-title" class="font-bold text-white">{{ $unassignedCount }} {{ $unassignedCount === 1 ? __('messages.navigation.ticket_singular') : __('messages.navigation.ticket_plural') }} {{ __('messages.navigation.without_assignee') }}</h3>
+                                <p class="mt-1 text-sm text-amber-200/80">{{ __('messages.navigation.assign_agent_hint') }}</p>
                             </div>
                         </div>
                         <a href="{{ route('admin.tickets.index', ['assigned_to' => 'unassigned']) }}" class="inline-flex w-fit items-center justify-center rounded-lg bg-amber-600 px-6 py-2 text-sm font-bold text-white transition hover:bg-amber-500">Ver chamados</a>
@@ -111,7 +111,7 @@
                     <div class="mb-6 flex items-center justify-between">
                         <h3 id="agent-ranking-title" class="flex items-center gap-2 text-lg font-bold text-white">
                             <svg class="h-5 w-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138Z" /></svg>
-                            Top agentes
+                            {{ __('messages.navigation.top_agents') }}
                         </h3>
                     </div>
                     <div class="space-y-3">
@@ -119,7 +119,7 @@
                             <article class="flex items-center gap-4 rounded-xl border border-white/5 bg-slate-800/50 p-3 transition hover:border-indigo-500/30">
                                 <div class="flex h-8 w-8 items-center justify-center rounded-full {{ $index === 0 ? 'bg-yellow-500/20 text-yellow-400' : ($index === 1 ? 'bg-slate-400/20 text-slate-300' : 'bg-amber-700/20 text-amber-500') }} text-sm font-bold">{{ $index + 1 }}</div>
                                 <div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold text-white">{{ $agent->name }}</p><p class="text-xs text-slate-400">{{ $agent->resolved_count }} resolvidos de {{ $agent->assigned_tickets_count }} atribuídos @if($agent->avg_rating) • {{ number_format($agent->avg_rating, 1) }} @endif</p></div>
-                                <div class="text-right"><p class="text-lg font-bold text-emerald-400">{{ $agent->resolved_count > 0 ? round(($agent->resolved_count / $agent->assigned_tickets_count) * 100) : 0 }}%</p><p class="text-[10px] uppercase text-slate-500">Taxa</p></div>
+                                <div class="text-right"><p class="text-lg font-bold text-emerald-400">{{ $agent->resolved_count > 0 ? round(($agent->resolved_count / $agent->assigned_tickets_count) * 100) : 0 }}%</p><p class="text-[10px] uppercase text-slate-500">{{ __('messages.navigation.rate') }}</p></div>
                             </article>
                         @endforeach
                     </div>
@@ -134,7 +134,7 @@
                     <div class="absolute right-0 top-0 w-24 h-24 bg-indigo-500/10 rounded-full blur-2xl group-hover:bg-indigo-500/20 transition"></div>
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">NPS Score</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ __('messages.navigation.nps_score') }}</div>
                             <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $npsStats['score'] ?? 0 }}</div>
                         </div>
                         <div class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400">
@@ -151,7 +151,7 @@
                     <div class="absolute right-0 top-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition"></div>
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Equipamentos</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ __('messages.navigation.equipment') }}</div>
                             <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $assetStats->total_assets ?? 0 }}</div>
                         </div>
                         <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400">
@@ -168,7 +168,7 @@
                     <div class="absolute right-0 top-0 w-24 h-24 bg-slate-500/10 rounded-full blur-2xl group-hover:bg-slate-500/20 transition"></div>
                     <div class="flex justify-between items-start mb-4">
                         <div>
-                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">Total Chamados</div>
+                            <div class="text-xs font-bold text-slate-400 uppercase tracking-widest">{{ __('messages.navigation.total_tickets') }}</div>
                             <div class="text-3xl font-black text-white mt-1 group-hover:scale-105 transition-transform origin-left">{{ $stats->total ?? 0 }}</div>
                         </div>
                         <div class="p-2 rounded-lg bg-slate-500/10 text-slate-400">
