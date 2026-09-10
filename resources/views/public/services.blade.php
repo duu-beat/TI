@@ -39,10 +39,10 @@
             
             <div class="text-center mb-20">
                 <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">
-                    Nossas Soluções
+                    {{ __('messages.public.services_page_title') }}
                 </h1>
                 <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-                    Do hardware ao software, cobrimos todas as camadas da sua tecnologia.
+                    {{ __('messages.public.services_page_description') }}
                 </p>
             </div>
 
@@ -50,12 +50,12 @@
             <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-24">
                 @php
                     $services = [
-                        ['icon' => '💻', 'title' => 'Suporte Técnico', 'desc' => 'Resolução rápida de problemas em computadores, impressoras e servidores.'],
-                        ['icon' => '🌐', 'title' => 'Redes e Wi-Fi', 'desc' => 'Instalação e configuração de redes corporativas estáveis e seguras.'],
-                        ['icon' => '🔒', 'title' => 'Cibersegurança', 'desc' => 'Proteção contra vírus, ransomware e ataques externos.'],
-                        ['icon' => '☁️', 'title' => 'Cloud & Backup', 'desc' => 'Migração para nuvem e rotinas de backup automático.'],
-                        ['icon' => '⚙️', 'title' => 'Consultoria TI', 'desc' => 'Planejamento estratégico para modernizar sua empresa.'],
-                        ['icon' => '🔧', 'title' => 'Manutenção', 'desc' => 'Limpeza, upgrade e reparo de hardware especializado.'],
+                        ['icon' => '💻', 'title' => __('messages.public.technical_support'), 'desc' => __('messages.public.technical_support_text')],
+                        ['icon' => '🌐', 'title' => __('messages.public.networks_wifi'), 'desc' => __('messages.public.networks_wifi_text')],
+                        ['icon' => '🔒', 'title' => __('messages.public.cybersecurity'), 'desc' => __('messages.public.cybersecurity_text')],
+                        ['icon' => '☁️', 'title' => __('messages.public.cloud_backup'), 'desc' => __('messages.public.cloud_backup_text')],
+                        ['icon' => '⚙️', 'title' => __('messages.public.it_consulting'), 'desc' => __('messages.public.it_consulting_text')],
+                        ['icon' => '🔧', 'title' => __('messages.public.maintenance'), 'desc' => __('messages.public.maintenance_text')],
                     ];
                 @endphp
 
@@ -78,9 +78,9 @@
                             
                             {{-- Plano Avulso --}}
                             <div class="p-8 md:p-12 border-b md:border-b-0 md:border-r border-white/10">
-                                <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Avulso</div>
-                                <h3 class="text-2xl font-bold text-white mb-4">Chamado Único</h3>
-                                <p class="text-slate-400 text-sm mb-8 min-h-[40px]">Ideal para problemas pontuais sem compromisso.</p>
+                                <div class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">{{ __('messages.public.one_off') }}</div>
+                                <h3 class="text-2xl font-bold text-white mb-4">{{ __('messages.public.single_ticket') }}</h3>
+                                <p class="text-slate-400 text-sm mb-8 min-h-[40px]">{{ __('messages.public.single_ticket_text') }}</p>
                                 <ul class="space-y-3 text-slate-400 text-sm mb-8">
                                     <li class="flex gap-2">✅ Pagamento por hora</li>
                                     <li class="flex gap-2">✅ Atendimento remoto ou local</li>
@@ -90,18 +90,18 @@
                                 {{-- BOTÃO LÓGICO AVULSO --}}
                                 @auth
                                     {{-- Como o admin/master estão ocultos, só cliente vê isso --}}
-                                    <a href="{{ route('client.tickets.create') }}" class="block w-full py-3 rounded-xl bg-white/10 text-white font-bold text-center hover:bg-white/20 transition">Abrir no Portal</a>
+                                    <a href="{{ route('client.tickets.create') }}" class="block w-full py-3 rounded-xl bg-white/10 text-white font-bold text-center hover:bg-white/20 transition">{{ __('messages.public.open_portal') }}</a>
                                 @else
-                                    <a href="{{ route('contact') }}" class="block w-full py-3 rounded-xl bg-white/10 text-white font-bold text-center hover:bg-white/20 transition">Solicitar Orçamento</a>
+                                    <a href="{{ route('contact') }}" class="block w-full py-3 rounded-xl bg-white/10 text-white font-bold text-center hover:bg-white/20 transition">{{ __('messages.public.request_quote') }}</a>
                                 @endauth
                             </div>
 
                             {{-- Plano Mensal --}}
                             <div class="p-8 rounded-3xl border border-cyan-500/30 bg-gradient-to-b from-cyan-900/20 to-slate-900/50 relative overflow-hidden">
-                                <div class="absolute top-0 right-0 bg-cyan-500 text-slate-950 text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase">Recomendado</div>
-                                <div class="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-4">Contrato</div>
-                                <h3 class="text-2xl font-bold text-white mb-4">Suporte Mensal</h3>
-                                <p class="text-slate-400 text-sm mb-8 min-h-[40px]">Segurança total e prioridade para o seu negócio.</p>
+                                <div class="absolute top-0 right-0 bg-cyan-500 text-slate-950 text-[10px] font-bold px-3 py-1 rounded-bl-xl uppercase">{{ __('messages.public.recommended') }}</div>
+                                <div class="text-xs font-bold text-cyan-400 uppercase tracking-widest mb-4">{{ __('messages.public.monthly_contract') }}</div>
+                                <h3 class="text-2xl font-bold text-white mb-4">{{ __('messages.public.monthly_support') }}</h3>
+                                <p class="text-slate-400 text-sm mb-8 min-h-[40px]">{{ __('messages.public.monthly_support_text') }}</p>
                                 <ul class="space-y-3 text-slate-300 text-sm mb-8">
                                     <li class="flex gap-2">✅ Valor fixo mensal</li>
                                     <li class="flex gap-2">✅ <strong>Prioridade Alta</strong> no SLA</li>
@@ -112,7 +112,7 @@
                                 @auth
                                     <a href="{{ route('client.tickets.create') }}" class="block w-full py-3 rounded-xl bg-cyan-500 text-slate-950 text-center font-bold hover:bg-cyan-400 transition">Contratar via Portal</a>
                                 @else
-                                    <a href="{{ route('contact') }}" class="block w-full py-3 rounded-xl bg-cyan-500 text-slate-950 text-center font-bold hover:bg-cyan-400 transition">Solicitar Proposta</a>
+                                    <a href="{{ route('contact') }}" class="block w-full py-3 rounded-xl bg-cyan-500 text-slate-950 text-center font-bold hover:bg-cyan-400 transition">{{ __('messages.public.request_proposal') }}</a>
                                 @endauth
                             </div>
 
