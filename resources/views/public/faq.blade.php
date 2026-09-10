@@ -54,14 +54,14 @@
              x-transition:enter-start="opacity-0 translate-y-4"
              x-transition:enter-end="opacity-100 translate-y-0">
             <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-xs font-bold uppercase tracking-widest mb-6 hover:bg-cyan-500/20 transition cursor-default">
-                ❓ Tira-Dúvidas
+                ❓ {{ __('messages.public.faq_badge') }}
             </div>
             <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">
-                Perguntas <br>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">Frequentes.</span>
+                {{ __('messages.public.faq_title') }} <br>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">{{ __('messages.public.faq_title_highlight') }}</span>
             </h1>
             <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-                As respostas para as dúvidas mais comuns sobre os nossos serviços e processos.
+                {{ __('messages.public.faq_description') }}
             </p>
         </div>
 
@@ -111,8 +111,8 @@
             @empty
                 <div class="text-center py-16 rounded-3xl border border-dashed border-white/10 bg-white/5">
                     <div class="text-4xl mb-4 grayscale opacity-50">🔍</div>
-                    <h3 class="text-white font-bold mb-2">Ainda não há perguntas</h3>
-                    <p class="text-slate-500 text-sm">Estamos a atualizar a nossa base de conhecimento.</p>
+                    <h3 class="text-white font-bold mb-2">{{ __('messages.public.faq_empty_title') }}</h3>
+                    <p class="text-slate-500 text-sm">{{ __('messages.public.faq_empty_text') }}</p>
                 </div>
             @endforelse
         </div>
@@ -122,26 +122,26 @@
             <div class="mt-20 text-center p-10 rounded-3xl border border-white/10 bg-gradient-to-b from-white/5 to-transparent backdrop-blur-md">
                 {{-- Conteúdo mantido igual ao original --}}
                 <h3 class="text-2xl font-bold text-white mb-3">
-                    @auth Precisa de suporte especializado? @else Não encontrou o que procura? @endauth
+                    @auth {{ __('messages.public.faq_support_title') }} @else {{ __('messages.public.faq_not_found_title') }} @endauth
                 </h3>
                 <p class="text-slate-400 mb-8 max-w-lg mx-auto">
                     @auth
-                        Como cliente da Suporte TI, você tem acesso prioritário através do nosso Portal. Utilize-o para abrir e acompanhar os seus chamados com maior agilidade.
+                        {{ __('messages.public.faq_client_text') }}
                     @else
-                        A nossa equipa está pronta para ajudar com dúvidas específicas ou problemas complexos.
+                        {{ __('messages.public.faq_guest_text') }}
                     @endauth
                 </p>
                 <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                     @auth
                         <a href="{{ route('client.tickets.create') }}" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition">
-                            Acessar Portal do Cliente
+                            {{ __('messages.public.client_portal') }}
                         </a>
                     @else
                         <a href="{{ route('contact') }}" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-500 text-white font-bold shadow-lg shadow-indigo-500/20 hover:scale-105 transition">
-                            Abrir Chamado
+                            {{ __('messages.public.open_ticket') }}
                         </a>
                         <a href="{{ route('contact') }}" class="w-full sm:w-auto px-8 py-3 rounded-xl bg-white/5 border border-white/10 text-white font-bold hover:bg-white/10 transition">
-                            Fale Conosco
+                            {{ __('messages.public.talk_to_us') }}
                         </a>
                     @endauth
                 </div>
