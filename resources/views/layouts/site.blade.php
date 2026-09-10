@@ -164,14 +164,14 @@
                             </div>
                             {{-- nome principal, troca cor no hover --}}
                             <div class="text-[10px] uppercase tracking-wider text-slate-400 font-medium">
-                                Soluções Rápidas
+                                {{ __('messages.public.start_now') }}
                             </div>
                             {{-- subtítulo pequeno em caixa alta --}}
                         </div>
                     </a>
 
                     {{-- DESKTOP NAV --}}
-                    <nav aria-label="Navegação principal" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
+                    <nav aria-label="{{ __('messages.public.main_navigation') }}" class="hidden md:flex items-center gap-8 text-sm font-medium text-slate-300">
                         {{-- 
                             Nav só aparece no desktop (md:flex, hidden no mobile)
                             links com espaçamento e estilo
@@ -202,30 +202,30 @@
                             @if(auth()->user()->isMaster())
                                 <a href="{{ route('master.dashboard') }}"
                                    class="inline-flex items-center rounded-xl bg-red-600 px-5 py-2.5 text-white font-bold hover:bg-red-500 hover:shadow-[0_0_15px_rgba(220,38,38,0.5)] transition hover:scale-105 border border-red-500/20">
-                                     Painel Master
+                                     {{ __('messages.public.master_panel') }}
                                 </a>
 
                             {{-- 2. Nível Admin (Atendimento) --}}
                             @elseif(auth()->user()->isAdmin())
                                 <a href="{{ route('admin.dashboard') }}"
                                    class="inline-flex items-center rounded-xl bg-cyan-600 px-5 py-2.5 text-white font-bold hover:bg-cyan-500 transition hover:scale-105 border border-cyan-500/20">
-                                    Painel Admin
+                                    {{ __('messages.public.admin_panel') }}
                                 </a>
 
                             {{-- 3. Nível Cliente (Padrão) --}}
                             @else
                                 <a href="{{ route('client.dashboard') }}"
                                    class="inline-flex items-center rounded-xl bg-white/10 px-5 py-2.5 text-white hover:bg-white/20 transition hover:scale-105 border border-white/5">
-                                    Acessar Portal
+                                    {{ __('messages.public.access_portal') }}
                                 </a>
                             @endif
 
                         @else
                             {{-- Visitante (Não logado) --}}
-                            <a href="{{ route('login') }}" class="hover:text-white transition font-semibold">Login</a>
+                            <a href="{{ route('login') }}" class="hover:text-white transition font-semibold">{{ __('auth.ui.login') }}</a>
                             <a href="{{ route('register') }}"
                                class="inline-flex items-center rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-2.5 font-bold text-slate-950 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:brightness-110 transition active:scale-95">
-                                Começar agora
+                                {{ __('messages.public.start_now') }}
                             </a>
                         @endauth
                     </nav>
@@ -236,7 +236,7 @@
                             @click="toggleMobileMenu($event.currentTarget)"
                             :aria-expanded="mobileMenuOpen.toString()"
                             aria-controls="mobile-main-menu"
-                            aria-label="Alternar menu principal"
+                            aria-label="{{ __('messages.public.toggle_menu') }}"
                             class="md:hidden text-slate-300 hover:text-white focus:outline-none z-50">
                         {{-- 
                             Botão aparece só no mobile (md:hidden)
@@ -303,7 +303,7 @@
                     {{-- Se não está logado --}}
                     <a @click="closeMobileMenu()" href="{{ route('login') }}" class="text-center text-slate-300 hover:text-white py-2">Login</a>
                     {{-- Link Login --}}
-                    <a @click="closeMobileMenu()" href="{{ route('register') }}" class="w-full text-center rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-4 py-3 font-bold text-slate-950">Criar Conta</a>
+                    <a @click="closeMobileMenu()" href="{{ route('register') }}" class="w-full text-center rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-4 py-3 font-bold text-slate-950">{{ __('auth.ui.register') }}</a>
                     {{-- Botão Cadastro --}}
                 @endauth
             </div>
@@ -354,20 +354,20 @@
                               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
                               {{-- Bolinha sólida na frente --}}
                             </span>
-                            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wide">Suporte e gestão de TI</span>
+                            <span class="text-xs font-semibold text-emerald-400 uppercase tracking-wide">{{ __('messages.public.footer_status') }}</span>
                             {{-- Texto do status (parece indicar "tudo ok") --}}
                         </div>
                     </div>
 
                     {{-- Coluna 2: Navegação --}}
                     <div>
-                        <h4 class="font-bold text-white mb-6">Navegação</h4>
+                        <h4 class="font-bold text-white mb-6">{{ __('messages.public.navigation') }}</h4>
                         {{-- Título da coluna --}}
                         <ul class="space-y-3 text-sm text-slate-400">
                             {{-- Lista com links do site --}}
                             <li><a href="{{ route('home') }}" class="hover:text-cyan-400 transition">Início</a></li>
                             {{-- Link Início --}}
-                            <li><a href="{{ route('sobre') }}" class="hover:text-cyan-400 transition">Sobre Nós</a></li> {{-- Adicionado aqui tb --}}
+                            <li><a href="{{ route('sobre') }}" class="hover:text-cyan-400 transition">{{ __('messages.public.about_us') }}</a></li> {{-- Adicionado aqui tb --}}
                             {{-- Link Sobre --}}
                             <li><a href="{{ route('services') }}" class="hover:text-cyan-400 transition">Serviços</a></li>
                             {{-- Link Serviços --}}
@@ -380,13 +380,13 @@
 
                     {{-- Coluna 3: Legal & Suporte --}}
                     <div>
-                        <h4 class="font-bold text-white mb-6">Legal</h4>
+                        <h4 class="font-bold text-white mb-6">{{ __('messages.public.legal') }}</h4>
                         {{-- Título da coluna --}}
                         <ul class="space-y-3 text-sm text-slate-400">
                             {{-- Lista de páginas legais --}}
-                            <li><a href="{{ route('terms') }}" class="hover:text-cyan-400 transition">Termos de Uso</a></li>
+                            <li><a href="{{ route('terms') }}" class="hover:text-cyan-400 transition">{{ __('messages.public.terms') }}</a></li>
                             {{-- Termos --}}
-                            <li><a href="{{ route('privacy') }}" class="hover:text-cyan-400 transition">Privacidade</a></li>
+                            <li><a href="{{ route('privacy') }}" class="hover:text-cyan-400 transition">{{ __('messages.public.privacy') }}</a></li>
                             {{-- Privacidade --}}
                             <li><a href="{{ route('sla') }}" class="hover:text-cyan-400 transition">SLA</a></li>
                             {{-- SLA --}}
@@ -395,7 +395,7 @@
 
                     {{-- Coluna 4: Contato & Redes Sociais --}}
                     <div>
-                        <h4 class="font-bold text-white mb-6">Fale Conosco</h4>
+                        <h4 class="font-bold text-white mb-6">{{ __('messages.public.contact_team') }}</h4>
                         {{-- Título da coluna --}}
                         <ul class="space-y-3 text-sm text-slate-400 mb-6">
                             {{-- Informações de contato --}}
