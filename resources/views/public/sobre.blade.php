@@ -46,15 +46,14 @@
             {{-- 1. HERO SECTION --}}
             <div class="text-center mb-32">
                 <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-xs font-bold uppercase tracking-widest mb-8 hover:bg-blue-500/20 transition cursor-default">
-                    🏢 Nossa Essência
+                    🏢 {{ __('messages.public.about_badge') }}
                 </div>
                 <h1 class="text-5xl md:text-7xl font-black text-white tracking-tight mb-8 leading-tight">
-                    Tecnologia invisível,<br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">resultados visíveis.</span>
+                    {{ __('messages.public.about_title') }}<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-indigo-500">{{ __('messages.public.about_title_highlight') }}</span>
                 </h1>
                 <p class="text-xl text-slate-400 max-w-3xl mx-auto leading-relaxed">
-                    Não somos apenas técnicos de informática. Somos arquitetos de estabilidade. 
-                    Acreditamos que a melhor tecnologia é aquela que funciona tão bem que você nem percebe que ela está lá.
+                    {{ __('messages.public.about_description') }}
                 </p>
             </div>
 
@@ -66,13 +65,13 @@
                         {{-- Imagem de Fundo --}}
                         <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2069&auto=format&fit=crop')] bg-cover bg-center opacity-40 mix-blend-overlay"></div>
                         <div class="relative z-10">
-                            <h3 class="text-2xl font-bold text-white mb-2">O futuro é agora.</h3>
-                            <p class="text-sm text-slate-300">E nós estamos construindo a infraestrutura para ele.</p>
+                            <h3 class="text-2xl font-bold text-white mb-2">{{ __('messages.public.about_future') }}</h3>
+                            <p class="text-sm text-slate-300">{{ __('messages.public.about_future_text') }}</p>
                         </div>
                     </div>
                 </div>
                 <div class="md:col-span-7 space-y-6 text-lg text-slate-300 leading-relaxed">
-                    <h2 class="text-3xl font-bold text-white mb-4">Por que fazemos o que fazemos?</h2>
+                    <h2 class="text-3xl font-bold text-white mb-4">{{ __('messages.public.about_why_title') }}</h2>
                     <p>
                         No mundo moderno, um minuto offline pode custar milhares de reais. Uma falha de segurança pode destruir uma reputação construída em décadas. A tecnologia deixou de ser um acessório para se tornar o coração pulsante de qualquer negócio.
                     </p>
@@ -95,7 +94,7 @@
                 <div class="absolute left-0 top-0 w-1 h-full bg-gradient-to-b from-blue-500/0 via-blue-500/50 to-blue-500/0 hidden md:block"></div>
                 
                 <div class="md:pl-12">
-                    <h2 class="text-3xl font-bold text-white mb-8">Nossa Trajetória</h2>
+                    <h2 class="text-3xl font-bold text-white mb-8">{{ __('messages.public.about_history_title') }}</h2>
                     
                     <div class="space-y-8 text-lg text-slate-400 leading-relaxed text-justify">
                         <p>
@@ -118,7 +117,7 @@
                 <div class="p-10 rounded-[2.5rem] border border-white/10 bg-slate-900/50 relative overflow-hidden">
                     <div class="absolute top-0 right-0 w-96 h-96 bg-white/5 rounded-full blur-[100px] pointer-events-none"></div>
                     
-                    <h2 class="text-3xl font-bold text-white mb-12 text-center">Como Trabalhamos</h2>
+                    <h2 class="text-3xl font-bold text-white mb-12 text-center">{{ __('messages.public.about_method_title') }}</h2>
                     
                     <div class="grid md:grid-cols-3 gap-8 relative z-10">
                         <div class="text-center">
@@ -146,7 +145,7 @@
             {{-- 5. VALORES --}}
             <div class="mb-24">
                 <div class="text-center mb-12">
-                    <h2 class="text-3xl font-bold text-white">Nossos Pilares</h2>
+                    <h2 class="text-3xl font-bold text-white">{{ __('messages.public.about_values_title') }}</h2>
                 </div>
                 <div class="grid md:grid-cols-3 gap-6">
                     <div class="p-8 rounded-3xl border border-white/10 bg-slate-900/30 hover:bg-white/5 transition duration-300">
@@ -167,17 +166,17 @@
             {{-- CTA FINAL COM LÓGICA PERSONALIZADA --}}
             @unless(auth()->check() && auth()->user()->isAdmin())
                 <div class="text-center border-t border-white/10 pt-20">
-                    <h2 class="text-3xl font-bold text-white mb-6">A sua empresa merece este nível de suporte.</h2>
+                    <h2 class="text-3xl font-bold text-white mb-6">{{ __('messages.public.about_cta_title') }}</h2>
                     <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
                         
                         @guest
                             <a href="{{ route('contact') }}" class="px-8 py-3 rounded-xl bg-white text-slate-900 font-bold hover:bg-slate-200 transition">
-                                Agendar Reunião
+                                {{ __('messages.public.schedule_meeting') }}
                             </a>
                         @endguest
 
                         <a href="{{ route('portfolio') }}" class="px-8 py-3 rounded-xl text-slate-300 font-medium hover:text-white transition">
-                            Ver Cases de Sucesso &rarr;
+                            {{ __('messages.public.success_cases') }} &rarr;
                         </a>
 
                     </div>
