@@ -40,14 +40,14 @@
             {{-- HERO SECTION --}}
             <div class="text-center mb-20">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-400 text-xs font-bold uppercase tracking-widest mb-6 hover:bg-purple-500/20 transition cursor-default">
-                    💼 Nossos Cases
+                    💼 {{ __('messages.public.portfolio_badge') }}
                 </div>
                 <h1 class="text-4xl md:text-6xl font-black text-white tracking-tight mb-6">
-                    Resultados que <br>
-                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">falam por si.</span>
+                    {{ __('messages.public.portfolio_title') }}<br>
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">{{ __('messages.public.portfolio_title_highlight') }}</span>
                 </h1>
                 <p class="text-lg text-slate-400 max-w-2xl mx-auto">
-                    Não vendemos apenas suporte, entregamos transformação. Veja como ajudámos outras empresas a voar.
+                    {{ __('messages.public.portfolio_description') }}
                 </p>
             </div>
 
@@ -181,18 +181,18 @@
                 <div class="text-center">
                     
                     @auth
-                        <h2 class="text-2xl font-bold text-white mb-3">Expanda a sua infraestrutura conosco.</h2>
+                        <h2 class="text-2xl font-bold text-white mb-3">{{ __('messages.public.portfolio_expand_title') }}</h2>
                         <p class="text-slate-400 mb-8 max-w-xl mx-auto">
-                            Identificou uma oportunidade de melhoria para o seu negócio? Abra um chamado específico para projetos e receba atendimento prioritário.
+                            {{ __('messages.public.portfolio_expand_text') }}
                         </p>
                         
                         <a href="{{ route('client.tickets.create') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500 to-indigo-500 text-white font-bold hover:scale-105 transition shadow-[0_0_20px_-5px_rgba(168,85,247,0.5)]">
-                            Iniciar Novo Projeto
+                            {{ __('messages.public.start_project') }}
                         </a>
                     @else
-                        <h2 class="text-2xl font-bold text-white mb-6">Quer um resultado assim?</h2>
+                        <h2 class="text-2xl font-bold text-white mb-6">{{ __('messages.public.portfolio_question') }}</h2>
                         <a href="{{ route('contact') }}" class="inline-flex items-center gap-2 px-8 py-4 rounded-2xl bg-white text-slate-900 font-bold hover:bg-slate-200 transition shadow-[0_0_20px_-5px_rgba(255,255,255,0.3)]">
-                            Solicitar Orçamento
+                            {{ __('messages.public.request_quote') }}
                         </a>
                     @endauth
 
