@@ -10,6 +10,10 @@ return [
         'unauthorized' => 'Você não tem permissão para executar esta ação.',
         'invalid_action' => 'A ação solicitada é inválida.',
     ],
+    'auth' => [
+        'history' => 'Histórico completo de soluções.',
+        'realtime_notifications' => 'Notificações em tempo real.',
+    ],
     'navigation' => [
         'home' => 'Início',
         'my_tickets' => 'Meus Chamados',
