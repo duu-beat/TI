@@ -34,18 +34,18 @@
                     {{-- Botão Voltar --}}
                     <a href="{{ url('/') }}" class="inline-flex items-center gap-2 text-slate-400 hover:text-white mb-6 transition group">
                         <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
-                        <span class="text-sm font-medium">Voltar ao Início</span>
+                        <span class="text-sm font-medium">{{ __('messages.public.back_home') }}</span>
                     </a>
 
-                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">Jurídico</h3>
+                    <h3 class="text-xs font-bold text-slate-500 uppercase tracking-widest mb-4">{{ __('messages.public.legal_section') }}</h3>
                     <nav class="space-y-2">
                         <a href="{{ route('terms') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition {{ request()->routeIs('terms') ? 'bg-white/10 text-white border border-white/5 shadow-lg shadow-black/5' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
                             <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
-                            Termos de Uso
+                            {{ __('messages.public.terms_title') }}
                         </a>
                         <a href="{{ route('privacy') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition {{ request()->routeIs('privacy') ? 'bg-cyan-500/10 text-cyan-400 border border-cyan-500/20 shadow-lg shadow-cyan-500/5' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
                             <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
-                            Política de Privacidade
+                            {{ __('messages.public.privacy_title') }}
                         </a>
                         <a href="{{ route('sla') }}" class="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition {{ request()->routeIs('sla') ? 'bg-white/10 text-white border border-white/5 shadow-lg shadow-black/5' : 'text-slate-400 hover:bg-white/5 hover:text-white' }}">
                             <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -87,7 +87,7 @@
                      x-transition:enter-end="opacity-100 translate-y-0">
                     
                     <div class="mb-8 border-b border-white/10 pb-8 print:border-black/10">
-                        <h1 class="text-4xl font-bold text-white mb-2 print:text-black">Política de Privacidade</h1>
+                        <h1 class="text-4xl font-bold text-white mb-2 print:text-black">{{ __('messages.public.privacy_title') }}</h1>
                         <p class="text-slate-400 print:text-gray-600">Última atualização: {{ date('d/m/Y') }}</p>
                     </div>
 
