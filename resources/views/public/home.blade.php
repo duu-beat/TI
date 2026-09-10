@@ -10,22 +10,22 @@
             <div class="mx-auto max-w-4xl text-center">
                 <p class="inline-flex items-center gap-2 rounded-full border border-indigo-400/20 bg-indigo-500/10 px-4 py-2 text-[11px] font-bold uppercase tracking-[0.18em] text-indigo-200">
                     <span class="h-1.5 w-1.5 rounded-full bg-cyan-300 shadow-[0_0_10px_rgba(103,232,249,0.9)]"></span>
-                    Operação de TI em um só lugar
+                    {{ __('messages.public.home_badge') }}
                 </p>
                 <h1 id="home-hero-title" class="mt-7 text-4xl font-black tracking-tight text-white sm:text-5xl lg:text-7xl">
-                    TI que funciona.
-                    <span class="block bg-gradient-to-r from-indigo-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">Negócio que segue em frente.</span>
+                    {{ __('messages.public.home_title') }}
+                    <span class="block bg-gradient-to-r from-indigo-300 via-cyan-300 to-emerald-300 bg-clip-text text-transparent">{{ __('messages.public.home_title_highlight') }}</span>
                 </h1>
                 <p class="mx-auto mt-7 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-                    Organize chamados, acompanhe prazos, proteja acessos e mantenha seus ativos sob controle com uma experiência simples para quem solicita, atende e supervisiona.
+                    {{ __('messages.public.home_description') }}
                 </p>
                 <div class="mt-10 flex flex-col justify-center gap-3 sm:flex-row">
                     <a href="{{ route('register') }}" class="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-7 py-4 text-sm font-bold text-slate-950 transition hover:brightness-110 hover:shadow-[0_0_28px_rgba(34,211,238,0.25)] focus:outline-none focus:ring-2 focus:ring-cyan-200 focus:ring-offset-2 focus:ring-offset-slate-950">
-                        Criar conta
+                        {{ __('messages.public.create_account') }}
                         <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m9 5 7 7-7 7" /></svg>
                     </a>
                     <a href="{{ route('contact') }}" class="inline-flex items-center justify-center rounded-2xl border border-white/10 bg-white/[0.04] px-7 py-4 text-sm font-bold text-white transition hover:border-white/20 hover:bg-white/[0.08] focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:ring-offset-2 focus:ring-offset-slate-950">
-                        Falar com especialista
+                        {{ __('messages.public.talk_to_specialist') }}
                     </a>
                 </div>
             </div>
@@ -33,18 +33,18 @@
             <div class="mx-auto mt-14 grid max-w-5xl gap-4 sm:grid-cols-3">
                 <article class="rounded-2xl border border-white/10 bg-slate-900/55 p-5 text-left shadow-xl shadow-slate-950/15 backdrop-blur-sm">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-indigo-400/20 bg-indigo-500/10 text-indigo-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 8v4l3 3m6-3a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg></div>
-                    <h2 class="mt-4 text-sm font-bold text-white">Atendimento com contexto</h2>
-                    <p class="mt-2 text-sm leading-6 text-slate-400">Chamados, anexos, atualizações e histórico reunidos no mesmo fluxo.</p>
+                    <h2 class="mt-4 text-sm font-bold text-white">{{ __('messages.public.context_support') }}</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-400">{{ __('messages.public.context_support_text') }}</p>
                 </article>
                 <article class="rounded-2xl border border-white/10 bg-slate-900/55 p-5 text-left shadow-xl shadow-slate-950/15 backdrop-blur-sm">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-cyan-400/20 bg-cyan-500/10 text-cyan-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 15v2m-6 4h12a2 2 0 0 0 2-2v-6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v6h12Z" /></svg></div>
-                    <h2 class="mt-4 text-sm font-bold text-white">Segurança e governança</h2>
-                    <p class="mt-2 text-sm leading-6 text-slate-400">2FA, auditoria, SLA e tratamento controlado de incidentes críticos.</p>
+                    <h2 class="mt-4 text-sm font-bold text-white">{{ __('messages.public.security_governance') }}</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-400">{{ __('messages.public.security_governance_text') }}</p>
                 </article>
                 <article class="rounded-2xl border border-white/10 bg-slate-900/55 p-5 text-left shadow-xl shadow-slate-950/15 backdrop-blur-sm">
                     <div class="flex h-10 w-10 items-center justify-center rounded-xl border border-emerald-400/20 bg-emerald-500/10 text-emerald-200"><svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M4 7h16M7 4v6m10-6v6M6 12h12v7H6z" /></svg></div>
-                    <h2 class="mt-4 text-sm font-bold text-white">Ativos rastreáveis</h2>
-                    <p class="mt-2 text-sm leading-6 text-slate-400">Inventário, QR Code e termos digitais para cada movimentação importante.</p>
+                    <h2 class="mt-4 text-sm font-bold text-white">{{ __('messages.public.trackable_assets') }}</h2>
+                    <p class="mt-2 text-sm leading-6 text-slate-400">{{ __('messages.public.trackable_assets_text') }}</p>
                 </article>
             </div>
         </div>
