@@ -22,31 +22,31 @@
                              class="h-12 md:h-16 w-auto object-contain group-hover:scale-105 transition duration-300">
                         <div class="leading-tight text-left ml-2">
                             <div class="text-white font-bold tracking-tight text-2xl leading-none group-hover:text-cyan-400 transition">Suporte TI</div>
-                            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">Portal do Cliente</div>
+                            <div class="text-xs text-slate-400 font-medium uppercase tracking-wider mt-1">{{ __('auth.ui.client_portal') }}</div>
                         </div>
                     </a>
 
                     <h1 class="mt-8 text-3xl md:text-4xl font-extrabold tracking-tight text-white leading-tight">
-                        Bem-vindo de volta!
+                        {{ __('auth.ui.welcome_back') }}
                     </h1>
                     <p class="mt-4 text-lg text-slate-400 leading-relaxed">
-                        Acesse sua conta para abrir chamados, ver o histórico e falar com o suporte.
+                        {{ __('auth.ui.access_account') }}
                     </p>
 
                     <div class="mt-8 space-y-3">
                         <div class="flex items-center gap-3 text-sm text-slate-300">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400">🚀</div>
-                            <span>Acesso rápido ao suporte técnico.</span>
+                            <span>{{ __('auth.ui.quick_support') }}</span>
                         </div>
                         <div class="flex items-center gap-3 text-sm text-slate-300">
                             <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400">🔒</div>
-                            <span>Ambiente seguro e criptografado.</span>
+                            <span>{{ __('auth.ui.secure_environment') }}</span>
                         </div>
                     </div>
                 </div>
 
                 <div class="mt-12 text-xs font-medium text-slate-500 border-t border-white/5 pt-6">
-                    Se tiver problemas para entrar, contate o administrador.
+                    {{ __('auth.ui.contact_admin') }}
                 </div>
             </div>
 
@@ -54,10 +54,10 @@
             <div class="relative p-8 lg:p-12 flex flex-col justify-center bg-slate-900/40 z-10">
                 <div class="flex items-center justify-between mb-8">
                     <div>
-                        <h2 class="text-2xl font-bold text-white">Login</h2>
-                        <p class="text-sm text-slate-400 mt-1">Entre com suas credenciais.</p>
+                        <h2 class="text-2xl font-bold text-white">{{ __('auth.ui.login') }}</h2>
+                        <p class="text-sm text-slate-400 mt-1">{{ __('auth.ui.enter_credentials') }}</p>
                     </div>
-                    <a href="{{ route('home') }}" class="text-sm text-slate-400 hover:text-white transition underline">Voltar</a>
+                    <a href="{{ route('home') }}" class="text-sm text-slate-400 hover:text-white transition underline">{{ __('auth.ui.back') }}</a>
                 </div>
 
                 <x-validation-errors class="mb-4 text-red-200 bg-red-500/10 p-3 rounded-xl border border-red-500/20 text-sm" />
@@ -86,7 +86,7 @@
 
                 <div class="relative flex py-2 items-center mb-6">
                     <div class="flex-grow border-t border-white/10"></div>
-                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">Ou com e-mail</span>
+                    <span class="flex-shrink-0 mx-4 text-slate-500 text-xs uppercase tracking-widest">{{ __('auth.ui.or_email') }}</span>
                     <div class="flex-grow border-t border-white/10"></div>
                 </div>
 
@@ -95,7 +95,7 @@
                     @csrf
 
                     <div>
-                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">E-mail</label>
+                        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">{{ __('auth.ui.email') }}</label>
                         <div class="relative mt-1">
                             <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                                 <svg class="h-5 w-5 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -110,10 +110,10 @@
 
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">Senha</label>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-wider ml-1">{{ __('auth.ui.password') }}</label>
                             @if (Route::has('password.request'))
                                 <a class="text-xs text-cyan-400 hover:text-cyan-300 hover:underline transition" href="{{ route('password.request') }}">
-                                    Esqueceu a senha?
+                                    {{ __('auth.ui.forgot_password') }}
                                 </a>
                             @endif
                         </div>
@@ -136,7 +136,7 @@
                     <div class="block">
                         <label for="remember_me" class="flex items-center cursor-pointer group">
                             <input id="remember_me" type="checkbox" name="remember" class="rounded border-white/20 bg-slate-900 text-cyan-500 shadow-sm focus:ring-cyan-500/50 focus:ring-offset-0 transition cursor-pointer">
-                            <span class="ms-2 text-sm text-slate-400 group-hover:text-slate-300 transition">Lembrar de mim</span>
+                            <span class="ms-2 text-sm text-slate-400 group-hover:text-slate-300 transition">{{ __('auth.ui.remember_me') }}</span>
                         </label>
                     </div>
 
@@ -146,21 +146,21 @@
                             :class="{ 'opacity-75 cursor-not-allowed': processing }"
                             class="w-full rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-6 py-4 font-bold text-slate-950 text-lg hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-[1.02] active:scale-[0.98] transition-all duration-300 flex justify-center items-center gap-2">
                         
-                        <span x-show="!processing">Entrar na Conta</span>
+                        <span x-show="!processing">{{ __('auth.ui.sign_in') }}</span>
                         
                         <span x-show="processing" style="display: none;" class="flex items-center gap-2">
                             <svg class="animate-spin h-5 w-5 text-slate-950" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                                 <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                             </svg>
-                            Entrando...
+                            {{ __('auth.ui.signing_in') }}
                         </span>
                     </button>
                 </form>
 
                 <div class="mt-8 text-center text-sm text-slate-400">
-                    Ainda não tem conta? 
-                    <a href="{{ route('register') }}" class="text-white font-semibold hover:text-cyan-400 transition">Criar agora</a>
+                    {{ __('auth.ui.no_account') }}
+                    <a href="{{ route('register') }}" class="text-white font-semibold hover:text-cyan-400 transition">{{ __('auth.ui.create_now') }}</a>
                 </div>
             </div>
         </div>
