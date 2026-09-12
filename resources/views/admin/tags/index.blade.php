@@ -8,7 +8,7 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path>
                         </svg>
                     </div>
-                    {{ __('Gerenciar Tags') }}
+                    {{ __('messages.navigation.tags.manage') }}
                 </h2>
             </div>
             
@@ -17,7 +17,7 @@
                 <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                 </svg>
-                <span>Nova Tag</span>
+                <span>{{ __('messages.navigation.tags.new') }}</span>
             </button>
         </div>
     </x-slot>
@@ -80,12 +80,12 @@
                             <h3 class="text-lg font-bold text-white tracking-wide">{{ $tag->name }}</h3>
                         </div>
                         <span class="bg-slate-950/50 border border-white/5 text-slate-400 text-[10px] font-mono px-2 py-1 rounded-lg">
-                            {{ $tag->tickets_count }} tickets
+                            {{ $tag->tickets_count }} {{ __('messages.navigation.ticket_plural') }}
                         </span>
                     </div>
 
                     <p class="text-sm text-slate-400 mb-6 min-h-[40px] line-clamp-2">
-                        {{ $tag->description ?? 'Sem descrição definida.' }}
+                        {{ $tag->description ?? __('messages.navigation.tags.no_description') }}
                     </p>
 
                     <div class="flex items-center gap-2 relative z-10">
@@ -98,14 +98,14 @@
                                     showEditModal = true;
                                 " 
                                 class="flex-1 bg-slate-800 hover:bg-indigo-600 border border-white/5 hover:border-indigo-500/50 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-lg transition-all duration-200">
-                            Editar
+                            {{ __('messages.navigation.tags.edit') }}
                         </button>
                         
                         <form action="{{ route('admin.tags.destroy', $tag) }}" method="POST" 
-                              onsubmit="return confirm('Tem certeza que deseja excluir esta tag?')" class="flex-1">
+                              onsubmit="return confirm('{{ __('messages.navigation.tags.confirm_delete') }}')" class="flex-1">
                             @csrf @method('DELETE')
                             <button type="submit" class="w-full bg-slate-800 hover:bg-red-600 border border-white/5 hover:border-red-500/50 text-slate-300 hover:text-white text-xs font-bold uppercase tracking-wider px-3 py-2.5 rounded-lg transition-all duration-200">
-                                Excluir
+                                {{ __('messages.navigation.tags.delete') }}
                             </button>
                         </form>
                     </div>
@@ -116,10 +116,10 @@
                         <div class="h-16 w-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
                             <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg>
                         </div>
-                        <h3 class="text-white font-medium mb-1">Nenhuma tag encontrada</h3>
-                        <p class="text-slate-500 text-sm mb-6">Crie tags para organizar os chamados por categoria ou prioridade.</p>
+                        <h3 class="text-white font-medium mb-1">{{ __('messages.navigation.tags.empty_title') }}</h3>
+                        <p class="text-slate-500 text-sm mb-6">{{ __('messages.navigation.tags.empty_text') }}</p>
                         <button @click="showCreateModal = true" class="bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/30 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition">
-                            Criar Primeira Tag
+                            {{ __('messages.navigation.tags.create_first') }}
                         </button>
                     </div>
                 </div>
@@ -142,19 +142,19 @@
                 <div class="h-1 w-full bg-indigo-500"></div>
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-white">Nova Tag</h3>
+                        <h3 class="text-xl font-bold text-white">{{ __('messages.navigation.tags.new') }}</h3>
                         <button @click="showCreateModal = false" class="text-slate-400 hover:text-white transition">✕</button>
                     </div>
 
                     <form action="{{ route('admin.tags.store') }}" method="POST" class="space-y-5">
                         @csrf
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nome da Tag</label>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ __('messages.navigation.tags.name') }}</label>
                             <input type="text" name="name" required class="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition outline-none">
                         </div>
 
                         <div x-data="{ color: '#3B82F6' }">
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Cor de Identificação</label>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ __('messages.navigation.tags.color') }}</label>
                             <div class="flex gap-3">
                                 <div class="relative w-12 h-10 rounded-xl overflow-hidden shadow-inner border border-white/10">
                                     <input type="color" name="color" x-model="color" class="absolute -top-2 -left-2 w-16 h-16 cursor-pointer p-0 border-0">
@@ -164,13 +164,13 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Descrição</label>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ __('messages.navigation.tags.description') }}</label>
                             <textarea name="description" rows="3" class="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition outline-none resize-none"></textarea>
                         </div>
 
                         <div class="flex gap-3 pt-2">
-                            <button type="button" @click="showCreateModal = false" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/5 text-slate-300 py-2.5 rounded-xl font-bold transition">Cancelar</button>
-                            <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/30 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition">Criar Tag</button>
+                            <button type="button" @click="showCreateModal = false" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/5 text-slate-300 py-2.5 rounded-xl font-bold transition">{{ __('messages.navigation.tags.cancel') }}</button>
+                            <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/30 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition">{{ __('messages.navigation.tags.create') }}</button>
                         </div>
                     </form>
                 </div>
@@ -186,7 +186,7 @@
                 <div class="h-1 w-full transition-colors duration-300" :style="'background-color: ' + editForm.color"></div>
                 <div class="p-6">
                     <div class="flex items-center justify-between mb-6">
-                        <h3 class="text-xl font-bold text-white">Editar Tag</h3>
+                        <h3 class="text-xl font-bold text-white">{{ __('messages.navigation.tags.edit') }}</h3>
                         <button @click="showEditModal = false" class="text-slate-400 hover:text-white transition">✕</button>
                     </div>
 
@@ -194,12 +194,12 @@
                         @csrf @method('PUT')
                         
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Nome da Tag</label>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ __('messages.navigation.tags.name') }}</label>
                             <input type="text" name="name" x-model="editForm.name" required class="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition outline-none">
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Cor de Identificação</label>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ __('messages.navigation.tags.color') }}</label>
                             <div class="flex gap-3">
                                 <div class="relative w-12 h-10 rounded-xl overflow-hidden shadow-inner border border-white/10">
                                     <input type="color" name="color" x-model="editForm.color" class="absolute -top-2 -left-2 w-16 h-16 cursor-pointer p-0 border-0">
@@ -209,13 +209,13 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">Descrição</label>
+                            <label class="block text-xs font-bold text-slate-400 uppercase mb-1">{{ __('messages.navigation.tags.description') }}</label>
                             <textarea name="description" x-model="editForm.description" rows="3" class="w-full bg-slate-950/50 border border-white/10 rounded-xl px-4 py-2.5 text-white focus:ring-2 focus:ring-indigo-500/50 focus:border-indigo-500 transition outline-none resize-none"></textarea>
                         </div>
 
                         <div class="flex gap-3 pt-2">
-                            <button type="button" @click="showEditModal = false" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/5 text-slate-300 py-2.5 rounded-xl font-bold transition">Cancelar</button>
-                            <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/30 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition">Salvar</button>
+                            <button type="button" @click="showEditModal = false" class="flex-1 bg-slate-800 hover:bg-slate-700 border border-white/5 text-slate-300 py-2.5 rounded-xl font-bold transition">{{ __('messages.navigation.tags.cancel') }}</button>
+                            <button type="submit" class="flex-1 bg-indigo-600 hover:bg-indigo-500 border border-indigo-400/30 text-white py-2.5 rounded-xl font-bold shadow-lg shadow-indigo-500/20 transition">{{ __('messages.navigation.tags.save') }}</button>
                         </div>
                     </form>
                 </div>
