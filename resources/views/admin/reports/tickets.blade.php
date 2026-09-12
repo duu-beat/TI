@@ -69,8 +69,8 @@
     </style>
 </head>
 <body class="p-8 antialiased">
-    <div id="report-skeleton" class="animate-pulse space-y-8" role="status" aria-live="polite" aria-label="Carregando relatório de chamados">
-        <span class="sr-only">Carregando relatório de chamados.</span>
+    <div id="report-skeleton" class="animate-pulse space-y-8" role="status" aria-live="polite" aria-label="{{ __('messages.navigation.reports.loading') }}">
+        <span class="sr-only">{{ __('messages.navigation.reports.loading') }}</span>
         <div class="ml-auto h-11 w-44 rounded-xl bg-slate-800"></div>
         <div class="flex items-end justify-between border-b border-white/10 pb-8"><div class="space-y-4"><div class="h-10 w-96 max-w-full rounded-xl bg-slate-800"></div><div class="h-4 w-72 max-w-full rounded-lg bg-slate-800/80"></div></div><div class="hidden space-y-3 text-right sm:block"><div class="ml-auto h-3 w-24 rounded bg-slate-800"></div><div class="ml-auto h-5 w-36 rounded bg-slate-800/80"></div></div></div>
         <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">@for($i = 0; $i < 4; $i++)<div class="h-32 rounded-3xl border border-white/5 bg-slate-900/60"></div>@endfor</div>
@@ -82,7 +82,7 @@
     <div class="no-print mb-8 flex justify-end">
         <button onclick="window.print()" class="flex items-center gap-2 px-6 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl font-bold shadow-lg shadow-indigo-900/20 transition-all active:scale-95">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 00-2 2h2m2 4h10a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"></path></svg>
-            Imprimir Relatório
+            {{ __('messages.navigation.reports.print') }}
         </button>
     </div>
 
@@ -93,12 +93,12 @@
                 <div class="p-2.5 rounded-xl bg-indigo-500/20 text-indigo-400 border border-indigo-500/30">
                     <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                 </div>
-                <h1 class="text-3xl font-extrabold tracking-tight text-white">Relatório Geral de Suporte TI</h1>
+                <h1 class="text-3xl font-extrabold tracking-tight text-white">{{ __('messages.navigation.reports.title') }}</h1>
             </div>
-            <p class="text-slate-400 font-medium">Análise detalhada de performance e volumetria de chamados.</p>
+            <p class="text-slate-400 font-medium">{{ __('messages.navigation.reports.description') }}</p>
         </div>
         <div class="text-right">
-            <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">Data de Emissão</p>
+            <p class="text-xs font-bold uppercase tracking-widest text-slate-500 mb-1">{{ __('messages.navigation.reports.issued_at') }}</p>
             <p class="text-lg font-mono text-indigo-300">{{ now()->format('d/m/Y H:i') }}</p>
         </div>
     </header>
@@ -106,19 +106,19 @@
     {{-- Cards de Estatísticas --}}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
         <div class="card bg-slate-900/50 border border-white/10 p-6 rounded-3xl shadow-xl">
-            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Total de Chamados</p>
+            <p class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{{ __('messages.navigation.reports.total_tickets') }}</p>
             <p class="text-3xl font-black text-white">{{ $tickets->count() }}</p>
         </div>
         <div class="card bg-slate-900/50 border border-white/10 p-6 rounded-3xl shadow-xl">
-            <p class="text-xs font-bold text-rose-400/80 uppercase tracking-wider mb-2">Vencidos (SLA)</p>
+            <p class="text-xs font-bold text-rose-400/80 uppercase tracking-wider mb-2">{{ __('messages.navigation.reports.overdue') }}</p>
             <p class="text-3xl font-black text-rose-500">{{ $stats['overdue'] ?? 0 }}</p>
         </div>
         <div class="card bg-slate-900/50 border border-white/10 p-6 rounded-3xl shadow-xl">
-            <p class="text-xs font-bold text-amber-400/80 uppercase tracking-wider mb-2">Vencem Hoje</p>
+            <p class="text-xs font-bold text-amber-400/80 uppercase tracking-wider mb-2">{{ __('messages.navigation.reports.due_today') }}</p>
             <p class="text-3xl font-black text-amber-500">{{ $stats['due_today'] ?? 0 }}</p>
         </div>
         <div class="card bg-slate-900/50 border border-white/10 p-6 rounded-3xl shadow-xl">
-            <p class="text-xs font-bold text-emerald-400/80 uppercase tracking-wider mb-2">Dentro do SLA</p>
+            <p class="text-xs font-bold text-emerald-400/80 uppercase tracking-wider mb-2">{{ __('messages.navigation.reports.within_sla') }}</p>
             <p class="text-3xl font-black text-emerald-500">{{ $stats['within_sla_percent'] ?? 0 }}%</p>
         </div>
     </div>
@@ -129,11 +129,11 @@
             <thead>
                 <tr class="bg-white/5 border-b border-white/10 text-[10px] uppercase tracking-[0.2em] text-slate-500 font-black">
                     <th class="px-6 py-5">ID</th>
-                    <th class="px-6 py-5">Data/Hora</th>
-                    <th class="px-6 py-5">Cliente</th>
-                    <th class="px-6 py-5">Assunto / Categoria</th>
-                    <th class="px-6 py-5">Status</th>
-                    <th class="px-6 py-5">SLA</th>
+                    <th class="px-6 py-5">{{ __('messages.navigation.reports.date_time') }}</th>
+                    <th class="px-6 py-5">{{ __('messages.navigation.reports.client') }}</th>
+                    <th class="px-6 py-5">{{ __('messages.navigation.reports.subject_category') }}</th>
+                    <th class="px-6 py-5">{{ __('messages.navigation.reports.status') }}</th>
+                    <th class="px-6 py-5">{{ __('messages.navigation.reports.sla') }}</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-white/5 text-sm">
@@ -151,7 +151,7 @@
                     <td class="px-6 py-4">
                         <div class="text-slate-200 font-medium truncate max-w-xs mb-1">{{ $ticket->subject }}</div>
                         <span class="inline-flex px-2 py-0.5 rounded text-[9px] font-black uppercase tracking-widest bg-slate-800 text-slate-400 border border-white/5">
-                            {{ $ticket->category ?? 'Geral' }}
+                            {{ $ticket->category ?? __('messages.navigation.reports.general') }}
                         </span>
                     </td>
                     <td class="px-6 py-4">
