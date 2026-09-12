@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Relatório de Chamados</title>
+    <title>{{ __('messages.navigation.reports.report_title') }}</title>
     <style>
         * {
             margin: 0;
@@ -95,12 +95,12 @@
 </head>
 <body>
     <div class="header">
-        <h1>📊 Relatório de Chamados</h1>
-        <p>Gerado em: {{ $generatedAt }}</p>
+        <h1>📊 {{ __('messages.navigation.reports.report_title') }}</h1>
+        <p>{{ __('messages.navigation.reports.generated_at') }} {{ $generatedAt }}</p>
         @if(isset($filters['date_from']) || isset($filters['date_to']))
             <p>
-                Período: 
-                {{ $filters['date_from'] ?? 'Início' }} até {{ $filters['date_to'] ?? 'Hoje' }}
+                {{ __('messages.navigation.reports.period') }}
+                {{ $filters['date_from'] ?? __('messages.navigation.reports.start') }} até {{ $filters['date_to'] ?? __('messages.navigation.reports.today') }}
             </p>
         @endif
     </div>
@@ -108,19 +108,19 @@
     <div class="stats">
         <div class="stat-box">
             <h3>{{ $stats['total'] }}</h3>
-            <p>Total de Chamados</p>
+            <p>{{ __('messages.navigation.reports.total_tickets') }}</p>
         </div>
         <div class="stat-box">
             <h3>{{ number_format($stats['avg_response_time'], 0) }}min</h3>
-            <p>Tempo Médio de Resposta</p>
+            <p>{{ __('messages.navigation.reports.avg_response') }}</p>
         </div>
         <div class="stat-box">
             <h3>{{ number_format($stats['avg_resolution_time'], 0) }}min</h3>
-            <p>Tempo Médio de Resolução</p>
+            <p>{{ __('messages.navigation.reports.avg_resolution') }}</p>
         </div>
         <div class="stat-box">
             <h3>{{ number_format($stats['avg_rating'], 1) }}/5</h3>
-            <p>Avaliação Média</p>
+            <p>{{ __('messages.navigation.reports.avg_rating') }}</p>
         </div>
     </div>
 
@@ -128,11 +128,11 @@
         <thead>
             <tr>
                 <th>ID</th>
-                <th>Cliente</th>
+                <th>{{ __('messages.navigation.reports.client') }}</th>
                 <th>Assunto</th>
                 <th>Status</th>
                 <th>Prioridade</th>
-                <th>Criado em</th>
+                <th>{{ __('messages.navigation.reports.created_at') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -155,7 +155,7 @@
 
     <div class="footer">
         <p>Suporte TI - Sistema de Gestão de Chamados</p>
-        <p>Este relatório foi gerado automaticamente pelo sistema</p>
+        <p>{{ __('messages.navigation.reports.automatically_generated') }}</p>
     </div>
 </body>
 </html>
