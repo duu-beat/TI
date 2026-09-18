@@ -134,7 +134,7 @@
                                                     {{ $ticket->subject }}
                                                 </div>
                                                 <span class="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide bg-slate-800 text-slate-400 border border-white/5">
-                                                    {{ $ticket->category ?? 'Geral' }}
+                                                    {{ $ticket->category ?? __('tickets.ui.general') }}
                                                 </span>
                                             </div>
                                         </td>
@@ -147,12 +147,12 @@
                                                       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-400 opacity-75"></span>
                                                       <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
                                                     </span>
-                                                    ALTA
+                                                    {{ __('tickets.ui.high') }}
                                                 </div>
                                             @elseif($ticket->priority === \App\Enums\TicketPriority::MEDIUM)
-                                                <span class="text-yellow-400 font-medium text-xs">Média</span>
+                                                <span class="text-yellow-400 font-medium text-xs">{{ __('tickets.ui.medium') }}</span>
                                             @else
-                                                <span class="text-emerald-400 font-medium text-xs">Normal</span>
+                                                <span class="text-emerald-400 font-medium text-xs">{{ __('tickets.ui.normal') }}</span>
                                             @endif
                                         </td>
 
@@ -182,7 +182,7 @@
                                         <td class="px-6 py-4 text-right">
                                             <a href="{{ route('admin.tickets.show', $ticket) }}" 
                                                class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-indigo-500/10 hover:bg-indigo-500 text-indigo-400 hover:text-white border border-indigo-500/20 transition-all text-xs font-bold uppercase tracking-wide">
-                                                <span>Gerir</span>
+                                                <span>{{ __('tickets.ui.manage_action') }}</span>
                                                 <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
                                             </a>
                                         </td>
@@ -194,8 +194,8 @@
                                                 <div class="h-16 w-16 bg-slate-800/50 rounded-full flex items-center justify-center mb-4 border border-white/5">
                                                     <svg class="w-8 h-8 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path></svg>
                                                 </div>
-                                                <h3 class="text-white font-medium mb-1">Nenhum chamado encontrado</h3>
-                                                <p class="text-slate-500 text-sm">Tente ajustar os filtros de busca.</p>
+                                                <h3 class="text-white font-medium mb-1">{{ __('tickets.ui.empty_admin_title') }}</h3>
+                                                <p class="text-slate-500 text-sm">{{ __('tickets.ui.empty_admin_description') }}</p>
                                             </div>
                                         </td>
                                     </tr>

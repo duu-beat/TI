@@ -8,16 +8,16 @@
                 <div class="p-2 bg-indigo-600/20 rounded-lg border border-indigo-500/30">
                     <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 00-2-2h-2a2 2 0 00-2 2"></path></svg>
                 </div>
-                Quadro de Gestão
+                {{ __('tickets.ui.kanban') }}
             </h2>
             
             {{-- Controles --}}
             <div class="flex items-center gap-3">
                 <div class="h-6 w-px bg-white/10 mx-1"></div>
-                <a href="{{ route('admin.tickets.index') }}" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition border border-white/5" title="Ver Lista">
+                <a href="{{ route('admin.tickets.index') }}" class="p-2 bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-white rounded-lg transition border border-white/5" title="{{ __('tickets.ui.view_list') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
                 </a>
-                <button disabled class="p-2 bg-indigo-600 text-white rounded-lg shadow-lg shadow-indigo-500/20 cursor-default" title="Kanban Ativo">
+                <button disabled class="p-2 bg-indigo-600 text-white rounded-lg shadow-lg shadow-indigo-500/20 cursor-default" title="{{ __('tickets.ui.active_kanban') }}">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
                 </button>
             </div>
@@ -111,7 +111,7 @@
                                          
                                          <a href="{{ route('admin.tickets.show', $ticket) }}" 
                                             class="p-2 bg-white/10 hover:bg-white/20 text-white rounded-lg backdrop-blur-md transition transform hover:scale-110 border border-white/10" 
-                                            title="Abrir Chamado">
+                                            title="{{ __('tickets.ui.open_ticket') }}">
                                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path></svg>
                                          </a>
 
@@ -121,7 +121,7 @@
                                                 <input type="hidden" name="assigned_to" value="{{ auth()->id() }}">
                                                 <button type="submit" 
                                                         class="p-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg shadow-lg shadow-indigo-500/30 transition transform hover:scale-110 border border-white/10"
-                                                        title="Atribuir para mim">
+                                                        title="{{ __('tickets.ui.assign_to_me') }}">
                                                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path></svg>
                                                 </button>
                                              </form>
@@ -169,7 +169,7 @@
                                 </div>
                             @empty
                                 <div class="empty-placeholder text-center py-10 opacity-40 border-2 border-dashed border-white/5 rounded-xl">
-                                    <p class="text-xs text-slate-400">Sem chamados</p>
+                                    <p class="text-xs text-slate-400">{{ __('tickets.ui.without_tickets') }}</p>
                                 </div>
                             @endforelse
                         </div>
