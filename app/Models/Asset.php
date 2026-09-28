@@ -103,11 +103,11 @@ class Asset extends Model
     public function getStatusLabel(): string
     {
         return match($this->status) {
-            'active' => 'Ativo',
-            'maintenance' => 'Em Manutenção',
-            'retired' => 'Aposentado',
-            'lost' => 'Extraviado',
-            default => 'Desconhecido',
+            'active' => __('assets.statuses.active'),
+            'maintenance' => __('assets.statuses.maintenance'),
+            'retired' => __('assets.statuses.retired'),
+            'lost' => __('assets.statuses.lost'),
+            default => __('assets.ui.unknown'),
         };
     }
 }

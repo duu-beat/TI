@@ -38,7 +38,7 @@ class AssetResponsibilityTermController extends Controller
             : $validated['recipient_id'];
 
         if (! $recipientId) {
-            return back()->withInput()->with('error', 'Selecione o responsável que receberá o ativo antes de emitir o termo.');
+            return back()->withInput()->with('error', __('assets.ui.recipient_required'));
         }
 
         $recipient = User::query()
@@ -48,7 +48,7 @@ class AssetResponsibilityTermController extends Controller
         $term = $terms->issue($asset, $recipient, $request->user(), $validated['type']);
 
         return redirect()->route('admin.assets.terms.sign', [$asset, $term])
-            ->with('success', 'Termo emitido. Solicite a assinatura do responsável no dispositivo.');
+            ->with('success', __('assets.ui.term_issued'));
     }
 
     public function sign(Asset $asset, AssetResponsibilityTerm $term): View
@@ -56,7 +56,7 @@ class AssetResponsibilityTermController extends Controller
         $this->ensureTermBelongsToAsset($asset, $term);
         $term->load('asset', 'recipient', 'issuer');
 
-        abort_unless($term->isPending(), 409, 'Este termo não está disponível para assinatura.');
+        abort_unless($term->isPending(), 409, __('assets.ui.term_unavailable'));
 
         return view('admin.assets.terms.sign', compact('asset', 'term'));
     }
@@ -68,7 +68,7 @@ class AssetResponsibilityTermController extends Controller
         $request->validate([
             'signature' => ['required', 'string', 'max:2000000'],
         ], [
-            'signature.required' => 'A assinatura é obrigatória para concluir o termo.',
+            'signature.required' => __('assets.ui.signature_required'),
         ]);
 
         try {
@@ -82,7 +82,7 @@ class AssetResponsibilityTermController extends Controller
         }
 
         return redirect()->route('admin.assets.show', $asset)
-            ->with('success', 'Termo assinado e movimentação do ativo registrada com sucesso.');
+            ->with('success', __('assets.ui.term_signed'));
     }
 
     public function download(Asset $asset, AssetResponsibilityTerm $term, AssetResponsibilityTermPdfService $pdfs)
@@ -107,7 +107,7 @@ class AssetResponsibilityTermController extends Controller
             $term->update(['status' => AssetResponsibilityTerm::STATUS_CANCELLED]);
         }
 
-        return redirect()->route('admin.assets.show', $asset)->with('info', 'Termo pendente cancelado.');
+        return redirect()->route('admin.assets.show', $asset)->with('info', __('assets.ui.term_cancelled'));
     }
 
     private function ensureTermBelongsToAsset(Asset $asset, AssetResponsibilityTerm $term): void

@@ -66,6 +66,6 @@ class AssetResponsibilityTerm extends Model
 
     public function typeLabel(): string
     {
-        return $this->type === self::TYPE_RETURN ? 'Devolução de ativo' : 'Entrega de ativo';
+        return $this->type === self::TYPE_RETURN ? __('assets.ui.return_asset') : __('assets.ui.delivery_asset');
     }
 }

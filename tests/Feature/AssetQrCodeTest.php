@@ -30,7 +30,7 @@ class AssetQrCodeTest extends TestCase
         $response = $this->actingAs($admin)->get(route('admin.assets.scan', $asset->qr_token));
 
         $response->assertOk();
-        $response->assertSee('Ficha do Ativo');
+        $response->assertSee(__('assets.ui.asset_sheet'));
         $response->assertSee('Notebook QR de Teste');
         $response->assertSee(route('admin.assets.qr-code', $asset), false);
         $response->assertSee(route('admin.assets.qr-label', $asset), false);

@@ -7,9 +7,9 @@
             </a>
             <div>
                 <h2 class="font-bold text-xl text-white leading-tight">
-                    📦 Novo Equipamento
+                    📦 {{ __('assets.ui.new_asset') }}
                 </h2>
-                <p class="text-xs text-slate-500 uppercase tracking-widest mt-0.5">Adicionar ativo ao inventário de TI</p>
+                <p class="text-xs text-slate-500 uppercase tracking-widest mt-0.5">{{ __('assets.ui.add_to_inventory') }}</p>
             </div>
         </div>
     </x-slot>
@@ -26,23 +26,23 @@
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
                         {{-- Nome --}}
                         <div class="md:col-span-2">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nome do Equipamento</label>
-                            <input type="text" name="name" required placeholder="Ex: Notebook Dell Latitude 3420"
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.equipment_name') }}</label>
+                            <input type="text" name="name" required placeholder="{{ __('assets.ui.equipment_name_placeholder') }}"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder-slate-700">
                             <x-input-error for="name" class="mt-2" />
                         </div>
 
                         {{-- Patrimônio --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Nº Patrimônio (Tag)</label>
-                            <input type="text" name="tag" required placeholder="Ex: TI-001"
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.asset_tag') }}</label>
+                            <input type="text" name="tag" required placeholder="{{ __('assets.ui.asset_tag_placeholder') }}"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder-slate-700">
                             <x-input-error for="tag" class="mt-2" />
                         </div>
 
                         {{-- Tipo --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Tipo de Ativo</label>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.asset_type') }}</label>
                             <select name="type" required 
                                     class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
                                 <option value="Laptop" class="bg-slate-900">Laptop</option>
@@ -56,31 +56,31 @@
 
                         {{-- Marca --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Marca</label>
-                            <input type="text" name="brand" placeholder="Ex: Dell, HP, Apple"
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.brand') }}</label>
+                            <input type="text" name="brand" placeholder="{{ __('assets.ui.brand_placeholder') }}"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder-slate-700">
                         </div>
 
                         {{-- Modelo --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Modelo</label>
-                            <input type="text" name="model" placeholder="Ex: Latitude 3420"
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.model') }}</label>
+                            <input type="text" name="model" placeholder="{{ __('assets.ui.model_placeholder') }}"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder-slate-700">
                         </div>
 
                         {{-- Serial --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Número de Série</label>
-                            <input type="text" name="serial_number" placeholder="S/N"
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.serial_number') }}</label>
+                            <input type="text" name="serial_number" placeholder="{{ __('assets.ui.serial_placeholder') }}"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder-slate-700">
                         </div>
 
-                        {{-- Usuário Responsável --}}
+                        {{-- {{ __('assets.ui.responsible_user') }} --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Usuário Responsável</label>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.responsible_user') }}</label>
                             <select name="user_id" 
                                     class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
-                                <option value="" class="bg-slate-900">-- Sem Vínculo (Em Estoque) --</option>
+                                <option value="" class="bg-slate-900">{{ __('assets.ui.without_assignment') }}</option>
                                 @foreach($users as $user)
                                     <option value="{{ $user->id }}" class="bg-slate-900">{{ $user->name }} ({{ $user->email }})</option>
                                 @endforeach
@@ -89,33 +89,33 @@
 
                         {{-- Status --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Status Inicial</label>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.initial_status') }}</label>
                             <select name="status" required 
                                     class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
-                                <option value="active" class="bg-slate-900">Ativo</option>
-                                <option value="maintenance" class="bg-slate-900">Em Manutenção</option>
-                                <option value="retired" class="bg-slate-900">Aposentado</option>
-                                <option value="lost" class="bg-slate-900">Extraviado</option>
+                                <option value="active" class="bg-slate-900">{{ __('assets.statuses.active') }}</option>
+                                <option value="maintenance" class="bg-slate-900">{{ __('assets.statuses.maintenance') }}</option>
+                                <option value="retired" class="bg-slate-900">{{ __('assets.statuses.retired') }}</option>
+                                <option value="lost" class="bg-slate-900">{{ __('assets.statuses.lost') }}</option>
                             </select>
                         </div>
 
                         {{-- Datas --}}
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Data de Compra</label>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.purchase_date') }}</label>
                             <input type="date" name="purchase_date"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
                         </div>
 
                         <div>
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Expiração da Garantia</label>
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.warranty_expiration') }}</label>
                             <input type="date" name="warranty_expiration"
                                    class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition">
                         </div>
 
                         {{-- Notas --}}
                         <div class="md:col-span-2">
-                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">Observações Técnicas</label>
-                            <textarea name="notes" rows="4" placeholder="Detalhes técnicos, histórico de manutenção, etc."
+                            <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.technical_notes') }}</label>
+                            <textarea name="notes" rows="4" placeholder="{{ __('assets.ui.technical_notes_placeholder') }}"
                                       class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition placeholder-slate-700"></textarea>
                         </div>
                     </div>
@@ -123,11 +123,11 @@
                     <div class="flex flex-col sm:flex-row justify-end gap-4 pt-8 border-t border-white/5">
                         <a href="{{ route('admin.assets.index') }}" 
                            class="px-8 py-3 bg-slate-800 hover:bg-slate-700 text-white text-sm font-bold rounded-2xl transition text-center">
-                            Cancelar
+                            {{ __('assets.ui.cancel') }}
                         </a>
                         <button type="submit" 
                                 class="px-10 py-3 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-bold rounded-2xl transition shadow-lg shadow-indigo-500/20 hover:shadow-indigo-500/40 transform hover:-translate-y-0.5 active:translate-y-0">
-                            Salvar Equipamento
+                            {{ __('assets.ui.save') }}
                         </button>
                     </div>
                 </form>

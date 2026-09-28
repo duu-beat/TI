@@ -107,8 +107,8 @@
                                             </div>
                                         </td>
                                         <td class="px-6 py-4">
-                                            <div class="text-slate-300 font-mono text-xs">Pat: <span class="text-indigo-400 font-bold">#{{ $asset->tag }}</span></div>
-                                            <div class="text-slate-500 text-[10px] mt-0.5">S/N: {{ $asset->serial_number ?? 'N/A' }}</div>
+                                            <div class="text-slate-300 font-mono text-xs">{{ __('assets.ui.tag') }}: <span class="text-indigo-400 font-bold">#{{ $asset->tag }}</span></div>
+                                            <div class="text-slate-500 text-[10px] mt-0.5">{{ __('assets.ui.serial_number_short') }}: {{ $asset->serial_number ?? __('assets.ui.not_available') }}</div>
                                         </td>
                                         <td class="px-6 py-4">
                                             @if($asset->user)
@@ -128,8 +128,8 @@
                                         <td class="px-6 py-4 text-right">
                                             <div class="flex items-center justify-end gap-2">
                                                 <a href="{{ route('admin.assets.show', $asset) }}"
-                                                   title="Abrir ficha e QR Code"
-                                                   aria-label="Abrir ficha e QR Code de {{ $asset->name }}"
+                                                   title="{{ __('assets.ui.open_qr') }}"
+                                                   aria-label="{{ __('assets.ui.open_qr_for', ['name' => $asset->name]) }}"
                                                    class="p-2 rounded-lg bg-slate-800 hover:bg-violet-600 text-slate-400 hover:text-white border border-white/5 transition-all">
                                                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5h4M5 5v4m14-4h-4m4 0v4M5 19h4m-4 0v-4m14 4h-4m4 0v-4M9 9h6v6H9z" /></svg>
                                                 </a>

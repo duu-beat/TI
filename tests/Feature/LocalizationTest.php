@@ -30,4 +30,13 @@ class LocalizationTest extends TestCase
         $this->assertSame('Salvar status', __('tickets.ui.save_status', [], 'pt_BR'));
         $this->assertSame('Quadro de Gestão', __('tickets.ui.kanban', [], 'pt_BR'));
     }
+
+    public function test_admin_asset_interface_translations_are_available(): void
+    {
+        $this->assertSame('Inventário de Ativos', __('assets.ui.inventory', [], 'pt_BR'));
+        $this->assertSame('Novo Equipamento', __('assets.ui.new_asset', [], 'pt_BR'));
+        $this->assertSame('QR Code do ativo :tag', __('assets.ui.qr_code_asset', ['tag' => ':tag'], 'pt_BR'));
+        $this->assertSame('Assinar termo de responsabilidade', __('assets.ui.sign_term', [], 'pt_BR'));
+        $this->assertSame('Entrega de ativo', __('assets.ui.delivery_asset', [], 'pt_BR'));
+    }
 }

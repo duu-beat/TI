@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Etiqueta QR · {{ $asset->tag }}</title>
+    <title>{{ __('assets.ui.qr_label_title', ['tag' => $asset->tag]) }}</title>
     <style>
         :root { color-scheme: light; }
         * { box-sizing: border-box; }
@@ -30,23 +30,23 @@
 </head>
 <body>
     <main>
-        <section class="label" aria-label="Etiqueta de inventário {{ $asset->tag }}">
+        <section class="label" aria-label="{{ __('assets.ui.inventory_label', ['tag' => $asset->tag]) }}">
             <div class="header">
-                <span class="brand">Suporte TI · Inventário</span>
+                <span class="brand">{{ __('assets.ui.inventory_brand') }}</span>
                 <span class="tag">#{{ $asset->tag }}</span>
             </div>
             <div class="content">
                 <div>
                     <p class="type">{{ $asset->type }}</p>
                     <h1 class="name">{{ $asset->name }}</h1>
-                    <p class="meta">{{ collect([$asset->brand, $asset->model])->filter()->join(' · ') ?: 'Modelo não informado' }}</p>
-                    <p class="meta">S/N: {{ $asset->serial_number ?: 'Não informado' }}</p>
+                    <p class="meta">{{ collect([$asset->brand, $asset->model])->filter()->join(' · ') ?: __('assets.ui.model_not_informed') }}</p>
+                    <p class="meta">S/N: {{ $asset->serial_number ?: __('assets.ui.not_informed') }}</p>
                 </div>
-                <img class="qr" src="{{ route('admin.assets.qr-code', $asset) }}" alt="QR Code do ativo {{ $asset->tag }}">
+                <img class="qr" src="{{ route('admin.assets.qr-code', $asset) }}" alt="{{ __('assets.ui.qr_code_asset', ['tag' => $asset->tag]) }}">
             </div>
-            <p class="footer">Escaneie com uma sessão autorizada para abrir a ficha interna do ativo.</p>
+            <p class="footer">{{ __('assets.ui.authorized_scan_hint') }}</p>
         </section>
-        <div class="actions"><button type="button" onclick="window.print()">Imprimir etiqueta</button></div>
+        <div class="actions"><button type="button" onclick="window.print()">{{ __('assets.ui.print_label') }}</button></div>
     </main>
 </body>
 </html>

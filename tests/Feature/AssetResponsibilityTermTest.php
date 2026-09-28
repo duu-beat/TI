@@ -52,7 +52,7 @@ class AssetResponsibilityTermTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.assets.terms.sign', [$asset, $term]))
             ->assertOk()
-            ->assertSee('Assinatura do responsável')
+            ->assertSee(__('assets.ui.responsible_signature'))
             ->assertSee('ResizeObserver', false)
             ->assertSee('setTransform(ratio', false)
             ->assertSee("'pointerdown'", false)
@@ -105,7 +105,7 @@ class AssetResponsibilityTermTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.assets.show', $asset))
             ->assertOk()
-            ->assertSee('Termos de entrega e devolução')
+            ->assertSee(__('assets.ui.delivery_return_terms'))
             ->assertSee('Assinado')
             ->assertSee(route('admin.assets.terms.download', [$asset, $term]), false);
     }

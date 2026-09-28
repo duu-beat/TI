@@ -26,52 +26,52 @@
 </head>
 <body>
     <header class="header">
-        <div class="eyebrow">Inventário e Suporte TI</div>
-        <h1>Termo de Responsabilidade — {{ $term->typeLabel() }}</h1>
-        <p class="subtitle">Documento digital de movimentação do ativo nº {{ $term->asset_id }} · Termo nº {{ $term->id }}</p>
+        <div class="eyebrow">{{ __('assets.ui.inventory_brand') }}</div>
+        <h1>{{ __('assets.ui.pdf_title', ['type' => $term->typeLabel()]) }}</h1>
+        <p class="subtitle">{{ __('assets.ui.pdf_subtitle', ['asset' => $term->asset_id, 'term' => $term->id]) }}</p>
     </header>
 
     <table class="meta">
         <tr>
-            <td width="50%"><span class="label">Ativo</span><span class="value">{{ $term->asset->name }}</span></td>
-            <td width="50%"><span class="label">Patrimônio</span><span class="value">{{ $term->asset->tag }}</span></td>
+            <td width="50%"><span class="label">{{ __('assets.ui.equipment') }}</span><span class="value">{{ $term->asset->name }}</span></td>
+            <td width="50%"><span class="label">{{ __('assets.ui.tag') }}</span><span class="value">{{ $term->asset->tag }}</span></td>
         </tr>
         <tr>
-            <td><span class="label">Marca / modelo</span><span class="value">{{ trim(($term->asset->brand ?: '') . ' ' . ($term->asset->model ?: '')) ?: 'Não informado' }}</span></td>
-            <td><span class="label">Número de série</span><span class="value">{{ $term->asset->serial_number ?: 'Não informado' }}</span></td>
+            <td><span class="label">{{ __('assets.ui.brand_model') }}</span><span class="value">{{ trim(($term->asset->brand ?: '') . ' ' . ($term->asset->model ?: '')) ?: __('assets.ui.not_informed') }}</span></td>
+            <td><span class="label">{{ __('assets.ui.serial_number') }}</span><span class="value">{{ $term->asset->serial_number ?: __('assets.ui.not_informed') }}</span></td>
         </tr>
         <tr>
-            <td><span class="label">Responsável</span><span class="value">{{ $term->recipient->name }} · {{ $term->recipient->email }}</span></td>
-            <td><span class="label">Emitido por</span><span class="value">{{ $term->issuer->name }}</span></td>
+            <td><span class="label">{{ __('assets.ui.responsible_user') }}</span><span class="value">{{ $term->recipient->name }} · {{ $term->recipient->email }}</span></td>
+            <td><span class="label">{{ __('assets.ui.issued_by') }}</span><span class="value">{{ $term->issuer->name }}</span></td>
         </tr>
     </table>
 
     <section class="section">
-        <h2 class="section-title">Declaração de responsabilidade</h2>
+        <h2 class="section-title">{{ __('assets.ui.responsibility_declaration') }}</h2>
         <div class="term-text">{{ $term->terms_text }}</div>
     </section>
 
     <section class="section">
-        <h2 class="section-title">Assinatura eletrônica</h2>
+        <h2 class="section-title">{{ __('assets.ui.electronic_signature') }}</h2>
         <div class="signature-wrap">
             @if($signatureDataUri)
-                <img src="{{ $signatureDataUri }}" class="signature" alt="Assinatura digital de {{ $term->recipient->name }}">
+                <img src="{{ $signatureDataUri }}" class="signature" alt="{{ __('assets.ui.signature') }} de {{ $term->recipient->name }}">
             @else
-                <span style="color:#b91c1c">Evidência de assinatura não encontrada.</span>
+                <span style="color:#b91c1c">{{ __('assets.ui.signature_not_found') }}</span>
             @endif
         </div>
     </section>
 
     <section class="section">
-        <h2 class="section-title">Registro de auditoria</h2>
+        <h2 class="section-title">{{ __('assets.ui.audit_log') }}</h2>
         <table class="audit">
-            <tr><td>Data e hora da assinatura</td><td>{{ $term->signed_at?->format('d/m/Y H:i:s') ?? 'Não informado' }}</td></tr>
-            <tr><td>Endereço IP registrado</td><td>{{ $term->signed_ip ?: 'Não informado' }}</td></tr>
-            <tr><td>Identificador da assinatura</td><td>{{ $term->signature_hash ?: 'Não informado' }}</td></tr>
-            <tr><td>Status do termo</td><td>Assinado e registrado</td></tr>
+            <tr><td>{{ __('assets.ui.signature_date_time') }}</td><td>{{ $term->signed_at?->format('d/m/Y H:i:s') ?? __('assets.ui.not_informed') }}</td></tr>
+            <tr><td>{{ __('assets.ui.registered_ip') }}</td><td>{{ $term->signed_ip ?: __('assets.ui.not_informed') }}</td></tr>
+            <tr><td>{{ __('assets.ui.signature_identifier') }}</td><td>{{ $term->signature_hash ?: __('assets.ui.not_informed') }}</td></tr>
+            <tr><td>{{ __('assets.ui.term_status') }}</td><td>{{ __('assets.ui.signed_and_registered') }}</td></tr>
         </table>
     </section>
 
-    <div class="footer">Sistema de Inventário e Suporte TI · Documento gerado em {{ now()->format('d/m/Y H:i') }}</div>
+    <div class="footer">{{ __('assets.ui.generated_document', ['date' => now()->format('d/m/Y H:i')]) }}</div>
 </body>
 </html>
