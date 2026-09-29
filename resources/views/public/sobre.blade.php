@@ -1,8 +1,8 @@
 @extends('layouts.site')
 
 {{-- SEO da Página Sobre --}}
-@section('title', 'Sobre Nós - Suporte TI')
-@section('meta_description', 'Conheça a Suporte TI em Seropédica. Transformamos a tecnologia de empresas com prevenção, monitoramento proativo e agilidade.')
+@section('title', __('messages.seo.about_title'))
+@section('meta_description', __('messages.seo.about_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE ADICIONADO --}}

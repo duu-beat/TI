@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
-@section('title', 'Nossos Serviços - Suporte TI')
-@section('meta_description', 'Serviços completos de TI: Manutenção, redes e segurança.')
+@section('title', __('messages.seo.services_title'))
+@section('meta_description', __('messages.seo.services_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE ADICIONADO --}}

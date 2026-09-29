@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
-@section('title', 'Suporte TI | Operação, segurança e continuidade para sua empresa')
-@section('meta_description', 'Centralize suporte, inventário, segurança e conhecimento em uma única operação de TI. Acompanhe chamados, SLA, ativos e governança com clareza.')
+@section('title', __('messages.seo.home_title'))
+@section('meta_description', __('messages.seo.home_description'))
 
 @section('content')
     <section class="relative overflow-hidden" aria-labelledby="home-hero-title">

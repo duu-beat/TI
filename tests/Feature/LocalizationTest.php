@@ -39,4 +39,12 @@ class LocalizationTest extends TestCase
         $this->assertSame('Assinar termo de responsabilidade', __('assets.ui.sign_term', [], 'pt_BR'));
         $this->assertSame('Entrega de ativo', __('assets.ui.delivery_asset', [], 'pt_BR'));
     }
+
+    public function test_shared_and_seo_catalogs_are_available_in_portuguese(): void
+    {
+        $this->assertSame('Fechar menu lateral', __('messages.shared.close_sidebar', [], 'pt_BR'));
+        $this->assertSame('Confirmar saída', __('messages.shared.confirm_logout', [], 'pt_BR'));
+        $this->assertSame('Suporte TI | Operação, segurança e continuidade para sua empresa', __('messages.seo.home_title', [], 'pt_BR'));
+        $this->assertSame('Login - Área do Cliente', __('messages.seo.login_title', [], 'pt_BR'));
+    }
 }

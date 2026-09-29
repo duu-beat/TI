@@ -1,6 +1,6 @@
 {{-- Configuração de SEO --}}
-@section('title', 'Login - Área do Cliente')
-@section('meta_description', 'Faça login para abrir novos chamados, acompanhar solicitações em tempo real e falar com nosso suporte técnico especializado.')
+@section('title', __('messages.seo.login_title'))
+@section('meta_description', __('messages.seo.login_description'))
 
 <x-guest-layout>
     <div class="w-full max-w-5xl">

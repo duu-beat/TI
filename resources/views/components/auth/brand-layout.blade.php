@@ -57,11 +57,11 @@
                         @else
                             <div class="flex items-center gap-3 text-sm text-slate-300">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-indigo-500/20 text-indigo-400">🚀</div>
-                                <span>Atendimento ágil e sem burocracia.</span>
+                                <span>{{ __('messages.shared.auth_fast_service') }}</span>
                             </div>
                             <div class="flex items-center gap-3 text-sm text-slate-300">
                                 <div class="flex items-center justify-center w-8 h-8 rounded-lg bg-cyan-500/20 text-cyan-400">🔒</div>
-                                <span>Ambiente seguro e criptografado.</span>
+                                <span>{{ __('messages.shared.auth_secure_environment') }}</span>
                             </div>
                         @endif
                     </div>
@@ -78,10 +78,10 @@
                     <div>
                         <h2 class="text-2xl font-bold text-white">{{ $title }}</h2>
                         <div class="text-sm text-slate-400 mt-1">
-                            Preencha suas credenciais.
+                            {{ __('messages.shared.auth_credentials') }}
                         </div>
                     </div>
-                    <a href="{{ route('home') }}" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition" title="Voltar ao site">✕</a>
+                    <a href="{{ route('home') }}" class="p-2 rounded-xl hover:bg-white/5 text-slate-400 hover:text-white transition" title="{{ __('messages.shared.back_to_site') }}">✕</a>
                 </div>
 
                 <div class="auth-form-content">

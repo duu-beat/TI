@@ -1,8 +1,8 @@
 @extends('layouts.site')
 
 {{-- Define o Título da Aba --}}
-@section('title', 'Contato - Suporte TI')
-@section('meta_description', 'Precisa de suporte técnico? Entre em contato agora. Atendimento rápido via WhatsApp, E-mail ou Telefone.')
+@section('title', __('messages.seo.contact_title'))
+@section('meta_description', __('messages.seo.contact_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE ADICIONADO --}}

@@ -1,7 +1,7 @@
 @extends('layouts.site')
 
-@section('title', 'FAQ - Suporte TI')
-@section('meta_description', 'Tire suas dúvidas sobre nossos serviços de suporte técnico.')
+@section('title', __('messages.seo.faq_title'))
+@section('meta_description', __('messages.seo.faq_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE ADICIONADO --}}

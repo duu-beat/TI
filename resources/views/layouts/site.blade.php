@@ -14,10 +14,10 @@
 
     {{-- 🔥 1. SEO & REDES SOCIAIS (NOVO) --}}
     {{-- Permite que cada página defina seu próprio título. Ex: "Contato - Suporte TI" --}}
-    <title>@yield('title', config('app.name', 'Suporte TI'))</title>
+    <title>@yield('title', config('app.name', __('messages.seo.default_title')))</title>
     
     {{-- Descrição para o Google --}}
-    <meta name="description" content="@yield('meta_description', 'Suporte TI especializado. Abertura de chamados técnicos, manutenção e consultoria para empresas e particulares.')">
+    <meta name="description" content="@yield('meta_description', __('messages.seo.default_description'))">
     <link rel="canonical" href="{{ url()->current() }}">
     <meta name="theme-color" content="#020617">
 
@@ -25,14 +25,14 @@
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pt_BR">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('title', config('app.name', 'Suporte TI'))">
-    <meta property="og:description" content="@yield('meta_description', 'Soluções rápidas em TI. Abra seu chamado agora.')">
+    <meta property="og:title" content="@yield('title', config('app.name', __('messages.seo.default_title')))">
+    <meta property="og:description" content="@yield('meta_description', __('messages.seo.default_description'))">
     <meta property="og:image" content="{{ asset('images/logosuporteTI.png') }}">
 
     {{-- Twitter --}}
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="@yield('title', config('app.name', 'Suporte TI'))">
+    <meta property="twitter:title" content="@yield('title', config('app.name', __('messages.seo.default_title')))">
     <meta property="twitter:description" content="@yield('meta_description', 'Soluções rápidas em TI.')">
     <meta property="twitter:image" content="{{ asset('images/logosuporteTI.png') }}">
 

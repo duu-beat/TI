@@ -29,7 +29,7 @@
 
 <aside role="navigation" 
        class="fixed inset-y-0 left-0 z-50 w-72 bg-slate-950/80 backdrop-blur-xl border-r border-white/10 flex flex-col transition-transform duration-300 lg:translate-x-0 lg:static lg:inset-auto"
-       aria-label="Menu lateral principal"
+       aria-label="{{ __('messages.shared.sidebar_navigation') }}"
        :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'">
     
     {{-- Seção de Logo e Identificação do Sistema --}}
@@ -51,7 +51,7 @@
                 x-ref="sidebarCloseButton"
                 @click="closeSidebar()"
                 class="lg:hidden text-slate-400 hover:text-white"
-                aria-label="Fechar menu lateral">
+                aria-label="{{ __('messages.shared.close_sidebar') }}">
             <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
         </button>
     </div>
@@ -77,7 +77,7 @@
                     aria-controls="account-menu"
                     class="w-full flex items-center gap-3 rounded-2xl p-2 text-left hover:bg-white/5 focus:outline-none focus:ring-2 focus:ring-cyan-400/60 transition group">
                 <img src="{{ $user->profile_photo_url }}"
-                     alt="{{ __('Abrir opções da conta de :name', ['name' => $user->name]) }}"
+                     alt="{{ __('messages.shared.open_account_options', ['name' => $user->name]) }}"
                      class="h-11 w-11 rounded-xl object-cover border border-white/10 bg-slate-800 group-hover:border-cyan-400/50 transition" />
                 <span class="min-w-0 flex-1">
                     <span class="block text-sm text-slate-200 font-semibold truncate group-hover:text-white transition">{{ $user->name }}</span>
@@ -100,15 +100,15 @@
                  @click.outside="accountMenuOpen = false"
                  class="absolute bottom-full left-0 right-0 z-[60] mb-3 rounded-2xl border border-white/10 bg-slate-900/95 p-2 shadow-2xl backdrop-blur-xl"
                  role="menu"
-                 aria-label="{{ __('Opções da conta') }}">
+                 aria-label="{{ __('messages.shared.account_options') }}">
                 <a href="{{ $profileRoute }}#identidade-da-conta"
                    role="menuitem"
                    @click="accountMenuOpen = false"
                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 hover:text-white transition">
                     <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-cyan-500/10 text-cyan-300">👤</span>
                     <span>
-                        <span class="block font-semibold">{{ __('Meu Perfil') }}</span>
-                        <span class="block text-xs text-slate-500">{{ __('Dados e foto da conta') }}</span>
+                        <span class="block font-semibold">{{ __('messages.shared.my_profile') }}</span>
+                        <span class="block text-xs text-slate-500">{{ __('messages.shared.account_data_photo') }}</span>
                     </span>
                 </a>
 
@@ -118,8 +118,8 @@
                    class="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm text-slate-200 hover:bg-white/10 hover:text-white transition">
                     <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-emerald-500/10 text-emerald-300">🛡️</span>
                     <span>
-                        <span class="block font-semibold">{{ __('Segurança da Conta') }}</span>
-                        <span class="block text-xs text-slate-500">{{ __('Senha, 2FA e sessões') }}</span>
+                        <span class="block font-semibold">{{ __('messages.shared.account_security') }}</span>
+                        <span class="block text-xs text-slate-500">{{ __('messages.shared.password_2fa_sessions') }}</span>
                     </span>
                 </a>
 
@@ -132,7 +132,7 @@
                         @click="accountMenuOpen = false; openLogoutModal($event.currentTarget)"
                         class="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm text-red-300 hover:bg-red-500/10 hover:text-red-200 transition">
                     <span class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10">↪</span>
-                    <span class="font-semibold">{{ __('Sair da conta') }}</span>
+                    <span class="font-semibold">{{ __('messages.shared.logout_account') }}</span>
                 </button>
             </div>
         </div>

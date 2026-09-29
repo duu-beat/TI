@@ -1,8 +1,8 @@
 @extends('layouts.site')
 
 {{-- SEO da Privacidade --}}
-@section('title', 'Política de Privacidade - Proteção de Dados e LGPD')
-@section('meta_description', 'Como coletamos, usamos e protegemos os seus dados pessoais. Compromisso com a segurança da informação e conformidade com a LGPD.')
+@section('title', __('messages.seo.privacy_title'))
+@section('meta_description', __('messages.seo.privacy_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE --}}

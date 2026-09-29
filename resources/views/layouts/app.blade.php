@@ -7,9 +7,9 @@
 
     <title>
         @auth
-            {{ auth()->user()->isMaster() ? 'Segurança' : (auth()->user()->isAdmin() ? 'Admin' : 'Cliente') }} &middot; {{ config('app.name', 'Suporte TI') }}
+            {{ auth()->user()->isMaster() ? __('messages.navigation.security') : (auth()->user()->isAdmin() ? __('messages.navigation.admin') : __('messages.navigation.client')) }} &middot; {{ config('app.name', __('messages.seo.default_title')) }}
         @else
-            {{ config('app.name', 'Suporte TI') }}
+            {{ config('app.name', __('messages.seo.default_title')) }}
         @endauth
     </title>
 
@@ -68,7 +68,7 @@
          x-show="!online" 
          x-cloak
          class="bg-red-600 text-white text-center text-xs font-bold py-1 fixed top-0 w-full z-[100] shadow-lg">
-        📡 VOCÊ ESTÁ OFFLINE - Verifique sua conexão
+        📡 {{ __('messages.shared.offline') }}
     </div>
 
     {{-- ✅ 2. BANNER GLOBAL (dados compartilhados no AppServiceProvider) --}}
@@ -134,7 +134,7 @@
                     <button type="button"
                             @click="openSidebar($event.currentTarget)"
                             :aria-expanded="sidebarOpen.toString()"
-                            aria-label="Abrir menu lateral"
+                            aria-label="{{ __('messages.shared.open_sidebar') }}"
                             class="lg:hidden text-slate-400 hover:text-white">
                         <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
                     </button>
@@ -149,8 +149,8 @@
             </header>
 
             <div class="flex-1 overflow-y-auto p-6 scroll-smooth">
-                <div x-show="!pageReady" class="page-loader-pulse animate-pulse mx-auto max-w-7xl space-y-6" role="status" aria-live="polite" aria-label="Carregando conteúdo da página">
-                    <span class="sr-only">Carregando conteúdo da página.</span>
+                <div x-show="!pageReady" class="page-loader-pulse animate-pulse mx-auto max-w-7xl space-y-6" role="status" aria-live="polite" aria-label="{{ __('messages.shared.loading_page') }}">
+                    <span class="sr-only">{{ __('messages.shared.loading_page') }}.</span>
                     <div class="h-32 rounded-3xl border border-white/5 bg-slate-900/65"></div>
                     <div class="grid gap-6 lg:grid-cols-12">
                         <div class="space-y-5 lg:col-span-8"><div class="h-56 rounded-3xl border border-white/5 bg-slate-900/60"></div><div class="h-40 rounded-3xl border border-white/5 bg-slate-900/60"></div></div>
@@ -190,8 +190,8 @@
                     <div class="flex items-center gap-4 mb-6">
                         <div class="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center text-2xl">👋</div>
                         <div>
-                            <div id="logout-modal-title" class="text-lg font-bold text-white">Confirmar saída</div>
-                            <div class="text-sm text-slate-400">Deseja encerrar a sessão?</div>
+                            <div id="logout-modal-title" class="text-lg font-bold text-white">{{ __('messages.shared.confirm_logout') }}</div>
+                            <div class="text-sm text-slate-400">{{ __('messages.shared.logout_question') }}</div>
                         </div>
                     </div>
 
@@ -200,13 +200,13 @@
                                 x-ref="logoutCancelButton"
                                 @click="closeLogoutModal()"
                                 class="rounded-xl bg-white/5 px-5 py-3 text-sm font-semibold text-slate-300 hover:bg-white/10 hover:text-white transition">
-                            Cancelar
+                            {{ __('messages.shared.cancel') }}
                         </button>
 
                         <form method="POST" action="{{ request()->routeIs('master.*') ? route('master.logout') : (request()->routeIs('admin.*') ? route('admin.logout') : route('logout')) }}">
                             @csrf
                             <button type="submit" class="rounded-xl bg-gradient-to-r from-indigo-500 to-cyan-400 px-5 py-3 text-sm font-bold text-slate-950 hover:opacity-90 transition shadow-lg shadow-cyan-500/20">
-                                Sair agora
+                                {{ __('messages.shared.logout_now') }}
                             </button>
                         </form>
                     </div>
@@ -265,7 +265,7 @@
                            x-model="query"
                            @input.debounce.300ms="search()"
                            class="h-14 w-full border-0 bg-transparent pl-12 pr-4 text-white placeholder:text-slate-500 focus:ring-0 sm:text-sm" 
-                           placeholder="Buscar chamados, clientes... (Pressione ESC para sair)">
+                           placeholder="{{ __('messages.shared.search_placeholder') }}">
                 </div>
 
                 {{-- Lista de Resultados --}}

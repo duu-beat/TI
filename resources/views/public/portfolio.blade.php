@@ -1,8 +1,8 @@
 @extends('layouts.site')
 
 {{-- SEO do Portfólio --}}
-@section('title', 'Portfólio - Suporte TI')
-@section('meta_description', 'Veja como a Suporte TI ajudou empresas a otimizar sua infraestrutura. Cases reais de otimização, segurança, redes e montagem de computadores.')
+@section('title', __('messages.seo.portfolio_title'))
+@section('meta_description', __('messages.seo.portfolio_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE ADICIONADO --}}

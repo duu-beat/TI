@@ -1,8 +1,8 @@
 @extends('layouts.site')
 
 {{-- SEO dos Termos --}}
-@section('title', 'Termos de Uso')
-@section('meta_description', 'Regras e condições para utilização dos serviços da Suporte TI.')
+@section('title', __('messages.seo.terms_title'))
+@section('meta_description', __('messages.seo.terms_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE --}}

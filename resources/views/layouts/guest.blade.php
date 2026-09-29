@@ -9,21 +9,21 @@
     <link rel="icon" href="{{ asset('images/logosuporteTI.png') }}" type="image/png">
 
     {{-- 🔥 SEO DINÂMICO --}}
-    <title>@yield('title', config('app.name', 'Suporte TI'))</title>
-    <meta name="description" content="@yield('meta_description', 'Acesse o portal do cliente Suporte TI para abrir chamados e gerenciar serviços.')">
+    <title>@yield('title', config('app.name', __('messages.seo.default_title')))</title>
+    <meta name="description" content="@yield('meta_description', __('messages.seo.portal_description'))">
 
     {{-- Open Graph / Facebook / WhatsApp --}}
     <meta property="og:type" content="website">
     <meta property="og:url" content="{{ url()->current() }}">
-    <meta property="og:title" content="@yield('title', config('app.name', 'Suporte TI'))">
-    <meta property="og:description" content="@yield('meta_description', 'Acesse o portal do cliente Suporte TI.')">
+    <meta property="og:title" content="@yield('title', config('app.name', __('messages.seo.default_title')))">
+    <meta property="og:description" content="@yield('meta_description', __('messages.seo.portal_og_description'))">
     <meta property="og:image" content="{{ asset('images/logosuporteTI.png') }}">
 
     {{-- Twitter --}}
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="{{ url()->current() }}">
-    <meta property="twitter:title" content="@yield('title', config('app.name', 'Suporte TI'))">
-    <meta property="twitter:description" content="@yield('meta_description', 'Acesse o portal do cliente Suporte TI.')">
+    <meta property="twitter:title" content="@yield('title', config('app.name', __('messages.seo.default_title')))">
+    <meta property="twitter:description" content="@yield('meta_description', __('messages.seo.portal_og_description'))">
     <meta property="twitter:image" content="{{ asset('images/logosuporteTI.png') }}">
 
     {{-- Fonte Outfit --}}

@@ -1,8 +1,8 @@
 @extends('layouts.site')
 
 {{-- SEO do SLA --}}
-@section('title', 'SLA e Prazos de Atendimento')
-@section('meta_description', 'Entenda nossos níveis de serviço (SLA), prazos de resposta e prioridades de atendimento para suporte técnico.')
+@section('title', __('messages.seo.sla_title'))
+@section('meta_description', __('messages.seo.sla_description'))
 
 @section('content')
 {{-- ✅ WRAPPER ALPINE ADICIONADO --}}

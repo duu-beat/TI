@@ -1,6 +1,6 @@
 {{-- Configuração de SEO --}}
-@section('title', 'Criar Conta - Junte-se ao Suporte TI')
-@section('meta_description', 'Cadastre-se gratuitamente para ter acesso a suporte de alta prioridade, gestão de infraestrutura e atendimento rápido.')
+@section('title', __('messages.seo.register_title'))
+@section('meta_description', __('messages.seo.register_description'))
 
 <x-guest-layout>
     <div class="w-full max-w-5xl">
