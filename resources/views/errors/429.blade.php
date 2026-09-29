@@ -11,7 +11,7 @@
         <h1 class="mt-3 text-3xl font-black text-white">Muitas solicitações em pouco tempo.</h1>
         <p class="mt-3 text-slate-400">Para proteger a conta e a plataforma, limitamos temporariamente esta ação. Aguarde alguns instantes antes de tentar novamente.</p>
         <div class="mt-8">
-            <a href="{{ route('home') }}" class="rounded-xl bg-violet-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-violet-400">Voltar ao início</a>
+            <a href="{{ route('home') }}" class="rounded-xl bg-violet-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-violet-400">{{ __('messages.shared.error_back_home') }}</a>
         </div>
     </div>
 </div>

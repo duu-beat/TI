@@ -10,7 +10,7 @@
             500
         </div>
         
-        <h1 class="text-3xl font-bold text-white mt-4">Erro Interno no Servidor</h1>
+        <h1 class="text-3xl font-bold text-white mt-4">{{ __('messages.shared.error_server_title') }}</h1>
         <p class="text-slate-400 mt-2 max-w-md mx-auto">
             Algo deu errado do nosso lado. Já notificamos a equipe técnica e estamos trabalhando nisso.
         </p>

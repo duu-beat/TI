@@ -11,20 +11,20 @@
             404
         </div>
         
-        <h1 class="text-3xl font-bold text-white mt-4">Ops! Página não encontrada.</h1>
+        <h1 class="text-3xl font-bold text-white mt-4">{{ __('messages.shared.error_not_found_title') }}</h1>
         <p class="text-slate-400 mt-2 max-w-md mx-auto">
-            Parece que você tentou acessar um link que não existe ou foi movido.
+            {{ __('messages.shared.error_not_found_text') }}
         </p>
 
         <div class="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
             <a href="{{ route('home') }}" 
                class="px-8 py-3 rounded-2xl bg-gradient-to-r from-indigo-500 to-cyan-400 font-bold text-slate-950 hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:scale-105 transition-all">
-                Voltar ao Início
+                {{ __('messages.shared.error_back_home') }}
             </a>
             
             <a href="{{ route('contact') }}" 
                class="px-8 py-3 rounded-2xl bg-white/5 border border-white/10 font-semibold text-white hover:bg-white/10 transition">
-                Reportar Problema
+                {{ __('messages.shared.error_report') }}
             </a>
         </div>
     </div>

@@ -12,7 +12,7 @@
         <p class="mt-3 text-slate-400">O serviço está temporariamente indisponível. Tente novamente em alguns minutos; seus dados permanecem protegidos.</p>
         <div class="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
             <a href="{{ url()->current() }}" class="rounded-xl bg-indigo-500 px-6 py-3 text-sm font-bold text-white transition hover:bg-indigo-400">Tentar novamente</a>
-            <a href="{{ route('home') }}" class="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">Voltar ao início</a>
+            <a href="{{ route('home') }}" class="rounded-xl border border-white/10 bg-white/5 px-6 py-3 text-sm font-semibold text-white transition hover:bg-white/10">{{ __('messages.shared.error_back_home') }}</a>
         </div>
     </div>
 </div>
