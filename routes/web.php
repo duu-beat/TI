@@ -122,7 +122,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
         Route::post('/login', [AdminAuthController::class, 'store'])->name('login.store');
     });
 
-    Route::post('/logout', [AdminAuthController::class, 'destroy'])->name('logout');
+    Route::post('/logout', [AdminAuthController::class, 'destroy'])->middleware('auth')->name('logout');
 
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         
@@ -172,7 +172,7 @@ Route::prefix('seguranca')->name('master.')->group(function () {
         Route::get('/login', [MasterAuthController::class, 'create'])->name('login');
         Route::post('/login', [MasterAuthController::class, 'store'])->name('login.store');
     });
-    Route::post('/logout', [MasterAuthController::class, 'destroy'])->name('logout');
+    Route::post('/logout', [MasterAuthController::class, 'destroy'])->middleware('auth')->name('logout');
 });
 
 Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::class])

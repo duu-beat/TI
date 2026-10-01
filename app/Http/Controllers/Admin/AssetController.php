@@ -24,7 +24,8 @@ class AssetController extends Controller
 
     public function export(Request $request)
     {
-        $assets = Asset::with('user')->latest()->get();
+        $this->authorize('viewAny', Asset::class);
+        $assets = Asset::with('user')->latest();
         
         $filename = "inventario_ti_" . date('Y-m-d_H-i') . ".csv";
         $handle = fopen('php://output', 'w');
@@ -35,7 +36,7 @@ class AssetController extends Controller
             'Serial', 'Status', 'Responsavel', 'Data Compra', 'Garantia'
         ]);
 
-        foreach ($assets as $asset) {
+        foreach ($assets->cursor() as $asset) {
             fputcsv($handle, [
                 $asset->id,
                 $asset->tag,
@@ -92,7 +93,7 @@ class AssetController extends Controller
 
     public function create()
     {
-        $users = User::orderBy('name')->get();
+        $users = User::query()->orderBy('name')->limit(200)->get(['id', 'name', 'email']);
         return view('admin.assets.create', compact('users'));
     }
 
@@ -137,6 +138,7 @@ class AssetController extends Controller
      */
     public function qrLabel(Asset $asset)
     {
+        $this->authorize('view', $asset);
         return view('admin.assets.qr-label', compact('asset'));
     }
 
@@ -145,6 +147,7 @@ class AssetController extends Controller
      */
     public function qrCode(Asset $asset, AssetQrCodeService $qrCodeService)
     {
+        $this->authorize('view', $asset);
         return response($qrCodeService->toSvg($asset), 200, [
             'Content-Type' => 'image/svg+xml; charset=UTF-8',
             'Cache-Control' => 'private, max-age=3600',
@@ -153,7 +156,7 @@ class AssetController extends Controller
 
     public function edit(Asset $asset)
     {
-        $users = User::orderBy('name')->get();
+        $users = User::query()->orderBy('name')->limit(200)->get(['id', 'name', 'email']);
         return view('admin.assets.edit', compact('asset', 'users'));
     }
 

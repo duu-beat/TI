@@ -17,6 +17,7 @@ class AssetResponsibilityTermController extends Controller
 {
     public function create(Asset $asset): View
     {
+        $this->authorize('view', $asset);
         $asset->load('user');
         $recipients = User::query()
             ->where('role', User::ROLE_CLIENT)
@@ -28,6 +29,7 @@ class AssetResponsibilityTermController extends Controller
 
     public function store(Request $request, Asset $asset, AssetResponsibilityTermService $terms): RedirectResponse
     {
+        $this->authorize('view', $asset);
         $validated = $request->validate([
             'type' => ['required', 'in:delivery,return'],
             'recipient_id' => ['nullable', 'exists:users,id'],
@@ -112,6 +114,7 @@ class AssetResponsibilityTermController extends Controller
 
     private function ensureTermBelongsToAsset(Asset $asset, AssetResponsibilityTerm $term): void
     {
+        $this->authorize('view', $asset);
         abort_unless($term->asset_id === $asset->id, 404);
     }
 
