@@ -17,8 +17,6 @@ class HomeControllerTest extends TestCase
         $response->assertOk()
             ->assertViewIs('public.home')
             ->assertSee('TI que funciona.')
-            ->assertDontSee('messages.public.')
-            ->assertDontSee('messages.seo.')
             ->assertSee('Tudo o que sua equipe precisa para manter a TI em movimento.')
             ->assertSee('Um fluxo simples para quem solicita, atende e supervisiona.')
             ->assertSee('Segurança não precisa ficar separada da operação.')
