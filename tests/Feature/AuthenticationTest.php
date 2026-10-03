@@ -30,6 +30,12 @@ class AuthenticationTest extends TestCase
         $response->assertRedirect(route('client.dashboard', absolute: false));
     }
 
+    public function test_unsupported_social_provider_is_not_accepted(): void
+    {
+        $this->get('/auth/twitter/redirect')->assertNotFound();
+        $this->get('/auth/twitter/callback')->assertNotFound();
+    }
+
     public function test_users_can_not_authenticate_with_invalid_password(): void
     {
         $user = User::factory()->create();

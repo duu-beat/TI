@@ -47,7 +47,7 @@ Route::get('/sla', [LegalController::class, 'sla'])->name('sla');
 */
 Route::get('/auth/{provider}/redirect', function ($provider) {
     return Socialite::driver($provider)->redirect();
-})->name('social.redirect');
+})->whereIn('provider', ['google', 'github'])->name('social.redirect');
 
 Route::get('/auth/{provider}/callback', function ($provider) {
     try {
@@ -67,7 +67,7 @@ Route::get('/auth/{provider}/callback', function ($provider) {
     } catch (\Exception $e) {
         return redirect()->route('login')->with('status', 'Erro ao logar com ' . ucfirst($provider));
     }
-})->name('social.callback');
+})->whereIn('provider', ['google', 'github'])->name('social.callback');
 
 /*
 |--------------------------------------------------------------------------
