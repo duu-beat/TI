@@ -31,8 +31,11 @@ class TicketAttachmentController extends Controller
     {
         abort_unless(Storage::disk($disk)->exists($path), 404);
 
+        $safeDownloadName = basename(str_replace(["\r", "\n"], '', $downloadName));
+        $safeDownloadName = str_replace(['\\', '"', "'"], '-', $safeDownloadName);
+
         return response()->file(Storage::disk($disk)->path($path), [
-            'Content-Disposition' => 'inline; filename="'.addslashes($downloadName).'"',
+            'Content-Disposition' => 'inline; filename="'.$safeDownloadName.'"',
             'X-Content-Type-Options' => 'nosniff',
         ]);
     }

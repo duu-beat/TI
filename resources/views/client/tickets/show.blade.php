@@ -53,7 +53,7 @@
                         this.typingTimeout = window.setTimeout(() => this.typingUser = null, 3000);
                     });
             },
-            attachmentUrl(attachment) { return attachment.url || ('/storage/' + (attachment.file_path || '')); },
+            attachmentUrl(attachment) { return attachment.url || '#'; },
             attachmentName(attachment) { return attachment.name || attachment.file_name || 'Anexo'; },
             isImageAttachment(attachment) { return (attachment.mime_type || '').startsWith('image/') || /\.(jpe?g|png|webp)$/i.test(this.attachmentName(attachment)); },
             isPdfAttachment(attachment) { return attachment.mime_type === 'application/pdf' || /\.pdf$/i.test(this.attachmentName(attachment)); },

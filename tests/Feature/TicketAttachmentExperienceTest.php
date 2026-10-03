@@ -120,6 +120,38 @@ class TicketAttachmentExperienceTest extends TestCase
             ->assertHeader('X-Content-Type-Options', 'nosniff');
     }
 
+    public function test_attachment_download_sanitizes_the_download_name(): void
+    {
+        Storage::fake('local');
+        $owner = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $ticket = Ticket::factory()->create(['user_id' => $owner->id]);
+        $message = $ticket->messages()->create([
+            'user_id' => $owner->id,
+            'message' => 'Anexo com nome potencialmente perigoso',
+            'is_internal' => false,
+            'time_spent' => 0,
+        ]);
+        $path = 'ticket-attachments/safe-name.txt';
+        Storage::disk('local')->put($path, 'conteúdo');
+        $attachment = $message->attachments()->create([
+            'file_name' => "relatorio\"\r\n.txt",
+            'file_path' => $path,
+            'mime_type' => 'text/plain',
+            'size' => 8,
+            'disk' => 'local',
+        ]);
+
+        $response = $this->actingAs($owner)
+            ->get(route('ticket-attachments.show', $attachment));
+
+        $response->assertOk();
+        $contentDisposition = $response->headers->get('Content-Disposition');
+        $this->assertIsString($contentDisposition);
+        $this->assertStringNotContainsString("\r", $contentDisposition);
+        $this->assertStringNotContainsString("\n", $contentDisposition);
+        $this->assertStringContainsString('filename="relatorio-', $contentDisposition);
+    }
+
     public function test_client_can_view_the_rebranded_ticket_workspace(): void
     {
         $client = User::factory()->create(['role' => User::ROLE_CLIENT]);

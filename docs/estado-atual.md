@@ -2,7 +2,7 @@
 
 **Atualizado em:** 3 de outubro de 2026  
 **Branch:** `main`  
-**Último commit publicado:** `03737e5 Reforça validações de autenticação e traduções`
+**Último avanço validado:** auditoria de anexos e uploads
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 88 testes aprovados.
-- 335 asserções executadas.
+- 89 testes aprovados.
+- 340 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -26,6 +26,11 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Providers de login social limitados a `google` e `github`.
 - Providers não autorizados retornam `404`.
 - Teste de regressão para impedir chaves `messages.public.*` e `messages.seo.*` na Home.
+- Anexos novos usam armazenamento privado (`local`) e download autorizado pelo chamado.
+- Removido o trait legado que gravava anexos no disco público.
+- Removido o fallback JavaScript para `/storage/` nas telas de chamados.
+- Nome enviado no header de download é sanitizado contra quebra de cabeçalho.
+- Teste de isolamento entre proprietários e teste de sanitização de nome de anexo.
 - Policies e middlewares existentes continuam preservados.
 - O locale não foi modificado nesta etapa.
 
@@ -51,8 +56,6 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 
 ### Prioridade alta
 
-- Auditar definitivamente todos os fluxos de upload e remover dependências do trait legado de anexos públicos.
-- Validar acesso a anexos entre chamados diferentes.
 - Revisar a duplicidade entre `app/Http/Requests/StoreTicketRequest.php` e `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Validar migrations, índices e constraints em MySQL/MariaDB real.
 - Configurar e testar filas, scheduler, e-mail e backup no ambiente de implantação.
