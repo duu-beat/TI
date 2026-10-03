@@ -6,7 +6,7 @@
 ![Vite](https://img.shields.io/badge/vite-%23646CFF.svg?style=for-the-badge&logo=vite&logoColor=white)
 ![WCAG 2.1 AA](https://img.shields.io/badge/Accessibility-WCAG%202.1%20AA-green.svg?style=for-the-badge)
 
-> **Status do Projeto** : 🚀 **Concluído / Produção**
+> **Status do Projeto** : 🚧 **Em estabilização técnica / pronto para validação**
 
 Sistema web completo de suporte técnico focado em organização, comunicação clara e uma interface moderna. Desenvolvido para resolver problemas reais de gestão interna e atendimento ao cliente, agora com recursos avançados de SLA, acessibilidade e métricas de performance.
 
@@ -126,6 +126,7 @@ npm run dev
 ## 📚 Documentação Técnica
 
 Para detalhes específicos sobre as implementações, consulte os documentos na raiz do projeto:
+* [Estado Atual](docs/estado-atual.md) - Situação real, validações, pendências e roadmap atualizado.
 * [Relatório de Documentação](RELATORIO_DOCUMENTACAO.md) - Detalhes dos comentários e DocBlocks.
 * [Acessibilidade Implementada](ACESSIBILIDADE_IMPLEMENTADA.md) - Guia completo de recursos WCAG.
 * [Resumo de Melhorias](MELHORIAS_IMPLEMENTADAS.md) - Detalhes técnicos das 5 grandes funcionalidades.
