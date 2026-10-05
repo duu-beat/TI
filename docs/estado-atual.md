@@ -1,8 +1,8 @@
 # Estado atual do projeto
 
-**Atualizado em:** 3 de outubro de 2026  
+**Atualizado em:** 5 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** auditoria de anexos e uploads
+**Último avanço validado:** unificação dos FormRequests de chamados
 
 ## Resumo
 
@@ -31,6 +31,8 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Removido o fallback JavaScript para `/storage/` nas telas de chamados.
 - Nome enviado no header de download é sanitizado contra quebra de cabeçalho.
 - Teste de isolamento entre proprietários e teste de sanitização de nome de anexo.
+- O fluxo de criação de chamados utiliza apenas `app/Http/Requests/StoreTicketRequest.php`.
+- Removido o FormRequest duplicado e não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Policies e middlewares existentes continuam preservados.
 - O locale não foi modificado nesta etapa.
 
@@ -56,9 +58,10 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 
 ### Prioridade alta
 
-- Revisar a duplicidade entre `app/Http/Requests/StoreTicketRequest.php` e `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Validar migrations, índices e constraints em MySQL/MariaDB real.
 - Configurar e testar filas, scheduler, e-mail e backup no ambiente de implantação.
+
+A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo utiliza apenas `app/Http/Requests/StoreTicketRequest.php`; o arquivo específico não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php` foi removido para evitar regras conflitantes.
 
 ### Prioridade média
 
