@@ -11,7 +11,7 @@ class HighPrioritySecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_client_cannot_access_administrative_inventory_wiki_tags_or_visits(): void
+    public function test_client_cannot_access_administrative_modules(): void
     {
         $client = User::factory()->create([
             'role' => User::ROLE_CLIENT,
@@ -21,7 +21,17 @@ class HighPrioritySecurityTest extends TestCase
         $this->actingAs($client)->get(route('admin.assets.index'))->assertForbidden();
         $this->actingAs($client)->get(route('admin.wiki.index'))->assertForbidden();
         $this->actingAs($client)->get(route('admin.tags.index'))->assertForbidden();
+        $this->actingAs($client)->get(route('admin.respostas-prontas.index'))->assertForbidden();
+        $this->actingAs($client)->get(route('admin.checklists.index'))->assertForbidden();
         $this->actingAs($client)->get(route('admin.visits.index'))->assertForbidden();
+
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+
+        $this->actingAs($admin)->get(route('admin.respostas-prontas.index'))->assertOk();
+        $this->actingAs($admin)->get(route('admin.checklists.index'))->assertOk();
     }
 
     public function test_wiki_search_and_category_filters_are_scoped_together(): void

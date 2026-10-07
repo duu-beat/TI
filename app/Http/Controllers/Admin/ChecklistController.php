@@ -15,6 +15,7 @@ class ChecklistController extends Controller
 {
     public function index(Request $request)
     {
+        $this->authorize('viewAny', ChecklistTemplate::class);
         $query = ChecklistTemplate::withCount('items');
 
         if ($request->filled('search')) {
@@ -35,11 +36,13 @@ class ChecklistController extends Controller
 
     public function create()
     {
+        $this->authorize('create', ChecklistTemplate::class);
         return view('admin.checklists.create');
     }
 
     public function store(Request $request)
     {
+        $this->authorize('create', ChecklistTemplate::class);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
@@ -69,12 +72,14 @@ class ChecklistController extends Controller
 
     public function edit(ChecklistTemplate $checklist)
     {
+        $this->authorize('view', $checklist);
         $checklist->load('items');
         return view('admin.checklists.edit', compact('checklist'));
     }
 
     public function update(Request $request, ChecklistTemplate $checklist)
     {
+        $this->authorize('update', $checklist);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'required|string|max:100',
@@ -107,6 +112,7 @@ class ChecklistController extends Controller
 
     public function destroy(ChecklistTemplate $checklist)
     {
+        $this->authorize('delete', $checklist);
         $checklist->delete();
         return redirect()->route('admin.checklists.index')
             ->with('success', 'Modelo de checklist removido.');

@@ -10,6 +10,7 @@ class CannedResponseController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', CannedResponse::class);
         $responses = CannedResponse::orderBy('category')->orderBy('title')->get();
         $categories = CannedResponse::distinct()->whereNotNull('category')->pluck('category');
         
@@ -18,6 +19,7 @@ class CannedResponseController extends Controller
 
     public function store(Request $request)
     {
+        $this->authorize('create', CannedResponse::class);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
@@ -31,6 +33,7 @@ class CannedResponseController extends Controller
 
     public function update(Request $request, CannedResponse $cannedResponse)
     {
+        $this->authorize('update', $cannedResponse);
         $validated = $request->validate([
             'title' => 'required|string|max:255',
             'category' => 'nullable|string|max:100',
@@ -44,6 +47,7 @@ class CannedResponseController extends Controller
 
     public function destroy(CannedResponse $cannedResponse)
     {
+        $this->authorize('delete', $cannedResponse);
         $cannedResponse->delete();
 
         return back()->with('success', 'Resposta removida.');

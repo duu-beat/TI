@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tag;
+use App\Models\Ticket;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Http\Requests\Admin\TagRequest;
@@ -12,6 +13,7 @@ class TagController extends Controller
 {
     public function index()
     {
+        $this->authorize('viewAny', Tag::class);
         $tags = Tag::withCount('tickets')
             ->latest()
             ->paginate(20);
@@ -21,6 +23,7 @@ class TagController extends Controller
 
     public function store(TagRequest $request)
     {
+        $this->authorize('create', Tag::class);
         $validated = $request->validated();
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -32,6 +35,7 @@ class TagController extends Controller
 
     public function update(TagRequest $request, Tag $tag)
     {
+        $this->authorize('update', $tag);
         $validated = $request->validated();
 
         $validated['slug'] = Str::slug($validated['name']);
@@ -43,6 +47,7 @@ class TagController extends Controller
 
     public function destroy(Tag $tag)
     {
+        $this->authorize('delete', $tag);
         // Remove relacionamentos antes de deletar
         $tag->tickets()->detach();
         $tag->delete();
@@ -60,7 +65,8 @@ class TagController extends Controller
             'tag_ids.*' => 'exists:tags,id',
         ]);
 
-        $ticket = \App\Models\Ticket::findOrFail($ticketId);
+        $ticket = Ticket::findOrFail($ticketId);
+        $this->authorize('update', $ticket);
         $ticket->tags()->sync($request->tag_ids);
 
         return back()->with('success', __('messages.success.updated'));
