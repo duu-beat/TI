@@ -1,7 +1,7 @@
 # Análise de compatibilidade com MySQL/MariaDB
 
 **Data:** 7 de outubro de 2026  
-**Status:** análise estática concluída; validação real pendente
+**Status:** migration de correção criada; validação real pendente
 
 ## Resultado executivo
 
@@ -32,7 +32,7 @@ O fluxo ativo de upload, entretanto, grava novos arquivos explicitamente no disc
 $disk = 'local';
 ```
 
-Isso não quebra os uploads novos, pois o valor é persistido como `local`. Porém, registros antigos ou registros criados por scripts/importações que dependam do valor padrão podem apontar para `public`. A correção deve ser feita com uma migration própria e um procedimento de migração física dos arquivos, nunca alterando uma migration já executada.
+Isso não quebra os uploads novos, pois o valor é persistido como `local`. Porém, registros antigos ou registros criados por scripts/importações que dependam do valor padrão podem apontar para `public`. Foi criada a migration `2026_10_07_000001_set_private_disk_default_on_ticket_attachments.php`, que altera apenas o padrão para `local` e normaliza valores nulos. Ela não move nem reescreve arquivos existentes, evitando quebrar anexos históricos. A migração física de arquivos antigos continua sendo uma tarefa separada e condicionada à inspeção do ambiente.
 
 ## Pontos específicos para MySQL/MariaDB
 

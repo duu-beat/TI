@@ -2,7 +2,7 @@
 
 **Atualizado em:** 7 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** análise de compatibilidade MySQL/MariaDB
+**Último avanço validado:** padrão privado dos anexos
 
 ## Resumo
 
@@ -31,6 +31,8 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Removido o fallback JavaScript para `/storage/` nas telas de chamados.
 - Nome enviado no header de download é sanitizado contra quebra de cabeçalho.
 - Teste de isolamento entre proprietários e teste de sanitização de nome de anexo.
+- Migration aplicada para alterar o padrão histórico de `ticket_attachments.disk` para `local`.
+- Valores nulos de `disk` são normalizados para `local`; arquivos antigos não são movidos automaticamente.
 - O fluxo de criação de chamados utiliza apenas `app/Http/Requests/StoreTicketRequest.php`.
 - Removido o FormRequest duplicado e não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Policies e middlewares existentes continuam preservados.
@@ -61,7 +63,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Validar migrations, índices e constraints em MySQL/MariaDB real.
 - Configurar e testar filas, scheduler, e-mail e backup no ambiente de implantação.
 
-A análise estática de MySQL/MariaDB foi concluída e está registrada em [analise-mysql-mariadb.md](analise-mysql-mariadb.md). A validação real permanece pendente porque o sandbox atual não possui servidor MySQL/MariaDB disponível. Foi identificado que migrations antigas usam padrão `public` para o disco dos anexos, enquanto o fluxo atual grava em `local`; essa migração deve ser tratada separadamente para não quebrar arquivos existentes.
+A análise estática de MySQL/MariaDB foi concluída e está registrada em [analise-mysql-mariadb.md](analise-mysql-mariadb.md). A validação real permanece pendente porque o sandbox atual não possui servidor MySQL/MariaDB disponível. O padrão dos novos anexos já foi corrigido para `local`; a migração física de arquivos históricos, caso necessária, depende da inspeção do ambiente.
 
 A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo utiliza apenas `app/Http/Requests/StoreTicketRequest.php`; o arquivo específico não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php` foi removido para evitar regras conflitantes.
 

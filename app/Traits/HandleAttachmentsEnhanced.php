@@ -93,7 +93,7 @@ trait HandleAttachmentsEnhanced
 
         // Deletar arquivo físico
         $path = $attachment->file_path;
-        $disk = $attachment->disk ?? 'public';
+        $disk = $attachment->disk ?? 'local';
 
         if ($path && Storage::disk($disk)->exists($path)) {
             Storage::disk($disk)->delete($path);
