@@ -18,6 +18,7 @@ use App\Policies\KnowledgeBasePolicy;
 use App\Policies\CannedResponsePolicy;
 use App\Policies\ChecklistTemplatePolicy;
 use App\Policies\TagPolicy;
+use App\Policies\TechnicalVisitPolicy;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +51,7 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(\App\Models\CannedResponse::class, CannedResponsePolicy::class);
         Gate::policy(\App\Models\ChecklistTemplate::class, ChecklistTemplatePolicy::class);
         Gate::policy(\App\Models\Tag::class, TagPolicy::class);
+        Gate::policy(\App\Models\TechnicalVisit::class, TechnicalVisitPolicy::class);
 
         Ticket::observe(TicketObserver::class);
         Asset::observe(AssetObserver::class);

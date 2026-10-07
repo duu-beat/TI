@@ -2,7 +2,7 @@
 
 **Atualizado em:** 7 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** Policies administrativas de Tags, respostas prontas e checklists
+**Último avanço validado:** Policy e autorização do fluxo de visitas técnicas
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 89 testes aprovados.
-- 344 asserções executadas.
+- 90 testes aprovados.
+- 349 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -35,6 +35,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Valores nulos de `disk` são normalizados para `local`; arquivos antigos não são movidos automaticamente.
 - Policies explícitas adicionadas para Tags, respostas prontas e modelos de checklist.
 - Clientes recebem `403` nesses módulos e Admin mantém o acesso operacional.
+- Policy explícita adicionada para visitas técnicas, incluindo autorização do chamado no agendamento e da visita na atualização de status.
 - O fluxo de criação de chamados utiliza apenas `app/Http/Requests/StoreTicketRequest.php`.
 - Removido o FormRequest duplicado e não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Policies e middlewares existentes continuam preservados.
@@ -71,7 +72,7 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Prioridade média
 
-- Criar Policies específicas para visitas técnicas, relatórios e históricos de ativos.
+- Criar Policies específicas para relatórios e históricos de ativos.
 - Ampliar testes de autorização para todos os recursos.
 - Melhorar busca textual para bases maiores.
 - Preparar exportações grandes para processamento em fila.

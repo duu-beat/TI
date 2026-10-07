@@ -22,6 +22,7 @@ class TechnicalVisitController extends Controller
      */
     public function index()
     {
+        $this->authorize('viewAny', TechnicalVisit::class);
         $visits = TechnicalVisit::with(['ticket', 'technician'])
             ->orderBy('scheduled_at', 'asc')
             ->paginate(15);
@@ -34,6 +35,7 @@ class TechnicalVisitController extends Controller
      */
     public function create(Ticket $ticket)
     {
+        $this->authorize('update', $ticket);
         return view('admin.visits.create', compact('ticket'));
     }
 
@@ -43,6 +45,8 @@ class TechnicalVisitController extends Controller
     public function store(TechnicalVisitRequest $request)
     {
         $validated = $request->validated();
+        $ticket = Ticket::findOrFail($validated['ticket_id']);
+        $this->authorize('update', $ticket);
 
         $visit = TechnicalVisit::create([
             'ticket_id' => $validated['ticket_id'],
@@ -54,7 +58,7 @@ class TechnicalVisitController extends Controller
         ]);
 
         // Adiciona nota interna no chamado informando o agendamento
-        $visit->ticket->messages()->create([
+        $ticket->messages()->create([
             'user_id' => Auth::id(),
             'is_internal' => true,
             'message' => "📅 **VISITA TÉCNICA AGENDADA** para o dia " . $visit->scheduled_at->format('d/m/Y \à\s H:i') . " no endereço: " . $visit->address
@@ -69,6 +73,7 @@ class TechnicalVisitController extends Controller
      */
     public function updateStatus(UpdateTechnicalVisitStatusRequest $request, TechnicalVisit $visit)
     {
+        $this->authorize('update', $visit);
 
         $oldStatus = $visit->getStatusLabel();
         $status = $request->validated()['status'];
