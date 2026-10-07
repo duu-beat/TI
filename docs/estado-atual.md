@@ -1,8 +1,8 @@
 # Estado atual do projeto
 
-**Atualizado em:** 5 de outubro de 2026
+**Atualizado em:** 7 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** unificação dos FormRequests de chamados
+**Último avanço validado:** análise de compatibilidade MySQL/MariaDB
 
 ## Resumo
 
@@ -60,6 +60,8 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 
 - Validar migrations, índices e constraints em MySQL/MariaDB real.
 - Configurar e testar filas, scheduler, e-mail e backup no ambiente de implantação.
+
+A análise estática de MySQL/MariaDB foi concluída e está registrada em [analise-mysql-mariadb.md](analise-mysql-mariadb.md). A validação real permanece pendente porque o sandbox atual não possui servidor MySQL/MariaDB disponível. Foi identificado que migrations antigas usam padrão `public` para o disco dos anexos, enquanto o fluxo atual grava em `local`; essa migração deve ser tratada separadamente para não quebrar arquivos existentes.
 
 A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo utiliza apenas `app/Http/Requests/StoreTicketRequest.php`; o arquivo específico não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php` foi removido para evitar regras conflitantes.
 
