@@ -2,7 +2,7 @@
 
 **Atualizado em:** 9 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** matriz de autorização por perfil
+**Último avanço validado:** proteção dos endpoints críticos de chamados
 
 ## Resumo
 
@@ -11,7 +11,7 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 ## Validações do último avanço
 
 - 91 testes aprovados.
-- 368 asserções executadas.
+- 371 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -39,6 +39,8 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Policy nomeada `viewReports` adicionada para proteger a tela e as exportações PDF/CSV dos relatórios.
 - Histórico de ativos permanece acessível somente dentro da ficha autorizada pela `AssetPolicy`; não há endpoint independente exposto.
 - Matriz de regressão confirma que Cliente e Master não acessam módulos operacionais em `/admin`; o Admin mantém o acesso operacional.
+- Endpoints de alteração de status, resposta, escalação, atribuição, fusão e checklist passaram a exigir autorização explícita do chamado.
+- Fusão entre chamados de clientes diferentes foi bloqueada para impedir exposição de mensagens e anexos entre contas.
 - O fluxo de criação de chamados utiliza apenas `app/Http/Requests/StoreTicketRequest.php`.
 - Removido o FormRequest duplicado e não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Policies e middlewares existentes continuam preservados.

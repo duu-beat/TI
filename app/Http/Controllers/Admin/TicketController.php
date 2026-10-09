@@ -109,6 +109,7 @@ class TicketController extends Controller
      */
     public function toggleChecklistItem(Ticket $ticket, \App\Models\TicketChecklist $item)
     {
+        $this->authorize('update', $ticket);
         $item = $ticket->checklists()->findOrFail($item->id);
 
         $item->update([
@@ -127,6 +128,7 @@ class TicketController extends Controller
 
     public function updateStatus(UpdateTicketStatusRequest $request, Ticket $ticket, UpdateTicketStatus $updater)
     {
+        $this->authorize('update', $ticket);
         $validated = $request->validated();
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($ticket, $validated, $updater) {
@@ -146,6 +148,7 @@ class TicketController extends Controller
 
     public function reply(AdminReplyTicketRequest $request, Ticket $ticket, ReplyToTicket $replier)
     {
+        $this->authorize('update', $ticket);
         $validated = $request->validated();
 
         if ($request->boolean('is_internal')) {
@@ -190,6 +193,7 @@ class TicketController extends Controller
 
     public function escalate(Ticket $ticket)
     {
+        $this->authorize('update', $ticket);
         \Illuminate\Support\Facades\DB::transaction(function () use ($ticket) {
             $ticket->update(['is_escalated' => true]);
 
@@ -205,6 +209,7 @@ class TicketController extends Controller
 
     public function assign(AssignTicketRequest $request, Ticket $ticket)
     {
+        $this->authorize('update', $ticket);
         $validated = $request->validated();
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($validated, $ticket) {
@@ -223,10 +228,15 @@ class TicketController extends Controller
 
     public function merge(MergeTicketRequest $request, Ticket $ticket)
     {
+        $this->authorize('update', $ticket);
         $targetTicket = Ticket::findOrFail($request->validated()['target_ticket_id']);
 
         if ($targetTicket->id === $ticket->id) {
             return back()->with('error', 'Não pode fundir o chamado com ele mesmo.');
+        }
+
+        if ($targetTicket->user_id !== $ticket->user_id) {
+            return back()->with('error', 'Só é permitido fundir chamados do mesmo cliente.');
         }
 
         \Illuminate\Support\Facades\DB::transaction(function () use ($ticket, $targetTicket) {

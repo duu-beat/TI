@@ -75,6 +75,36 @@ class InternalSecurityTest extends TestCase
             ->assertNotFound();
     }
 
+    public function test_admin_cannot_merge_tickets_from_different_clients(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $firstOwner = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $secondOwner = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $sourceTicket = $this->makeTicket($firstOwner, ['subject' => 'Chamado de origem']);
+        $targetTicket = $this->makeTicket($secondOwner, ['subject' => 'Chamado de destino']);
+        $message = $sourceTicket->messages()->create([
+            'user_id' => $firstOwner->id,
+            'message' => 'Mensagem privada do primeiro cliente',
+            'is_internal' => false,
+            'time_spent' => 0,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.tickets.merge', $sourceTicket), [
+                'target_ticket_id' => $targetTicket->id,
+            ])
+            ->assertSessionHas('error', 'Só é permitido fundir chamados do mesmo cliente.');
+
+        $this->assertDatabaseHas('ticket_messages', [
+            'id' => $message->id,
+            'ticket_id' => $sourceTicket->id,
+        ]);
+        $this->assertDatabaseHas('tickets', [
+            'id' => $sourceTicket->id,
+            'status' => TicketStatus::NEW->value,
+        ]);
+    }
+
     public function test_admin_dashboard_keeps_operational_indicators_in_the_loaded_content(): void
     {
         $admin = User::factory()->create([
