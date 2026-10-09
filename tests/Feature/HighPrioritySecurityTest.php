@@ -12,19 +12,34 @@ class HighPrioritySecurityTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_client_cannot_access_administrative_modules(): void
+    public function test_client_and_master_cannot_access_operational_admin_modules(): void
     {
         $client = User::factory()->create([
             'role' => User::ROLE_CLIENT,
             'email_verified_at' => now(),
         ]);
 
-        $this->actingAs($client)->get(route('admin.assets.index'))->assertForbidden();
-        $this->actingAs($client)->get(route('admin.wiki.index'))->assertForbidden();
-        $this->actingAs($client)->get(route('admin.tags.index'))->assertForbidden();
-        $this->actingAs($client)->get(route('admin.respostas-prontas.index'))->assertForbidden();
-        $this->actingAs($client)->get(route('admin.checklists.index'))->assertForbidden();
-        $this->actingAs($client)->get(route('admin.visits.index'))->assertForbidden();
+        $master = User::factory()->create([
+            'role' => User::ROLE_MASTER,
+            'email_verified_at' => now(),
+        ]);
+
+        $operationalRoutes = [
+            'admin.dashboard',
+            'admin.tickets.index',
+            'admin.assets.index',
+            'admin.wiki.index',
+            'admin.tags.index',
+            'admin.respostas-prontas.index',
+            'admin.checklists.index',
+            'admin.visits.index',
+            'admin.reports.index',
+        ];
+
+        foreach ($operationalRoutes as $routeName) {
+            $this->actingAs($client)->get(route($routeName))->assertForbidden();
+            $this->actingAs($master)->get(route($routeName))->assertForbidden();
+        }
 
         $admin = User::factory()->create([
             'role' => User::ROLE_ADMIN,
