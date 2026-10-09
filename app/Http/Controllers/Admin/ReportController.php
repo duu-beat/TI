@@ -17,6 +17,7 @@ class ReportController extends Controller
      */
     public function index(Request $request)
     {
+        $this->authorize('viewReports');
         $query = Ticket::with(['user', 'assignee', 'tags']);
 
         // Aplicar filtros
@@ -60,6 +61,7 @@ class ReportController extends Controller
      */
     public function exportPdf(Request $request)
     {
+        $this->authorize('viewReports');
         $query = $this->buildQuery($request);
         $tickets = $query->get();
         $stats = $this->calculateStats($query);
@@ -79,6 +81,7 @@ class ReportController extends Controller
      */
     public function exportExcel(Request $request)
     {
+        $this->authorize('viewReports');
         $query = $this->buildQuery($request);
         $tickets = $query->get();
 

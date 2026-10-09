@@ -95,4 +95,26 @@ class HighPrioritySecurityTest extends TestCase
             'status' => 'scheduled',
         ]);
     }
+
+    public function test_only_admin_can_view_and_export_reports(): void
+    {
+        $client = User::factory()->create([
+            'role' => User::ROLE_CLIENT,
+            'email_verified_at' => now(),
+        ]);
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+
+        foreach (['admin.reports.index', 'admin.reports.export-excel', 'admin.reports.export-pdf'] as $routeName) {
+            $this->actingAs($client)->get(route($routeName))->assertForbidden();
+        }
+
+        $this->actingAs($admin)->get(route('admin.reports.index'))->assertOk();
+        $this->actingAs($admin)
+            ->get(route('admin.reports.export-excel'))
+            ->assertOk()
+            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+    }
 }
