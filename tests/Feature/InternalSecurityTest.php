@@ -163,6 +163,40 @@ class InternalSecurityTest extends TestCase
             ->assertDontSee($resolvedTicket->subject);
     }
 
+    public function test_kanban_eager_loads_only_the_latest_message_and_attachments(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $ticket = $this->makeTicket($client);
+        $ticket->messages()->create([
+            'user_id' => $client->id,
+            'message' => 'Mensagem antiga',
+            'is_internal' => false,
+            'time_spent' => 0,
+        ]);
+        $latestMessage = $ticket->messages()->create([
+            'user_id' => $client->id,
+            'message' => 'Mensagem mais recente',
+            'is_internal' => false,
+            'time_spent' => 0,
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.tickets.kanban'))
+            ->assertOk()
+            ->assertViewHas('groupedTickets', function ($groupedTickets) use ($ticket, $latestMessage): bool {
+                $loadedTicket = $groupedTickets->flatten()->firstWhere('id', $ticket->id);
+
+                return $loadedTicket !== null
+                    && $loadedTicket->relationLoaded('latestMessage')
+                    && $loadedTicket->latestMessage?->is($latestMessage)
+                    && $loadedTicket->latestMessage->relationLoaded('attachments');
+            });
+    }
+
     public function test_internal_dashboard_stats_are_portable_and_cache_invalidates(): void
     {
         $client = User::factory()->create(['role' => 'client']);

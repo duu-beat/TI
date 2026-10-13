@@ -7,6 +7,7 @@ use App\Enums\TicketStatus;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -74,6 +75,11 @@ class Ticket extends Model
     public function messages(): HasMany
     {
         return $this->hasMany(TicketMessage::class)->latest();
+    }
+
+    public function latestMessage(): HasOne
+    {
+        return $this->hasOne(TicketMessage::class)->latestOfMany();
     }
 
     public function attachments(): HasMany

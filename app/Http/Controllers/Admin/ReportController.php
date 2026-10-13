@@ -18,7 +18,7 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         $this->authorize('viewReports');
-        $query = Ticket::with(['user', 'assignee', 'tags']);
+        $query = Ticket::with(['user', 'assignee']);
 
         // Aplicar filtros
         if ($request->filled('date_from')) {
@@ -141,7 +141,7 @@ class ReportController extends Controller
      */
     private function buildQuery(Request $request)
     {
-        $query = Ticket::with(['user', 'assignee', 'tags']);
+        $query = Ticket::with(['user', 'assignee']);
 
         if ($request->filled('date_from')) {
             $query->whereDate('created_at', '>=', $request->date_from);

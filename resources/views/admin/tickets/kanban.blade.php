@@ -149,7 +149,7 @@
                                                 <div class="w-6 h-6 rounded-lg bg-slate-700 flex items-center justify-center text-[10px] text-white font-bold border border-white/10">
                                                     {{ substr($ticket->user->name, 0, 1) }}
                                                 </div>
-                                                @if($ticket->messages->first()?->attachments->isNotEmpty())
+                                                @if($ticket->latestMessage?->attachments->isNotEmpty())
                                                     <div class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-indigo-500 rounded-full border border-slate-800"></div>
                                                 @endif
                                             </div>

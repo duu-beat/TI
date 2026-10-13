@@ -1,8 +1,8 @@
 # Estado atual do projeto
 
-**Atualizado em:** 9 de outubro de 2026
+**Atualizado em:** 13 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** proteção dos endpoints críticos de chamados
+**Último avanço validado:** otimização de consultas do Kanban e relatórios
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 91 testes aprovados.
-- 371 asserções executadas.
+- 93 testes aprovados.
+- 373 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -45,6 +45,8 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Removido o FormRequest duplicado e não utilizado em `app/Http/Requests/Client/StoreTicketRequest.php`.
 - Policies e middlewares existentes continuam preservados.
 - O locale não foi modificado nesta etapa.
+- O Kanban carrega somente a mensagem mais recente e seus anexos por chamado, evitando carregar todo o histórico em memória.
+- Relatórios administrativos não carregam mais a relação de tags, que não é utilizada nas telas nem nas exportações.
 
 ## Módulos disponíveis
 
@@ -81,6 +83,13 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 - Melhorar busca textual para bases maiores.
 - Preparar exportações grandes para processamento em fila.
 - Atualizar documentação de deploy conforme o ambiente definitivo.
+
+### Auditoria de performance realizada
+
+- A listagem administrativa utiliza paginação de 15 registros e relacionamentos principais eager-loaded.
+- O Kanban permanece limitado aos 100 chamados mais recentes em aberto, agora com relacionamento `latestMessage` e anexos pré-carregados.
+- O relatório administrativo permanece paginado em 50 registros.
+- As exportações PDF/CSV continuam limitadas pela capacidade do formato; o CSV é o próximo candidato para processamento em streaming/fila quando o volume real justificar.
 
 ### Próximas funcionalidades
 

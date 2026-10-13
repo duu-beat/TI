@@ -64,7 +64,7 @@ class TicketController extends Controller
     public function kanban()
     {
         // 1. Busca tickets abertos com relacionamentos
-        $tickets = Ticket::with(['user', 'assignee', 'tags']) 
+        $tickets = Ticket::with(['user', 'assignee', 'tags', 'latestMessage.attachments'])
             ->where('status', '!=', TicketStatus::CLOSED)
             ->latest()
             ->limit(100)
