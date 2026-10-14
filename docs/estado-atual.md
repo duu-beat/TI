@@ -2,7 +2,7 @@
 
 **Atualizado em:** 14 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** otimização da busca global
+**Último avanço validado:** ajuste da ordem do menu público
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 95 testes aprovados.
-- 384 asserções executadas.
+- 96 testes aprovados.
+- 390 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -50,6 +50,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Exportação CSV utiliza `lazy(500)` e grava os registros em fluxo, reduzindo o uso de memória em bases maiores.
 - Busca global normaliza espaços, limita a entrada a 80 caracteres e seleciona somente as colunas necessárias.
 - Busca global mantém limites de 5 chamados e 3 usuários, com ordenação determinística e teste de autorização para o endpoint.
+- Menu público desktop e mobile reorganizado para: Serviços, FAQ, Portfólio, Sobre e Contato.
 
 ## Módulos disponíveis
 

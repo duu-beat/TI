@@ -67,4 +67,23 @@ class HomeControllerTest extends TestCase
             ->assertSee(route('services'), false)
             ->assertSee(route('contact'), false);
     }
+
+    public function test_public_navigation_uses_the_requested_order(): void
+    {
+        $content = $this->get(route('home'))
+            ->assertOk()
+            ->getContent();
+
+        $labels = ['Serviços', 'FAQ', 'Portfólio', 'Sobre', 'Contato'];
+        $positions = array_map(
+            static fn (string $label): int => strpos($content, ">{$label}</a>"),
+            $labels,
+        );
+
+        $this->assertNotContains(false, $positions);
+        $this->assertTrue($positions[0] < $positions[1]);
+        $this->assertTrue($positions[1] < $positions[2]);
+        $this->assertTrue($positions[2] < $positions[3]);
+        $this->assertTrue($positions[3] < $positions[4]);
+    }
 }

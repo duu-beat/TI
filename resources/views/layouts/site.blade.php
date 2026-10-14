@@ -176,19 +176,14 @@
                             Nav só aparece no desktop (md:flex, hidden no mobile)
                             links com espaçamento e estilo
                         --}}
-                        {{-- 🔥 Link SOBRE adicionado aqui --}}
-                        <a class="hover:text-white transition hover:-translate-y-0.5 {{ request()->routeIs('sobre') ? 'text-cyan-400' : '' }}" href="{{ route('sobre') }}">Sobre</a>
-                        {{-- 
-                            Link "Sobre"
-                            routeIs('sobre') pinta o link como ativo (cyan)
-                            hover sobe levemente e fica branco
-                        --}}
                         <a class="hover:text-white transition hover:-translate-y-0.5 {{ request()->routeIs('services') ? 'text-cyan-400' : '' }}" href="{{ route('services') }}">Serviços</a>
                         {{-- Link Serviços com destaque se rota atual for services --}}
                         <a class="hover:text-white transition hover:-translate-y-0.5 {{ request()->routeIs('faq') ? 'text-cyan-400' : '' }}" href="{{ route('faq') }}">FAQ</a>
                         {{-- Link FAQ com destaque se rota atual for faq --}}
                         <a class="hover:text-white transition hover:-translate-y-0.5 {{ request()->routeIs('portfolio') ? 'text-cyan-400' : '' }}" href="{{ route('portfolio') }}">Portfólio</a>
                         {{-- Link Portfólio com destaque se rota atual for portfolio --}}
+                        <a class="hover:text-white transition hover:-translate-y-0.5 {{ request()->routeIs('sobre') ? 'text-cyan-400' : '' }}" href="{{ route('sobre') }}">Sobre</a>
+                        {{-- Link Sobre com destaque se rota atual for sobre --}}
                         <a class="hover:text-white transition hover:-translate-y-0.5 {{ request()->routeIs('contact') ? 'text-cyan-400' : '' }}" href="{{ route('contact') }}">Contato</a>
                         {{-- Link Contato com destaque se rota atual for contact --}}
 
@@ -275,15 +270,14 @@
                     - style display none: evita flash antes do Alpine iniciar
                  --}}
                  
-                {{-- 🔥 Link SOBRE adicionado aqui --}}
-                <a x-ref="mobileFirstLink" @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('sobre') }}">Sobre</a>
-                {{-- Link Sobre no menu mobile --}}
-                <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('services') }}">Serviços</a>
+                <a x-ref="mobileFirstLink" @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('services') }}">Serviços</a>
                 {{-- Link Serviços no menu mobile --}}
                 <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('faq') }}">FAQ</a>
                 {{-- Link FAQ no menu mobile --}}
                 <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('portfolio') }}">Portfólio</a>
                 {{-- Link Portfólio no menu mobile --}}
+                <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('sobre') }}">Sobre</a>
+                {{-- Link Sobre no menu mobile --}}
                 <a @click="closeMobileMenu()" class="text-lg font-medium text-slate-300 hover:text-white" href="{{ route('contact') }}">Contato</a>
                 {{-- Link Contato no menu mobile --}}
                 
