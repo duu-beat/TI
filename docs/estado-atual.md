@@ -2,7 +2,7 @@
 
 **Atualizado em:** 14 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** ajuste da ordem do menu público
+**Último avanço validado:** base de filiais e setores no inventário
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 96 testes aprovados.
-- 390 asserções executadas.
+- 100 testes aprovados.
+- 404 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -51,6 +51,9 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Busca global normaliza espaços, limita a entrada a 80 caracteres e seleciona somente as colunas necessárias.
 - Busca global mantém limites de 5 chamados e 3 usuários, com ordenação determinística e teste de autorização para o endpoint.
 - Menu público desktop e mobile reorganizado para: Serviços, FAQ, Portfólio, Sobre e Contato.
+- Ativos agora podem ser vinculados opcionalmente a uma filial e a um setor.
+- Setores só podem ser vinculados à filial correspondente; filiais e setores excluídos logicamente não são aceitos nos formulários.
+- Ativos existentes permanecem compatíveis sem localização definida.
 
 ## Módulos disponíveis
 
@@ -63,6 +66,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Checklists de atendimento.
 - Visitas técnicas.
 - Inventário de ativos.
+- Filiais e setores para organização do inventário.
 - QR Code de ativos.
 - Termos digitais com assinatura.
 - Base de Conhecimento/Wiki.
@@ -97,8 +101,8 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Próximas funcionalidades
 
-- Setores, filiais e localizações.
-- Histórico completo de movimentação de ativos.
+- Fluxo transacional de transferência de ativos entre responsáveis, setores e filiais.
+- Telas administrativas para manutenção de filiais e setores.
 - Importação de inventário por CSV/Excel.
 - Gestão de fornecedores, garantias e contratos.
 - Dashboard analítico por setor, categoria e ativo.

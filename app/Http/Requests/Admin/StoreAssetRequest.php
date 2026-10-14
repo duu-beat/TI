@@ -19,6 +19,14 @@ class StoreAssetRequest extends FormRequest
             'name' => ['required', 'string', 'max:255'],
             'tag' => ['required', 'string', 'max:50', 'unique:assets,tag'],
             'user_id' => ['nullable', Rule::exists('users', 'id')->where(fn ($query) => $query->where('role', User::ROLE_CLIENT))],
+            'branch_id' => ['nullable', 'integer', Rule::exists('branches', 'id')->whereNull('deleted_at')],
+            'sector_id' => [
+                'nullable',
+                'integer',
+                Rule::exists('sectors', 'id')->where(fn ($query) => $query
+                    ->where('branch_id', $this->input('branch_id'))
+                    ->whereNull('deleted_at')),
+            ],
             'type' => ['required', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],

@@ -19,6 +19,8 @@ class Asset extends Model
     use HasFactory, SoftDeletes, Searchable, Auditable;
     protected $fillable = [
         'user_id',
+        'branch_id',
+        'sector_id',
         'name',
         'tag',
         'serial_number',
@@ -57,6 +59,16 @@ class Asset extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function branch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class);
+    }
+
+    public function sector(): BelongsTo
+    {
+        return $this->belongsTo(Sector::class);
     }
 
     /**

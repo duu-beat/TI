@@ -119,6 +119,30 @@
                                 </select>
                             </div>
 
+                            {{-- Localização do ativo --}}
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.branch') }}</label>
+                                <select name="branch_id"
+                                        class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                    <option value="" class="bg-slate-900">{{ __('assets.ui.without_branch') }}</option>
+                                    @foreach($branches as $branch)
+                                        <option value="{{ $branch->id }}" class="bg-slate-900" {{ old('branch_id', $asset->branch_id) == $branch->id ? 'selected' : '' }}>{{ $branch->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error for="branch_id" class="mt-2" />
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.sector') }}</label>
+                                <select name="sector_id"
+                                        class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                    <option value="" class="bg-slate-900">{{ __('assets.ui.without_sector') }}</option>
+                                    @foreach($sectors as $sector)
+                                        <option value="{{ $sector->id }}" data-branch-id="{{ $sector->branch_id }}" class="bg-slate-900" {{ old('sector_id', $asset->sector_id) == $sector->id ? 'selected' : '' }}>{{ $sector->name }}</option>
+                                    @endforeach
+                                </select>
+                                <x-input-error for="sector_id" class="mt-2" />
+                            </div>
+
                             {{-- Status --}}
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.current_status') }}</label>
