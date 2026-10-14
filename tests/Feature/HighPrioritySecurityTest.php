@@ -132,4 +132,33 @@ class HighPrioritySecurityTest extends TestCase
             ->assertOk()
             ->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
     }
+
+    public function test_csv_export_streams_filtered_ticket_rows(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        Ticket::factory()->create([
+            'user_id' => $client->id,
+            'subject' => 'Chamado incluído no CSV',
+            'category' => 'Hardware',
+        ]);
+        Ticket::factory()->create([
+            'user_id' => $client->id,
+            'subject' => 'Chamado fora do filtro',
+            'category' => 'Software',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->get(route('admin.reports.export-excel', ['category' => 'Hardware']));
+
+        $response->assertOk()
+            ->assertHeader('Content-Type', 'text/csv; charset=UTF-8');
+        $content = $response->streamedContent();
+
+        $this->assertStringContainsString('Chamado incluído no CSV', $content);
+        $this->assertStringNotContainsString('Chamado fora do filtro', $content);
+    }
 }

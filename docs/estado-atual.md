@@ -1,8 +1,8 @@
 # Estado atual do projeto
 
-**Atualizado em:** 13 de outubro de 2026
+**Atualizado em:** 14 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** otimização de consultas do Kanban e relatórios
+**Último avanço validado:** exportação CSV em streaming
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 93 testes aprovados.
-- 373 asserções executadas.
+- 94 testes aprovados.
+- 378 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -47,6 +47,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - O locale não foi modificado nesta etapa.
 - O Kanban carrega somente a mensagem mais recente e seus anexos por chamado, evitando carregar todo o histórico em memória.
 - Relatórios administrativos não carregam mais a relação de tags, que não é utilizada nas telas nem nas exportações.
+- Exportação CSV utiliza `lazy(500)` e grava os registros em fluxo, reduzindo o uso de memória em bases maiores.
 
 ## Módulos disponíveis
 
@@ -81,7 +82,6 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 - Ampliar testes de autorização para todos os recursos.
 - Melhorar busca textual para bases maiores.
-- Preparar exportações grandes para processamento em fila.
 - Atualizar documentação de deploy conforme o ambiente definitivo.
 
 ### Auditoria de performance realizada
@@ -89,7 +89,7 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 - A listagem administrativa utiliza paginação de 15 registros e relacionamentos principais eager-loaded.
 - O Kanban permanece limitado aos 100 chamados mais recentes em aberto, agora com relacionamento `latestMessage` e anexos pré-carregados.
 - O relatório administrativo permanece paginado em 50 registros.
-- As exportações PDF/CSV continuam limitadas pela capacidade do formato; o CSV é o próximo candidato para processamento em streaming/fila quando o volume real justificar.
+- A exportação CSV é processada em blocos de 500 registros durante o streaming da resposta; a exportação PDF continua limitada pela capacidade de renderização do formato.
 
 ### Próximas funcionalidades
 

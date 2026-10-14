@@ -83,7 +83,8 @@ class ReportController extends Controller
     {
         $this->authorize('viewReports');
         $query = $this->buildQuery($request);
-        $tickets = $query->get();
+        // Mantém o uso de memória previsível mesmo com muitos chamados.
+        $tickets = $query->lazy(500);
 
         $filename = 'relatorio-chamados-' . now()->format('Y-m-d') . '.csv';
 
