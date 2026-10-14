@@ -34,6 +34,7 @@ class HighPrioritySecurityTest extends TestCase
             'admin.checklists.index',
             'admin.visits.index',
             'admin.reports.index',
+            'admin.global-search',
         ];
 
         foreach ($operationalRoutes as $routeName) {
@@ -160,5 +161,31 @@ class HighPrioritySecurityTest extends TestCase
 
         $this->assertStringContainsString('Chamado incluído no CSV', $content);
         $this->assertStringNotContainsString('Chamado fora do filtro', $content);
+    }
+
+    public function test_global_search_normalizes_query_and_limits_ticket_results(): void
+    {
+        $admin = User::factory()->create([
+            'role' => User::ROLE_ADMIN,
+            'email_verified_at' => now(),
+        ]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+
+        Ticket::factory()->count(6)->create([
+            'user_id' => $client->id,
+            'subject' => 'Problema de VPN corporativa',
+        ]);
+
+        $response = $this->actingAs($admin)
+            ->getJson(route('admin.global-search', ['query' => '  VPN  ']));
+
+        $response->assertOk();
+        $results = $response->json();
+
+        $this->assertCount(5, $results);
+        $this->assertTrue(collect($results)->every(fn (array $result): bool => $result['type'] === 'ticket'));
+        $this->assertSame([], $this->actingAs($admin)
+            ->getJson(route('admin.global-search', ['query' => ' V ']))
+            ->json());
     }
 }

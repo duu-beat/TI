@@ -258,15 +258,24 @@ class TicketController extends Controller
     // Busca Global para o Spotlight
     public function globalSearch(Request $request)
     {
-        $query = $request->get('query');
-        
-        if (strlen($query) < 2) return response()->json([]);
+        $query = trim((string) $request->query('query', ''));
+
+        if (mb_strlen($query) < 2) {
+            return response()->json([]);
+        }
+
+        $query = mb_substr($query, 0, 80);
 
         // Busca Tickets
-        $tickets = Ticket::where('id', 'like', "%{$query}%")
-            ->orWhere('subject', 'like', "%{$query}%")
-            ->with('user')
-            ->take(5)
+        $tickets = Ticket::query()
+            ->select(['id', 'user_id', 'subject', 'status'])
+            ->where(function ($ticketQuery) use ($query) {
+                $ticketQuery->where('id', 'like', "%{$query}%")
+                    ->orWhere('subject', 'like', "%{$query}%");
+            })
+            ->with('user:id,name')
+            ->orderByDesc('id')
+            ->limit(5)
             ->get()
             ->map(function($ticket) {
                 return [
@@ -281,12 +290,15 @@ class TicketController extends Controller
 
         // Busca Usuários (Limitado a Master na busca global para segurança)
         $users = $request->user()->isMaster()
-            ? User::where(function($q) use ($query) {
+            ? User::query()
+                ->select(['id', 'name', 'email'])
+                ->where(function ($q) use ($query) {
                 $q->where('name', 'like', "%{$query}%")
                   ->orWhere('email', 'like', "%{$query}%");
-            })
-            ->take(3)
-            ->get()
+                })
+                ->orderBy('name')
+                ->limit(3)
+                ->get()
             ->map(function($user) {
                 return [
                     'type' => 'user',

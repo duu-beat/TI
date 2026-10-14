@@ -2,7 +2,7 @@
 
 **Atualizado em:** 14 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** exportação CSV em streaming
+**Último avanço validado:** otimização da busca global
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 94 testes aprovados.
-- 378 asserções executadas.
+- 95 testes aprovados.
+- 384 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -48,6 +48,8 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - O Kanban carrega somente a mensagem mais recente e seus anexos por chamado, evitando carregar todo o histórico em memória.
 - Relatórios administrativos não carregam mais a relação de tags, que não é utilizada nas telas nem nas exportações.
 - Exportação CSV utiliza `lazy(500)` e grava os registros em fluxo, reduzindo o uso de memória em bases maiores.
+- Busca global normaliza espaços, limita a entrada a 80 caracteres e seleciona somente as colunas necessárias.
+- Busca global mantém limites de 5 chamados e 3 usuários, com ordenação determinística e teste de autorização para o endpoint.
 
 ## Módulos disponíveis
 
@@ -81,7 +83,7 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 ### Prioridade média
 
 - Ampliar testes de autorização para todos os recursos.
-- Melhorar busca textual para bases maiores.
+- Avaliar busca full-text para bases muito maiores, caso o volume real justifique.
 - Atualizar documentação de deploy conforme o ambiente definitivo.
 
 ### Auditoria de performance realizada
@@ -90,6 +92,7 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 - O Kanban permanece limitado aos 100 chamados mais recentes em aberto, agora com relacionamento `latestMessage` e anexos pré-carregados.
 - O relatório administrativo permanece paginado em 50 registros.
 - A exportação CSV é processada em blocos de 500 registros durante o streaming da resposta; a exportação PDF continua limitada pela capacidade de renderização do formato.
+- A busca global evita payloads desnecessários e entradas excessivamente longas; buscas com menos de dois caracteres retornam vazio.
 
 ### Próximas funcionalidades
 
