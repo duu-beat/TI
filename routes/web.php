@@ -202,6 +202,19 @@ Route::middleware(['auth', 'verified', \App\Http\Middleware\MasterMiddleware::cl
 Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::resource('tags', \App\Http\Controllers\Admin\TagController::class)
         ->only(['index', 'store', 'update', 'destroy']);
+
+    Route::controller(\App\Http\Controllers\Admin\InventoryLocationController::class)
+        ->prefix('inventario/localizacoes')
+        ->name('inventory.locations.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/filiais', 'storeBranch')->name('branches.store');
+            Route::put('/filiais/{branch}', 'updateBranch')->name('branches.update');
+            Route::delete('/filiais/{branch}', 'destroyBranch')->name('branches.destroy');
+            Route::post('/setores', 'storeSector')->name('sectors.store');
+            Route::put('/setores/{sector}', 'updateSector')->name('sectors.update');
+            Route::delete('/setores/{sector}', 'destroySector')->name('sectors.destroy');
+        });
     
     Route::post('chamados/{ticket}/tags', [\App\Http\Controllers\Admin\TagController::class, 'attachToTicket'])
         ->name('tickets.tags.attach');

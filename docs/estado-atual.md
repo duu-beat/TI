@@ -2,7 +2,7 @@
 
 **Atualizado em:** 14 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** base de filiais e setores no inventário
+**Último avanço validado:** CRUD protegido de filiais e setores no inventário
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 100 testes aprovados.
-- 404 asserções executadas.
+- 101 testes aprovados.
+- 408 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -54,6 +54,9 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Ativos agora podem ser vinculados opcionalmente a uma filial e a um setor.
 - Setores só podem ser vinculados à filial correspondente; filiais e setores excluídos logicamente não são aceitos nos formulários.
 - Ativos existentes permanecem compatíveis sem localização definida.
+- CRUD administrativo de filiais e setores protegido por policy e middleware de administrador.
+- Exclusão de filiais e setores utiliza SoftDeletes, preservando vínculos e histórico dos ativos.
+- Nomes de setores são únicos dentro de cada filial, com regressão automatizada.
 
 ## Módulos disponíveis
 
@@ -102,7 +105,6 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 ### Próximas funcionalidades
 
 - Fluxo transacional de transferência de ativos entre responsáveis, setores e filiais.
-- Telas administrativas para manutenção de filiais e setores.
 - Importação de inventário por CSV/Excel.
 - Gestão de fornecedores, garantias e contratos.
 - Dashboard analítico por setor, categoria e ativo.

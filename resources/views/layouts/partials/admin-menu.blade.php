@@ -54,6 +54,11 @@
         📦 Inventário de TI
     </a>
 
+    <a href="{{ route('admin.inventory.locations.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.inventory.locations.*') ? $activeClass : $inactiveClass }}">
+        🏢 Filiais e Setores
+    </a>
+
     {{-- Checklists --}}
     <a href="{{ route('admin.checklists.index') }}"
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.checklists.*') ? $activeClass : $inactiveClass }}">

@@ -96,4 +96,81 @@ class AssetLocationTest extends TestCase
             ->assertSee('Filial Norte')
             ->assertSee('Operações');
     }
+
+    public function test_client_cannot_access_or_mutate_inventory_locations(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+
+        $this->actingAs($client)
+            ->get(route('admin.inventory.locations.index'))
+            ->assertForbidden();
+
+        $this->actingAs($client)
+            ->post(route('admin.inventory.locations.branches.store'), ['name' => 'Filial indevida'])
+            ->assertForbidden();
+    }
+
+    public function test_admin_can_manage_branches_and_sectors(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.inventory.locations.index'))
+            ->assertOk();
+
+        $this->actingAs($admin)
+            ->post(route('admin.inventory.locations.branches.store'), [
+                'name' => 'Filial Sul',
+                'code' => 'SUL',
+                'address' => 'Rua das Redes, 10',
+            ])
+            ->assertRedirect();
+
+        $branch = Branch::where('code', 'SUL')->firstOrFail();
+
+        $this->actingAs($admin)
+            ->post(route('admin.inventory.locations.sectors.store'), [
+                'branch_id' => $branch->id,
+                'name' => 'Infraestrutura',
+            ])
+            ->assertRedirect();
+
+        $sector = Sector::where('branch_id', $branch->id)->firstOrFail();
+
+        $this->actingAs($admin)
+            ->put(route('admin.inventory.locations.sectors.update', $sector), [
+                'branch_id' => $branch->id,
+                'name' => 'Infraestrutura e Redes',
+            ])
+            ->assertRedirect();
+
+        $this->assertDatabaseHas('sectors', [
+            'id' => $sector->id,
+            'name' => 'Infraestrutura e Redes',
+        ]);
+
+        $this->actingAs($admin)
+            ->delete(route('admin.inventory.locations.branches.destroy', $branch))
+            ->assertRedirect();
+
+        $this->assertSoftDeleted('branches', ['id' => $branch->id]);
+    }
+
+    public function test_sector_name_must_be_unique_inside_each_branch(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $branch = Branch::factory()->create();
+
+        Sector::factory()->create([
+            'branch_id' => $branch->id,
+            'name' => 'Suporte',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.inventory.locations.sectors.store'), [
+                'branch_id' => $branch->id,
+                'name' => 'Suporte',
+            ])
+            ->assertSessionHasErrors('name');
+    }
 }

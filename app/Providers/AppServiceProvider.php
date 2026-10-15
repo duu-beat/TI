@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Asset;
+use App\Models\Branch;
+use App\Models\Sector;
 use App\Models\KnowledgeBase;
 use App\Models\NpsSurvey;
 use App\Models\Ticket;
@@ -14,6 +16,7 @@ use App\Observers\TicketObserver;
 use App\Policies\TicketPolicy;
 use App\Policies\NotificationPolicy;
 use App\Policies\AssetPolicy;
+use App\Policies\InventoryLocationPolicy;
 use App\Policies\KnowledgeBasePolicy;
 use App\Policies\CannedResponsePolicy;
 use App\Policies\ChecklistTemplatePolicy;
@@ -48,6 +51,8 @@ class AppServiceProvider extends ServiceProvider
         Gate::policy(Ticket::class, TicketPolicy::class);
         Gate::policy(Notification::class, NotificationPolicy::class);
         Gate::policy(Asset::class, AssetPolicy::class);
+        Gate::policy(Branch::class, InventoryLocationPolicy::class);
+        Gate::policy(Sector::class, InventoryLocationPolicy::class);
         Gate::policy(KnowledgeBase::class, KnowledgeBasePolicy::class);
         Gate::policy(\App\Models\CannedResponse::class, CannedResponsePolicy::class);
         Gate::policy(\App\Models\ChecklistTemplate::class, ChecklistTemplatePolicy::class);
