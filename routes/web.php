@@ -247,6 +247,13 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
             Route::post('/{term}/cancelar', 'cancel')->name('cancel');
             Route::get('/{term}/pdf', 'download')->name('download');
         });
+    Route::controller(\App\Http\Controllers\Admin\AssetTransferController::class)
+        ->prefix('assets/{asset}/transferencia')
+        ->name('assets.transfer.')
+        ->group(function () {
+            Route::get('/', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+        });
     Route::resource('assets', \App\Http\Controllers\Admin\AssetController::class);
 
     // 📋 Rotas de Checklist

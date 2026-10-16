@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Models\Asset;
+use App\Models\AssetHistory;
 use App\Models\Branch;
 use App\Models\Sector;
 use App\Models\User;
@@ -172,5 +173,74 @@ class AssetLocationTest extends TestCase
                 'name' => 'Suporte',
             ])
             ->assertSessionHasErrors('name');
+    }
+
+    public function test_admin_can_transfer_asset_and_records_complete_location_history(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $recipient = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $oldBranch = Branch::factory()->create(['name' => 'Filial Antiga']);
+        $newBranch = Branch::factory()->create(['name' => 'Filial Nova']);
+        $oldSector = Sector::factory()->create(['branch_id' => $oldBranch->id, 'name' => 'Antigo']);
+        $newSector = Sector::factory()->create(['branch_id' => $newBranch->id, 'name' => 'Novo']);
+        $asset = Asset::factory()->create([
+            'user_id' => null,
+            'branch_id' => $oldBranch->id,
+            'sector_id' => $oldSector->id,
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.assets.transfer.store', $asset), [
+                'user_id' => $recipient->id,
+                'branch_id' => $newBranch->id,
+                'sector_id' => $newSector->id,
+                'reason' => 'Entrega para novo projeto',
+            ])
+            ->assertRedirect(route('admin.assets.show', $asset));
+
+        $asset->refresh();
+        $this->assertSame($recipient->id, $asset->user_id);
+        $this->assertSame($newBranch->id, $asset->branch_id);
+        $this->assertSame($newSector->id, $asset->sector_id);
+        $this->assertDatabaseHas('asset_histories', [
+            'asset_id' => $asset->id,
+            'action' => 'transfer',
+            'old_branch_id' => $oldBranch->id,
+            'new_branch_id' => $newBranch->id,
+            'old_sector_id' => $oldSector->id,
+            'new_sector_id' => $newSector->id,
+            'new_user_id' => $recipient->id,
+        ]);
+    }
+
+    public function test_transfer_rejects_sector_from_another_branch_without_changing_asset(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $branch = Branch::factory()->create();
+        $otherBranch = Branch::factory()->create();
+        $sector = Sector::factory()->create(['branch_id' => $otherBranch->id]);
+        $asset = Asset::factory()->create(['branch_id' => $branch->id, 'sector_id' => null]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.assets.transfer.store', $asset), [
+                'branch_id' => $branch->id,
+                'sector_id' => $sector->id,
+                'reason' => 'Tentativa inválida',
+            ])
+            ->assertSessionHasErrors('sector_id');
+
+        $asset->refresh();
+        $this->assertNull($asset->sector_id);
+        $this->assertDatabaseMissing('asset_histories', ['asset_id' => $asset->id, 'action' => 'transfer']);
+    }
+
+    public function test_client_cannot_access_asset_transfer(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $asset = Asset::factory()->create();
+
+        $this->actingAs($client)
+            ->get(route('admin.assets.transfer.create', $asset))
+            ->assertForbidden();
     }
 }

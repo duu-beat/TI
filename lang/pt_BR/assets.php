@@ -11,6 +11,16 @@ return [
         'lost' => 'Extraviado',
     ],
     'stock' => 'Em estoque',
+    'transfer' => [
+        'eyebrow' => 'Governança do inventário',
+        'title' => 'Transferir ativo',
+        'current_location' => 'Localização atual',
+        'reason' => 'Motivo da transferência',
+        'reason_placeholder' => 'Informe o motivo, chamado ou termo relacionado à transferência.',
+        'confirm' => 'Confirmar transferência',
+        'completed' => 'Transferência registrada com sucesso.',
+        'history_description' => 'Transferência: :reason. Responsável: :old_user → :new_user. Filial: :old_branch → :new_branch. Setor: :old_sector → :new_sector.',
+    ],
     'locations' => [
         'eyebrow' => 'Inventário organizado',
         'title' => 'Filiais e setores',

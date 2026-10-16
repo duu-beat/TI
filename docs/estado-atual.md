@@ -1,8 +1,8 @@
 # Estado atual do projeto
 
-**Atualizado em:** 14 de outubro de 2026
+**Atualizado em:** 16 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** CRUD protegido de filiais e setores no inventário
+**Último avanço validado:** transferência transacional de ativos
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 101 testes aprovados.
-- 408 asserções executadas.
+- 106 testes aprovados.
+- 426 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -57,6 +57,9 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - CRUD administrativo de filiais e setores protegido por policy e middleware de administrador.
 - Exclusão de filiais e setores utiliza SoftDeletes, preservando vínculos e histórico dos ativos.
 - Nomes de setores são únicos dentro de cada filial, com regressão automatizada.
+- Transferências de ativos atualizam responsável, filial e setor dentro de transação com `lockForUpdate()`.
+- Cada transferência registra motivo, executor e valores antigos/novos no histórico do ativo.
+- Setor de outra filial é rejeitado antes da alteração, evitando estado inconsistente.
 
 ## Módulos disponíveis
 
@@ -70,6 +73,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Visitas técnicas.
 - Inventário de ativos.
 - Filiais e setores para organização do inventário.
+- Transferência rastreável de ativos entre responsáveis, filiais e setores.
 - QR Code de ativos.
 - Termos digitais com assinatura.
 - Base de Conhecimento/Wiki.
@@ -104,7 +108,6 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Próximas funcionalidades
 
-- Fluxo transacional de transferência de ativos entre responsáveis, setores e filiais.
 - Importação de inventário por CSV/Excel.
 - Gestão de fornecedores, garantias e contratos.
 - Dashboard analítico por setor, categoria e ativo.

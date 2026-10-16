@@ -16,6 +16,10 @@ class AssetHistory extends Model
         'new_status',
         'old_user_id',
         'new_user_id',
+        'old_branch_id',
+        'new_branch_id',
+        'old_sector_id',
+        'new_sector_id',
         'signature', // Base64 da assinatura digital
     ];
 
@@ -37,5 +41,25 @@ class AssetHistory extends Model
     public function newUser(): BelongsTo
     {
         return $this->belongsTo(User::class, 'new_user_id');
+    }
+
+    public function oldBranch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'old_branch_id');
+    }
+
+    public function newBranch(): BelongsTo
+    {
+        return $this->belongsTo(Branch::class, 'new_branch_id');
+    }
+
+    public function oldSector(): BelongsTo
+    {
+        return $this->belongsTo(Sector::class, 'old_sector_id');
+    }
+
+    public function newSector(): BelongsTo
+    {
+        return $this->belongsTo(Sector::class, 'new_sector_id');
     }
 }

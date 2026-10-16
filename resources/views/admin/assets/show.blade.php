@@ -12,6 +12,9 @@
                 <a href="{{ route('admin.assets.terms.create', $asset) }}" class="rounded-xl border border-indigo-400/25 bg-indigo-500/10 px-4 py-2 text-sm font-bold text-indigo-200 hover:bg-indigo-500 hover:text-white transition">
                     {{ __('assets.ui.issue_term') }}
                 </a>
+                <a href="{{ route('admin.assets.transfer.create', $asset) }}" class="rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-500 hover:text-white transition">
+                    {{ __('assets.transfer.title') }}
+                </a>
                 <a href="{{ route('admin.assets.edit', $asset) }}" class="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 transition">
                     {{ __('assets.ui.maintenance_editing') }}
                 </a>
