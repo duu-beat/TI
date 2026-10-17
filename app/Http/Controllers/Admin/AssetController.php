@@ -134,6 +134,7 @@ class AssetController extends Controller
             'responsibilityTerms.recipient',
             'responsibilityTerms.issuer',
             'warranties.supplier',
+            'contracts.supplier',
             'tickets' => fn ($query) => $query->latest()->limit(5),
         ]);
 

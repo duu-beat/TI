@@ -268,6 +268,16 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
             Route::put('/{warranty}', 'update')->name('update');
             Route::delete('/{warranty}', 'destroy')->name('destroy');
         });
+    Route::controller(\App\Http\Controllers\Admin\AssetContractController::class)
+        ->prefix('assets/{asset}/contratos')
+        ->name('assets.contracts.')
+        ->group(function () {
+            Route::get('/novo', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{contract}/editar', 'edit')->name('edit');
+            Route::put('/{contract}', 'update')->name('update');
+            Route::delete('/{contract}', 'destroy')->name('destroy');
+        });
     Route::controller(\App\Http\Controllers\Admin\AssetTransferController::class)
         ->prefix('assets/{asset}/transferencia')
         ->name('assets.transfer.')

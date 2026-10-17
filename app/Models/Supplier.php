@@ -29,4 +29,9 @@ class Supplier extends Model
     {
         return $this->hasMany(AssetWarranty::class);
     }
+
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(AssetContract::class);
+    }
 }

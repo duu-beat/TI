@@ -82,6 +82,11 @@ class Asset extends Model
         return $this->hasMany(AssetWarranty::class)->latest('expires_at');
     }
 
+    public function contracts(): HasMany
+    {
+        return $this->hasMany(AssetContract::class)->latest('expires_at');
+    }
+
     /**
      * Chamados vinculados a este equipamento específico
      */
