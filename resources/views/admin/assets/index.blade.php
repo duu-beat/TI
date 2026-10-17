@@ -16,6 +16,9 @@
                     <svg class="w-4 h-4 text-slate-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
                     <span>{{ __('assets.ui.export_csv') }}</span>
                 </a>
+                <a href="{{ route('admin.assets.import.create') }}" class="group flex items-center gap-2 px-4 py-2.5 bg-slate-800 hover:bg-slate-700 border border-white/10 text-slate-300 hover:text-white rounded-xl font-bold text-sm transition shadow-lg">
+                    <span>↥ {{ __('assets.import.title') }}</span>
+                </a>
                 <a href="{{ route('admin.assets.create') }}" 
                    class="group flex items-center gap-2 px-4 py-2.5 bg-cyan-600 hover:bg-cyan-500 border border-cyan-400/30 rounded-xl text-sm font-bold text-white transition hover:shadow-[0_0_20px_rgba(6,182,212,0.4)]">
                     <svg class="w-4 h-4 transition-transform group-hover:scale-110" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>

@@ -8,6 +8,7 @@ use App\Models\Branch;
 use App\Models\Sector;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Http\UploadedFile;
 use Tests\TestCase;
 
 class AssetLocationTest extends TestCase
@@ -242,5 +243,55 @@ class AssetLocationTest extends TestCase
         $this->actingAs($client)
             ->get(route('admin.assets.transfer.create', $asset))
             ->assertForbidden();
+    }
+
+    public function test_admin_imports_csv_assets_with_responsibility_and_location(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $recipient = User::factory()->create(['role' => User::ROLE_CLIENT, 'email' => 'ana@example.test']);
+        $branch = Branch::factory()->create(['code' => 'NORTE']);
+        Sector::factory()->create(['branch_id' => $branch->id, 'name' => 'TI']);
+
+        $csv = implode("\n", [
+            'name,tag,type,brand,model,serial_number,status,purchase_date,warranty_expiration,user_email,branch_code,sector_name,notes',
+            'Notebook importado,IMP-001,Laptop,Dell,Latitude,SN-001,active,2026-01-10,2027-01-10,ana@example.test,NORTE,TI,Importado pelo setor de TI',
+        ]);
+
+        $this->actingAs($admin)
+            ->post(route('admin.assets.import.store'), ['file' => UploadedFile::fake()->createWithContent('ativos.csv', $csv)])
+            ->assertRedirect(route('admin.assets.index'))
+            ->assertSessionHas('success', '1 ativos importados com sucesso.');
+
+        $this->assertDatabaseHas('assets', [
+            'tag' => 'IMP-001',
+            'user_id' => $recipient->id,
+            'branch_id' => $branch->id,
+        ]);
+        $this->assertDatabaseHas('asset_histories', ['action' => 'import']);
+    }
+
+    public function test_invalid_csv_import_is_atomic_and_reports_line_errors(): void
+    {
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $csv = implode("\n", [
+            'name,tag,type,status',
+            'Válido,IMP-002,Laptop,active',
+            'Inválido,IMP-003,Laptop,unknown',
+        ]);
+
+        $this->actingAs($admin)
+            ->from(route('admin.assets.import.create'))
+            ->post(route('admin.assets.import.store'), ['file' => UploadedFile::fake()->createWithContent('ativos.csv', $csv)])
+            ->assertRedirect(route('admin.assets.import.create'))
+            ->assertSessionHas('import_errors', fn (array $errors) => count($errors) === 1 && str_contains($errors[0], 'Linha 3'));
+
+        $this->assertDatabaseMissing('assets', ['tag' => 'IMP-002']);
+        $this->assertDatabaseMissing('assets', ['tag' => 'IMP-003']);
+    }
+
+    public function test_client_cannot_import_assets(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $this->actingAs($client)->get(route('admin.assets.import.create'))->assertForbidden();
     }
 }

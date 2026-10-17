@@ -11,6 +11,18 @@ return [
         'lost' => 'Extraviado',
     ],
     'stock' => 'Em estoque',
+    'import' => [
+        'eyebrow' => 'Carga controlada',
+        'title' => 'Importar inventário CSV',
+        'file_label' => 'Arquivo CSV',
+        'submit' => 'Validar e importar',
+        'validation_title' => 'A importação não foi realizada:',
+        'atomic_hint' => 'Nenhum registro foi gravado porque o arquivo contém erros.',
+        'format_title' => 'Formato esperado',
+        'format_description' => 'Use a primeira linha como cabeçalho. Os campos obrigatórios são name, tag e type. Datas aceitas: AAAA-MM-DD ou DD/MM/AAAA.',
+        'limit_hint' => 'Limite: 1.000 registros por arquivo. Para responsável use user_email; para localização use branch_code e sector_name.',
+        'completed' => ':count ativos importados com sucesso.',
+    ],
     'transfer' => [
         'eyebrow' => 'Governança do inventário',
         'title' => 'Transferir ativo',

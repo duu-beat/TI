@@ -232,6 +232,8 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     });
 
     // 📦 Rotas de Inventário (Assets)
+    Route::get('assets/importar', [\App\Http\Controllers\Admin\AssetImportController::class, 'create'])->name('assets.import.create');
+    Route::post('assets/importar', [\App\Http\Controllers\Admin\AssetImportController::class, 'store'])->name('assets.import.store');
     Route::get('assets/export', [\App\Http\Controllers\Admin\AssetController::class, 'export'])->name('assets.export');
     Route::get('assets/scan/{asset:qr_token}', [\App\Http\Controllers\Admin\AssetController::class, 'show'])->name('assets.scan');
     Route::get('assets/{asset}/etiqueta-qr', [\App\Http\Controllers\Admin\AssetController::class, 'qrLabel'])->name('assets.qr-label');

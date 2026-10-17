@@ -1,8 +1,8 @@
 # Estado atual do projeto
 
-**Atualizado em:** 16 de outubro de 2026
+**Atualizado em:** 17 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** transferência transacional de ativos
+**Último avanço validado:** importação CSV atômica de ativos
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 106 testes aprovados.
-- 426 asserções executadas.
+- 109 testes aprovados.
+- 437 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -60,6 +60,9 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Transferências de ativos atualizam responsável, filial e setor dentro de transação com `lockForUpdate()`.
 - Cada transferência registra motivo, executor e valores antigos/novos no histórico do ativo.
 - Setor de outra filial é rejeitado antes da alteração, evitando estado inconsistente.
+- Importação CSV limitada a 1.000 registros por arquivo e protegida por autorização administrativa.
+- Todas as linhas são validadas antes da gravação; qualquer erro cancela o lote inteiro.
+- Importação resolve responsável por e-mail e localização por código de filial e nome do setor.
 
 ## Módulos disponíveis
 
@@ -74,6 +77,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Inventário de ativos.
 - Filiais e setores para organização do inventário.
 - Transferência rastreável de ativos entre responsáveis, filiais e setores.
+- Importação de inventário por CSV com validação de linhas e histórico de criação.
 - QR Code de ativos.
 - Termos digitais com assinatura.
 - Base de Conhecimento/Wiki.
@@ -108,7 +112,6 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Próximas funcionalidades
 
-- Importação de inventário por CSV/Excel.
 - Gestão de fornecedores, garantias e contratos.
 - Dashboard analítico por setor, categoria e ativo.
 - Escalonamento configurável por prioridade e categoria.
