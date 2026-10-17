@@ -4,6 +4,7 @@ namespace Tests\Feature;
 
 use App\Models\Asset;
 use App\Models\AssetHistory;
+use App\Models\Ticket;
 use App\Models\Branch;
 use App\Models\Sector;
 use App\Models\User;
@@ -293,5 +294,44 @@ class AssetLocationTest extends TestCase
     {
         $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
         $this->actingAs($client)->get(route('admin.assets.import.create'))->assertForbidden();
+    }
+
+    public function test_admin_can_view_inventory_dashboard_with_aggregated_metrics(): void
+    {
+        \Illuminate\Support\Facades\Cache::forget(\App\Services\InventoryDashboardService::CACHE_KEY);
+        $admin = User::factory()->create(['role' => User::ROLE_ADMIN]);
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+        $branch = Branch::factory()->create(['name' => 'Filial Analítica']);
+        $sector = Sector::factory()->create(['branch_id' => $branch->id, 'name' => 'Monitoramento']);
+        $asset = Asset::factory()->create([
+            'branch_id' => $branch->id,
+            'sector_id' => $sector->id,
+            'status' => 'maintenance',
+            'tag' => 'DASH-001',
+        ]);
+        Ticket::factory()->create([
+            'user_id' => $client->id,
+            'asset_id' => $asset->id,
+            'status' => \App\Enums\TicketStatus::IN_PROGRESS,
+            'subject' => 'Falha recorrente no equipamento',
+        ]);
+
+        $this->actingAs($admin)
+            ->get(route('admin.assets.dashboard'))
+            ->assertOk()
+            ->assertSee(__('assets.dashboard.title'))
+            ->assertSee('Filial Analítica')
+            ->assertSee('Monitoramento')
+            ->assertSee('DASH-001')
+            ->assertSee(__('assets.dashboard.problematic_assets'));
+    }
+
+    public function test_client_cannot_access_inventory_dashboard(): void
+    {
+        $client = User::factory()->create(['role' => User::ROLE_CLIENT]);
+
+        $this->actingAs($client)
+            ->get(route('admin.assets.dashboard'))
+            ->assertForbidden();
     }
 }

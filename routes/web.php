@@ -232,6 +232,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     });
 
     // 📦 Rotas de Inventário (Assets)
+    Route::get('assets/dashboard', [\App\Http\Controllers\Admin\InventoryDashboardController::class, 'index'])->name('assets.dashboard');
     Route::get('assets/importar', [\App\Http\Controllers\Admin\AssetImportController::class, 'create'])->name('assets.import.create');
     Route::post('assets/importar', [\App\Http\Controllers\Admin\AssetImportController::class, 'store'])->name('assets.import.store');
     Route::get('assets/export', [\App\Http\Controllers\Admin\AssetController::class, 'export'])->name('assets.export');
