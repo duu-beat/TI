@@ -77,6 +77,11 @@ class Asset extends Model
         return $this->belongsTo(Supplier::class);
     }
 
+    public function warranties(): HasMany
+    {
+        return $this->hasMany(AssetWarranty::class)->latest('expires_at');
+    }
+
     /**
      * Chamados vinculados a este equipamento específico
      */

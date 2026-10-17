@@ -15,6 +15,9 @@
                 <a href="{{ route('admin.assets.transfer.create', $asset) }}" class="rounded-xl border border-amber-400/25 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-200 hover:bg-amber-500 hover:text-white transition">
                     {{ __('assets.transfer.title') }}
                 </a>
+                <a href="{{ route('admin.assets.warranties.create', $asset) }}" class="rounded-xl border border-emerald-400/25 bg-emerald-500/10 px-4 py-2 text-sm font-bold text-emerald-200 hover:bg-emerald-500 hover:text-white transition">
+                    {{ __('assets.warranties.new') }}
+                </a>
                 <a href="{{ route('admin.assets.edit', $asset) }}" class="rounded-xl bg-cyan-600 px-4 py-2 text-sm font-bold text-white hover:bg-cyan-500 transition">
                     {{ __('assets.ui.maintenance_editing') }}
                 </a>
@@ -130,6 +133,11 @@
                     </div>
                 </section>
             </div>
+
+            <section class="rounded-3xl border border-emerald-400/15 bg-slate-900/60 p-6 shadow-xl">
+                <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between"><div><p class="text-xs font-bold uppercase tracking-[0.18em] text-emerald-300">{{ __('assets.warranties.eyebrow') }}</p><h3 class="mt-1 text-lg font-bold text-white">{{ __('assets.warranties.title') }}</h3></div><a href="{{ route('admin.assets.warranties.create', $asset) }}" class="rounded-xl bg-emerald-600 px-4 py-2 text-xs font-bold text-white">{{ __('assets.warranties.new') }}</a></div>
+                <div class="mt-5 grid gap-3 xl:grid-cols-2">@forelse($asset->warranties as $warranty)<article class="rounded-2xl border border-white/10 bg-slate-950/35 p-4"><div class="flex items-start justify-between gap-3"><div><p class="text-sm font-bold text-slate-100">{{ __('assets.warranties.' . $warranty->type) }}</p><p class="mt-1 text-xs text-slate-500">{{ $warranty->starts_at->format('d/m/Y') }} — {{ $warranty->expires_at->format('d/m/Y') }} @if($warranty->supplier) · {{ $warranty->supplier->name }} @endif</p></div><span class="rounded-lg px-2 py-1 text-[10px] font-bold uppercase {{ $warranty->status() === 'active' ? 'bg-emerald-500/10 text-emerald-300' : ($warranty->status() === 'expiring' ? 'bg-amber-500/10 text-amber-300' : 'bg-rose-500/10 text-rose-300') }}">{{ $warranty->statusLabel() }}</span></div><div class="mt-3 flex flex-wrap gap-3 text-xs text-slate-500">@if($warranty->contract_number)<span>{{ __('assets.warranties.contract_number') }}: {{ $warranty->contract_number }}</span>@endif @if($warranty->invoice_number)<span>{{ __('assets.warranties.invoice_number') }}: {{ $warranty->invoice_number }}</span>@endif</div><div class="mt-4 flex gap-3"><a href="{{ route('admin.assets.warranties.edit', [$asset, $warranty]) }}" class="text-xs font-bold text-cyan-300">{{ __('assets.suppliers.edit') }}</a><form method="POST" action="{{ route('admin.assets.warranties.destroy', [$asset, $warranty]) }}" onsubmit="return confirm('{{ __('assets.warranties.confirm_delete') }}')">@csrf @method('DELETE')<button class="text-xs font-bold text-rose-300">{{ __('assets.suppliers.delete') }}</button></form></div></article>@empty<div class="xl:col-span-2 rounded-2xl border border-dashed border-white/10 px-5 py-8 text-center text-sm text-slate-500">{{ __('assets.warranties.empty') }}</div>@endforelse</div>
+            </section>
 
             <section class="rounded-3xl border border-indigo-400/15 bg-slate-900/60 p-6 shadow-xl">
                 <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">

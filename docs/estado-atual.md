@@ -2,7 +2,7 @@
 
 **Atualizado em:** 17 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** gestão de fornecedores integrada ao inventário
+**Último avanço validado:** gestão de garantias integrada aos ativos
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 116 testes aprovados.
-- 467 asserções executadas.
+- 121 testes aprovados.
+- 487 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -69,6 +69,10 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Gestão de fornecedores possui CRUD administrativo protegido por policy e exclusão lógica.
 - Ativos podem ser vinculados a fornecedores ativos; fornecedores inativos ou excluídos logicamente são rejeitados pela validação.
 - O vínculo com fornecedor é opcional e utiliza `nullOnDelete`, preservando os ativos caso o fornecedor seja removido.
+- Garantias possuem tabela própria, permitindo múltiplas garantias por ativo sem perder o histórico anterior.
+- Cada garantia registra tipo, fornecedor, contrato, nota fiscal, vigência e observações.
+- Status de garantia é calculado automaticamente como vigente, vencendo em até 90 dias ou expirada.
+- Operações de garantia verificam o vínculo entre o registro e o ativo, bloqueando acesso IDOR entre equipamentos.
 
 ## Módulos disponíveis
 
@@ -86,6 +90,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Importação de inventário por CSV com validação de linhas e histórico de criação.
 - Dashboard analítico por filial, setor, categoria, status e ativos problemáticos.
 - Gestão de fornecedores com dados comerciais, status, contagem de ativos vinculados e vínculo nos formulários de ativos.
+- Gestão de garantias por ativo, com controle de vigência, fornecedor, contrato e nota fiscal.
 - QR Code de ativos.
 - Termos digitais com assinatura.
 - Base de Conhecimento/Wiki.
@@ -120,7 +125,7 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Próximas funcionalidades
 
-- Gestão de garantias e contratos.
+- Gestão de contratos e notas fiscais.
 - Escalonamento configurável por prioridade e categoria.
 - Integração oficial com WhatsApp ou Telegram, após definição do provedor e requisitos de LGPD.
 - Recursos opcionais de IA, controlados por configuração e limite de custo.

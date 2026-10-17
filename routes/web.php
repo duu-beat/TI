@@ -258,6 +258,16 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
             Route::post('/{term}/cancelar', 'cancel')->name('cancel');
             Route::get('/{term}/pdf', 'download')->name('download');
         });
+    Route::controller(\App\Http\Controllers\Admin\AssetWarrantyController::class)
+        ->prefix('assets/{asset}/garantias')
+        ->name('assets.warranties.')
+        ->group(function () {
+            Route::get('/novo', 'create')->name('create');
+            Route::post('/', 'store')->name('store');
+            Route::get('/{warranty}/editar', 'edit')->name('edit');
+            Route::put('/{warranty}', 'update')->name('update');
+            Route::delete('/{warranty}', 'destroy')->name('destroy');
+        });
     Route::controller(\App\Http\Controllers\Admin\AssetTransferController::class)
         ->prefix('assets/{asset}/transferencia')
         ->name('assets.transfer.')
