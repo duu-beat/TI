@@ -59,6 +59,11 @@
         🏢 Filiais e Setores
     </a>
 
+    <a href="{{ route('admin.inventory.suppliers.index') }}"
+       class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.inventory.suppliers.*') ? $activeClass : $inactiveClass }}">
+        🚚 Fornecedores
+    </a>
+
     {{-- Checklists --}}
     <a href="{{ route('admin.checklists.index') }}"
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.checklists.*') ? $activeClass : $inactiveClass }}">

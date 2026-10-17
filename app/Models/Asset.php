@@ -21,6 +21,7 @@ class Asset extends Model
         'user_id',
         'branch_id',
         'sector_id',
+        'supplier_id',
         'name',
         'tag',
         'serial_number',
@@ -69,6 +70,11 @@ class Asset extends Model
     public function sector(): BelongsTo
     {
         return $this->belongsTo(Sector::class);
+    }
+
+    public function supplier(): BelongsTo
+    {
+        return $this->belongsTo(Supplier::class);
     }
 
     /**

@@ -143,6 +143,15 @@
                                 <x-input-error for="sector_id" class="mt-2" />
                             </div>
 
+                            <div>
+                                <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.supplier') }}</label>
+                                <select name="supplier_id" class="w-full bg-slate-950/50 border-white/5 rounded-2xl py-3 px-4 text-slate-200 focus:border-indigo-500/50 focus:bg-slate-900 focus:ring-4 focus:ring-indigo-500/10 outline-none transition cursor-pointer appearance-none">
+                                    <option value="">{{ __('assets.ui.without_supplier') }}</option>
+                                    @foreach($suppliers as $supplier)<option value="{{ $supplier->id }}" {{ old('supplier_id', $asset->supplier_id) == $supplier->id ? 'selected' : '' }}>{{ $supplier->name }}</option>@endforeach
+                                </select>
+                                <x-input-error for="supplier_id" class="mt-2" />
+                            </div>
+
                             {{-- Status --}}
                             <div>
                                 <label class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 block">{{ __('assets.ui.current_status') }}</label>

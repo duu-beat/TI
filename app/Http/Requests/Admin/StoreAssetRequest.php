@@ -27,6 +27,7 @@ class StoreAssetRequest extends FormRequest
                     ->where('branch_id', $this->input('branch_id'))
                     ->whereNull('deleted_at')),
             ],
+            'supplier_id' => ['nullable', 'integer', Rule::exists('suppliers', 'id')->whereNull('deleted_at')->where('is_active', true)],
             'type' => ['required', 'string', 'max:100'],
             'brand' => ['nullable', 'string', 'max:100'],
             'model' => ['nullable', 'string', 'max:100'],

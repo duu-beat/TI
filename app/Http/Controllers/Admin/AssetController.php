@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\AssetHistory;
 use App\Models\Branch;
 use App\Models\Sector;
+use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Services\AssetQrCodeService;
@@ -98,7 +99,8 @@ class AssetController extends Controller
         $users = User::query()->orderBy('name')->limit(200)->get(['id', 'name', 'email']);
         $branches = Branch::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']);
         $sectors = Sector::query()->where('is_active', true)->orderBy('name')->get(['id', 'branch_id', 'name']);
-        return view('admin.assets.create', compact('users', 'branches', 'sectors'));
+        $suppliers = Supplier::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']);
+        return view('admin.assets.create', compact('users', 'branches', 'sectors', 'suppliers'));
     }
 
     public function store(StoreAssetRequest $request)
@@ -163,7 +165,8 @@ class AssetController extends Controller
         $users = User::query()->orderBy('name')->limit(200)->get(['id', 'name', 'email']);
         $branches = Branch::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']);
         $sectors = Sector::query()->where('is_active', true)->orderBy('name')->get(['id', 'branch_id', 'name']);
-        return view('admin.assets.edit', compact('asset', 'users', 'branches', 'sectors'));
+        $suppliers = Supplier::query()->where('is_active', true)->orderBy('name')->get(['id', 'name']);
+        return view('admin.assets.edit', compact('asset', 'users', 'branches', 'sectors', 'suppliers'));
     }
 
     public function update(UpdateAssetRequest $request, Asset $asset)

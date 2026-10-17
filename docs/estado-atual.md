@@ -2,7 +2,7 @@
 
 **Atualizado em:** 17 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** dashboard analítico do inventário
+**Último avanço validado:** gestão de fornecedores integrada ao inventário
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 111 testes aprovados.
-- 444 asserções executadas.
+- 116 testes aprovados.
+- 467 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -66,6 +66,9 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Dashboard analítico do inventário protegido por policy e cacheado por cinco minutos.
 - Métricas analíticas agregam total, status, responsáveis, localização, filial, setor, categoria e ativos com mais chamados abertos.
 - Consultas de distribuição usam `whereHas` e `withCount`, mantendo compatibilidade entre SQLite e MySQL/MariaDB.
+- Gestão de fornecedores possui CRUD administrativo protegido por policy e exclusão lógica.
+- Ativos podem ser vinculados a fornecedores ativos; fornecedores inativos ou excluídos logicamente são rejeitados pela validação.
+- O vínculo com fornecedor é opcional e utiliza `nullOnDelete`, preservando os ativos caso o fornecedor seja removido.
 
 ## Módulos disponíveis
 
@@ -82,6 +85,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Transferência rastreável de ativos entre responsáveis, filiais e setores.
 - Importação de inventário por CSV com validação de linhas e histórico de criação.
 - Dashboard analítico por filial, setor, categoria, status e ativos problemáticos.
+- Gestão de fornecedores com dados comerciais, status, contagem de ativos vinculados e vínculo nos formulários de ativos.
 - QR Code de ativos.
 - Termos digitais com assinatura.
 - Base de Conhecimento/Wiki.
@@ -116,7 +120,7 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Próximas funcionalidades
 
-- Gestão de fornecedores, garantias e contratos.
+- Gestão de garantias e contratos.
 - Escalonamento configurável por prioridade e categoria.
 - Integração oficial com WhatsApp ou Telegram, após definição do provedor e requisitos de LGPD.
 - Recursos opcionais de IA, controlados por configuração e limite de custo.

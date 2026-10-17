@@ -232,6 +232,14 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     });
 
     // 📦 Rotas de Inventário (Assets)
+    Route::controller(\App\Http\Controllers\Admin\SupplierController::class)
+        ->prefix('inventario/fornecedores')->name('inventory.suppliers.')
+        ->group(function () {
+            Route::get('/', 'index')->name('index');
+            Route::post('/', 'store')->name('store');
+            Route::put('/{supplier}', 'update')->name('update');
+            Route::delete('/{supplier}', 'destroy')->name('destroy');
+        });
     Route::get('assets/dashboard', [\App\Http\Controllers\Admin\InventoryDashboardController::class, 'index'])->name('assets.dashboard');
     Route::get('assets/importar', [\App\Http\Controllers\Admin\AssetImportController::class, 'create'])->name('assets.import.create');
     Route::post('assets/importar', [\App\Http\Controllers\Admin\AssetImportController::class, 'store'])->name('assets.import.store');
