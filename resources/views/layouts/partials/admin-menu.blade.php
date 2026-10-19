@@ -41,6 +41,10 @@
        class="block rounded-xl px-4 py-2.5 text-sm {{ request()->routeIs('admin.reports.*') ? $activeClass : $inactiveClass }}">
         📊 Relatórios
     </a>
+    <a href="{{ route('admin.reports.inventory-financial') }}"
+       class="ml-4 block rounded-xl px-4 py-2 text-xs {{ request()->routeIs('admin.reports.inventory-financial') ? $activeClass : $inactiveClass }}">
+        └ Custos do Inventário
+    </a>
 
     {{-- Agenda de Visitas --}}
     <a href="{{ route('admin.visits.index') }}"

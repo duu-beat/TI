@@ -222,6 +222,7 @@ Route::middleware(['auth', 'verified', 'admin'])->prefix('admin')->name('admin.'
     Route::get('/relatorios', [\App\Http\Controllers\Admin\ReportController::class, 'index'])->name('reports.index');
     Route::get('/relatorios/exportar-pdf', [\App\Http\Controllers\Admin\ReportController::class, 'exportPdf'])->name('reports.export-pdf');
     Route::get('/relatorios/exportar-excel', [\App\Http\Controllers\Admin\ReportController::class, 'exportExcel'])->name('reports.export-excel');
+    Route::get('/relatorios/inventario-financeiro', [\App\Http\Controllers\Admin\InventoryFinancialReportController::class, 'index'])->name('reports.inventory-financial');
 
     // 📅 Rotas de Visitas Técnicas
     Route::controller(\App\Http\Controllers\Admin\TechnicalVisitController::class)->prefix('visitas')->name('visits.')->group(function () {

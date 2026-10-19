@@ -2,7 +2,7 @@
 
 **Atualizado em:** 17 de outubro de 2026
 **Branch:** `main`  
-**Último avanço validado:** gestão de contratos integrada aos ativos
+**Último avanço validado:** relatório financeiro consolidado do inventário
 
 ## Resumo
 
@@ -10,8 +10,8 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 
 ## Validações do último avanço
 
-- 126 testes aprovados.
-- 504 asserções executadas.
+- 129 testes aprovados.
+- 514 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -76,6 +76,10 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Contratos possuem tabela própria com número, tipo, fornecedor, vigência, valor, renovação automática, nota fiscal e observações.
 - Status de contratos é calculado automaticamente como vigente, vencendo em até 90 dias ou expirado.
 - Operações de contratos validam o ativo pai, impedindo acesso a contratos de outros equipamentos.
+- Relatório financeiro do inventário consolida ativos, garantias, contratos e valores por fornecedor.
+- O relatório permite filtrar um fornecedor sem misturar as opções do filtro com os dados da tabela.
+- Situações de contratos vigentes, vencendo em até 90 dias e expirados são agregadas com consultas compatíveis com SQLite e MySQL/MariaDB.
+- O relatório utiliza a mesma autorização administrativa dos relatórios de chamados; clientes recebem `403`.
 
 ## Módulos disponíveis
 
@@ -95,6 +99,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - Gestão de fornecedores com dados comerciais, status, contagem de ativos vinculados e vínculo nos formulários de ativos.
 - Gestão de garantias por ativo, com controle de vigência, fornecedor, contrato e nota fiscal.
 - Gestão de contratos por ativo, com valor, renovação automática, fornecedor e nota fiscal.
+- Relatório consolidado de garantias, contratos e custos por fornecedor.
 - QR Code de ativos.
 - Termos digitais com assinatura.
 - Base de Conhecimento/Wiki.
@@ -129,7 +134,6 @@ A duplicidade dos FormRequests de criação de chamados foi resolvida. O fluxo u
 
 ### Próximas funcionalidades
 
-- Relatórios consolidados de garantias, contratos e custos por fornecedor.
 - Escalonamento configurável por prioridade e categoria.
 - Integração oficial com WhatsApp ou Telegram, após definição do provedor e requisitos de LGPD.
 - Recursos opcionais de IA, controlados por configuração e limite de custo.
