@@ -6,13 +6,13 @@
                 <h2 class="mt-1 text-xl font-bold text-white">{{ __('assets.locations.title') }}</h2>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button type="button" @click="showBranchForm = true" class="rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-500">{{ __('assets.locations.new_branch') }}</button>
-                <button type="button" @click="showSectorForm = true" class="rounded-xl border border-indigo-400/25 bg-indigo-500/10 px-4 py-2.5 text-sm font-bold text-indigo-200 transition hover:bg-indigo-500 hover:text-white">{{ __('assets.locations.new_sector') }}</button>
+                <button type="button" @click="$dispatch('open-branch-form')" class="rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white transition hover:bg-cyan-500">{{ __('assets.locations.new_branch') }}</button>
+                <button type="button" @click="$dispatch('open-sector-form')" class="rounded-xl border border-indigo-400/25 bg-indigo-500/10 px-4 py-2.5 text-sm font-bold text-indigo-200 transition hover:bg-indigo-500 hover:text-white">{{ __('assets.locations.new_sector') }}</button>
             </div>
         </div>
     </x-slot>
 
-    <div class="py-8" x-data="{ showBranchForm: false, showSectorForm: false }">
+    <div class="py-8" x-data="{ showBranchForm: false, showSectorForm: false }" @open-branch-form.window="showBranchForm = true" @open-sector-form.window="showSectorForm = true">
         <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
             @if(session('success'))
                 <div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">{{ session('success') }}</div>

@@ -4,7 +4,7 @@ Sistema web de suporte técnico, gestão de chamados e inventário de ativos des
 
 > **Status atual:** em estabilização técnica, com os principais módulos funcionais implementados.
 >
-> **Última validação:** 129 testes aprovados e 514 asserções.
+> **Última validação:** 129 testes aprovados e 520 asserções.
 
 ## Sumário
 
@@ -67,6 +67,7 @@ O locale de desenvolvimento é preservado conforme a configuração atual do amb
 - Gestão de garantias com vigência, fornecedor, contrato e nota fiscal.
 - Gestão de contratos com valor, renovação automática, fornecedor e nota fiscal.
 - Relatório financeiro consolidado por fornecedor.
+- Botões de cadastro de filiais, setores e fornecedores com abertura funcional dos respectivos modais.
 
 ### Área Master
 
@@ -234,7 +235,7 @@ git diff --check
 A última suíte validada apresentou:
 
 - **129 testes aprovados**.
-- **514 asserções**.
+- **520 asserções**.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas.
 - Rotas compiladas.

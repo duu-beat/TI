@@ -119,7 +119,11 @@ class AssetLocationTest extends TestCase
 
         $this->actingAs($admin)
             ->get(route('admin.inventory.locations.index'))
-            ->assertOk();
+            ->assertOk()
+            ->assertSee("\$dispatch('open-branch-form')", false)
+            ->assertSee("\$dispatch('open-sector-form')", false)
+            ->assertSee('@open-branch-form.window="showBranchForm = true"', false)
+            ->assertSee('@open-sector-form.window="showSectorForm = true"', false);
 
         $this->actingAs($admin)
             ->post(route('admin.inventory.locations.branches.store'), [

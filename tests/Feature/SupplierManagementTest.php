@@ -19,7 +19,9 @@ class SupplierManagementTest extends TestCase
         $this->actingAs($admin)
             ->get(route('admin.inventory.suppliers.index'))
             ->assertOk()
-            ->assertSee(__('assets.suppliers.title'));
+            ->assertSee(__('assets.suppliers.title'))
+            ->assertSee("\$dispatch('open-supplier-form')", false)
+            ->assertSee('@open-supplier-form.window="showForm = true"', false);
 
         $this->actingAs($admin)
             ->post(route('admin.inventory.suppliers.store'), [

@@ -1,6 +1,6 @@
 # Estado atual do projeto
 
-**Atualizado em:** 17 de outubro de 2026
+**Atualizado em:** 19 de outubro de 2026
 **Branch:** `main`  
 **Último avanço validado:** relatório financeiro consolidado do inventário
 
@@ -11,7 +11,7 @@ O sistema está em fase de **estabilização técnica**, com os principais fluxo
 ## Validações do último avanço
 
 - 129 testes aprovados.
-- 514 asserções executadas.
+- 520 asserções executadas.
 - 7 testes ignorados por funcionalidades opcionais já conhecidas.
 - Views Blade compiladas com sucesso.
 - Rotas compiladas com sucesso.
@@ -80,6 +80,7 @@ O build exibiu apenas um aviso não bloqueante sobre a versão desatualizada do 
 - O relatório permite filtrar um fornecedor sem misturar as opções do filtro com os dados da tabela.
 - Situações de contratos vigentes, vencendo em até 90 dias e expirados são agregadas com consultas compatíveis com SQLite e MySQL/MariaDB.
 - O relatório utiliza a mesma autorização administrativa dos relatórios de chamados; clientes recebem `403`.
+- Os botões de novo cadastro no cabeçalho de Filiais e Setores e de Fornecedores comunicam-se com os modais por eventos Alpine, corrigindo o escopo entre o cabeçalho e o conteúdo da página.
 
 ## Módulos disponíveis
 

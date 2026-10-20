@@ -2,10 +2,10 @@
     <x-slot name="header">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div><p class="text-xs font-bold uppercase tracking-[0.2em] text-cyan-400">{{ __('assets.suppliers.eyebrow') }}</p><h2 class="mt-1 text-xl font-bold text-white">{{ __('assets.suppliers.title') }}</h2></div>
-            <button type="button" @click="showForm = true" class="rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-500">{{ __('assets.suppliers.new') }}</button>
+            <button type="button" @click="$dispatch('open-supplier-form')" class="rounded-xl bg-cyan-600 px-4 py-2.5 text-sm font-bold text-white hover:bg-cyan-500">{{ __('assets.suppliers.new') }}</button>
         </div>
     </x-slot>
-    <div class="py-8" x-data="{ showForm: false }">
+    <div class="py-8" x-data="{ showForm: false }" @open-supplier-form.window="showForm = true">
         <div class="mx-auto max-w-7xl space-y-6 px-4 sm:px-6 lg:px-8">
             @if(session('success'))<div class="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 px-4 py-3 text-sm font-semibold text-emerald-300">{{ session('success') }}</div>@endif
             @if($errors->any())<div class="rounded-2xl border border-rose-400/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-200"><p class="font-bold">{{ __('assets.suppliers.validation_title') }}</p><ul class="mt-2 list-disc pl-5">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
